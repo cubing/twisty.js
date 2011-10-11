@@ -127,6 +127,7 @@ $(document).ready(function() {
   reloadCube();
 
   $("#cubeDimension").bind("input", reDimensionCube);
+  $("#allow_dragging").bind("change", reloadCube);
   $("#sticker_border").bind("change", reloadCube);
 
   $("#alg_ccc").bind("click", function() {
@@ -179,6 +180,7 @@ $(document).ready(function() {
       "type": "cube",
       "dimension": currentCubeSize,
       "stickerBorder": $("#sticker_border").is(':checked'),
+      allowDragging: $("#allow_dragging").is(':checked'),
       showFps: true
     });
     $("#cubeDimension").blur(); 

@@ -26,10 +26,6 @@ Started by Lucas Garron, July 2011.
 
 
 ## Bugs and Features
-- Solved Detection / Timer Stop
-- Proper timing and animation handling.
-- Resize canvas on div resize.
-- Always fit twisty fully inside canvas
 - Animate based on time, not steps
 - Update speed before move (reproduce: queue lots of moves; after they're done, the next move is instant, the one after that normal).
   - Rethink speed control in general.
