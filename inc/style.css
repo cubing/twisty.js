@@ -205,7 +205,7 @@ div.right {
   border-radius: 8px;
 }
 
-.canvasFocused {
+#twistyContainer {
   background-color: #EAEAEA;
   background-image:
     -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
