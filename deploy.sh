@@ -10,4 +10,4 @@ echo "${NEW_CACHE_MANIFEST}" > "${MANIFEST_FILE}"
 
 
 # Currently only works for lgarron.
-rsync -avz . lusaka.dreamhost.com:~/cubing.net/twisty.js
+rsync -avz --delete --exclude .DS_Store --exclude .git --exclude deploy.sh . lusaka.dreamhost.com:~/cubing.net/twisty.js
