@@ -366,13 +366,13 @@ twistyjs.TwistyScene = function() {
 
   var pendingAnimationLoop = null;
   function stopAnimation() {
-    if(pendingAnimationLoop != null) {
+    if(pendingAnimationLoop !== null) {
       cancelRequestAnimFrame(pendingAnimationLoop);
       pendingAnimationLoop = null;
     }
   }
   function startAnimation() {
-    if(pendingAnimationLoop == null) {
+    if(pendingAnimationLoop === null) {
       //log("Starting move queue: " + movesToString(moveQueue));
       startMove();
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
@@ -389,7 +389,7 @@ twistyjs.TwistyScene = function() {
     // That was fun, lets do it again!
     // We check pendingAnimationLoop first, because the loop
     // may have been cancelled during stepAnimation().
-    if(pendingAnimationLoop != null) {
+    if(pendingAnimationLoop !== null) {
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
     }
   }
