@@ -3,18 +3,17 @@
 
 <title>twisty.js</title>
 
-<link href="inc/style.css" rel="stylesheet" media="screen"
-  type="text/css" />
+<link href="inc/css/style.css" rel="stylesheet" media="screen" type="text/css" />
 
-<script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+<script type="text/javascript" src="inc/lib/jquery-1.6.min.js"></script>
 
-<script type="text/javascript" src="inc/Three.js"></script>
-<script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
-<script type="text/javascript" src="inc/Stats.js"></script>
+<script type="text/javascript" src="inc/lib/Three.js"></script>
+<script type="text/javascript" src="inc/lib/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/lib/Stats.js"></script>
 
-<script src="inc/twisty_alg.js" type="text/javascript"></script>
-<script src="inc/twisty.js" type="text/javascript"></script>
-<script src="inc/twisty_demo.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty_demo.js" type="text/javascript"></script>
 
 </head>
 <body>
@@ -36,7 +35,7 @@
             <input id="cubeDimension" placeholder="Cube Dimension"
               type="number" min="1" max="12" step="1" value="3" /> <br>
             
-            <input type="checkbox" id="allow_dragging"/>
+            <input type="checkbox" id="allow_dragging" checked="true"/>
             <label for="allow_dragging">Allow Dragging</label>
             <input type="checkbox" id="sticker_border"/>
             <label for="sticker_border">Sticker Border</label>
@@ -66,13 +65,12 @@
       </p>
       </div>
 
-      <h2>Info</h2>
+      <h2>twisty.js Info</h2>
       <div class="padded">
         <p class="spacey">
-          twisty.js - by <a href="http://www.garron.us/">Lucas
-            Garron</a> <br> Notes: <a href="README.md">README.md</a> <br>
+          Notes: <a href="README.md">README.md</a> <br>
           <span style="font-variant: small-caps;">GitHub</span>: <a
-            href="https://github.com/lgarron/twisty.js">lgarron/twisty.js</a>
+            href="https://github.com/cubing/twisty.js">cubing/twisty.js</a>
           <br> 3D Library: <a
             href="https://github.com/mrdoob/three.js/">three.js</a> (by
           mrdoob)

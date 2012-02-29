@@ -149,7 +149,7 @@ $(document).ready(function() {
   twistyScene.cam(0);
 
   $("#enableOfflineSupport").bind("click", function() {
-    window.location.href = "offline.html";
+    window.location.href = "inc/offline/offline.html";
   });
 
   $("#createCanvasPNG").bind("click", function() {
@@ -175,7 +175,7 @@ $(document).ready(function() {
   }
 
   function reloadCube() {
-    log(currentCubeSize);
+    log("Current cube size: " + currentCubeSize);
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,

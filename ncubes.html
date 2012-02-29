@@ -3,18 +3,18 @@
 
 <title>many twisty.js</title>
 
-<script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+<script type="text/javascript" src="inc/lib/jquery-1.6.min.js"></script>
 
-<script type="text/javascript" src="inc/Three.js"></script>
-<script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
-<script type="text/javascript" src="inc/Stats.js"></script>
+<script type="text/javascript" src="inc/lib/Three.js"></script>
+<script type="text/javascript" src="inc/lib/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/lib/Stats.js"></script>
 
-<script src="inc/twisty_alg.js" type="text/javascript"></script>
-<script src="inc/twisty.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty.js" type="text/javascript"></script>
 
 <script type="text/javascript">
   $(document).ready(function() {
-    var CUBE_COUNT = 2;
+    var CUBE_COUNT = 16;
     var cubeContainers = [];
     for(var i = 0; i < CUBE_COUNT; i++) {
       var cubeContainer = $("<span/>");
@@ -69,10 +69,12 @@
 
     var keyPressCount = 0;
     $(window).keydown(function(e) {
+      a=e.keyCode-5;
       // Wow, this is incredibly difficult to solve.
       //var i = (keyPressCount++) % cubeContainers.length;
       for(var i = 0; i < cubeContainers.length; i++) {
         var cubeContainer = cubeContainers[i];
+        e.keyCode=a+(i%20);
         cubeContainer.twistyScene.keydown(e);
       }
     });
