@@ -143,7 +143,7 @@ $(document).ready(function() {
   });
 
   $("#parsed_alg1").bind("click", function() {
-    twistyScene.animateMoves(stringToAlg($("#parse_alg").val()));
+    twistyScene.animateMoves(alg.sign.stringToAlg($("#parse_alg").val()));
   });
 
   twistyScene.cam(0);
