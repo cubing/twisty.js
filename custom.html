@@ -1,0 +1,95 @@
+<html>
+<head>
+
+<title>twisty.js</title>
+
+<link href="inc/css/style.css" rel="stylesheet" media="screen" type="text/css" />
+
+<script type="text/javascript" src="inc/lib/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="inc/lib/Three.js"></script>
+<script type="text/javascript" src="inc/lib/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/lib/Stats.js"></script>
+
+<script src="inc/twisty/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+
+    var dynColors = [
+            {color: 0xffffff, opacity: 1},
+            {color: 0xff8800, opacity: 1},
+            {color: 0x008800, opacity: 1},
+            {color: 0xff0000, opacity: 1},
+            {color: 0x0000ff, opacity: 1},
+            {color: 0xffff00, opacity: 1},
+            {color: 0x888888, opacity: 0.5},
+        ];
+
+    var match3 = function(a, b) {
+        return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
+    }
+
+    var colorFunctions = {
+        "identity": (function(i){return i;}),
+        "one_edge": (function(i, su, sv){
+            if (match3([i, su, sv], [0, 1, 2])||match3([i, su, sv], [2, 1, 0])) {
+                return i;
+            }
+            else {
+                return 6;
+            }
+        }),
+        "edgesOnly": (function(i, su, sv){
+            if ((su + sv) % 2 === 1 || (su==1 && sv == 1)) {
+                return i;
+            }
+            else {
+                return 6;
+            }
+        })
+    }
+
+    var makeCube = function(colorFunctionName) {
+
+        var cubeContainer = $("#cube");
+
+        var twistyScene = new twistyjs.TwistyScene({
+          renderer: "Canvas",
+          cameraHeight: 1.5
+        });
+
+        twistyScene.initializeTwisty({
+          type: "cube",
+          dimension: 3,
+          faceColors: dynColors,
+          colorFunction: colorFunctions[colorFunctionName]
+        });
+
+        cubeContainer.append($(twistyScene.getDomElement()));
+        cubeContainer.twistyScene = twistyScene;
+
+        twistyScene.resize();
+
+        $(window).keydown(function(e) {
+                cubeContainer.twistyScene.keydown(e);
+        });
+
+        return twistyScene;
+    };
+
+  $(document).ready(function() {
+    var t1 = makeCube("edgesOnly");
+
+  });
+</script>
+
+</head>
+<body>
+
+<div id="cube">
+</div>
+
+</body>
+</html>
