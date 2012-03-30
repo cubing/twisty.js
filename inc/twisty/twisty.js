@@ -71,7 +71,7 @@ twistyjs.registerTwisty = function(twistyName, twistyConstructor) {
   twisties[twistyName] = twistyConstructor;
 };
 
-twistyjs.TwistyScene = function() {
+twistyjs.TwistyScene = function(options) {
   // that=this is a Crockford convention for accessing "this" inside of methods.
   var that = this;
 
@@ -84,6 +84,10 @@ twistyjs.TwistyScene = function() {
   var camera, scene, renderer;
   var twistyCanvas;
   var cameraTheta = 0;
+  var cameraHeight = 2;
+  if (options && typeof options.cameraHeight !== "null") {
+    cameraHeight = options.cameraHeight;
+  }
 
   var stats = null;
 
@@ -137,7 +141,12 @@ twistyjs.TwistyScene = function() {
      * Go!
      */
 
-    renderer = new THREE.CanvasRenderer();
+    if (options && typeof options.renderer !== "null" && options.renderer == "WebGL") {
+      renderer = new THREE.WebGLRenderer();
+    }
+    else {
+      renderer = new THREE.CanvasRenderer();
+    }
     twistyCanvas = renderer.domElement;
 
     twistyContainer.appendChild(twistyCanvas);
@@ -180,20 +189,6 @@ twistyjs.TwistyScene = function() {
     var keyCode = e.keyCode;
     //log(keyCode);
     twisty.keydownCallback(twisty, e);
-
-    switch (keyCode) {
-
-      case 37:
-        moveCameraDelta(Math.TAU/48);
-        e.preventDefault();
-        break;
-
-      case 39:
-        moveCameraDelta(-Math.TAU/48);
-        e.preventDefault();
-        break;
-
-    }
   };
 
 
@@ -256,7 +251,8 @@ twistyjs.TwistyScene = function() {
 
   function moveCameraPure(theta) {
     cameraTheta = theta;
-    camera.position = new THREE.Vector3(2.5*Math.sin(theta), 2, 2.5*Math.cos(theta));
+    var scale = 4/(cameraHeight+2);
+    camera.position = new THREE.Vector3(2.5*Math.sin(theta)*scale, cameraHeight, 2.5*Math.cos(theta)*scale);
   }
 
   function moveCameraDelta(deltaTheta) {
@@ -530,6 +526,7 @@ twistyjs.TwistyScene = function() {
       "opacity": 1,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
+      "colorFunction": (function(i, su, sv){return i;}),
       "scale": 1,
     };
 
@@ -548,9 +545,10 @@ twistyjs.TwistyScene = function() {
     var materials = [];
     var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } );
     borderMaterial.opacity = cubeOptions["opacity"];
-    for (var i = 0; i < numSides; i++) {
-      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
-      material.opacity = cubeOptions["opacity"];
+    for (var i = 0; i < cubeOptions["faceColors"].length; i++) {
+      console.log(cubeOptions["faceColors"][i]);
+      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i].color });
+      material.opacity = cubeOptions["faceColors"][i].opacity;
       materials.push(material);
     }
 
@@ -625,8 +623,8 @@ twistyjs.TwistyScene = function() {
 
         var sticker = new THREE.Object3D();
 
-        
-        var meshes = [ materials[i] ];
+        var colorMeshIndex = cubeOptions["colorFunction"](i, su, sv);
+        var meshes = [ materials[colorMeshIndex] ];
         if (cubeOptions["stickerBorder"]) {
           meshes.push(borderMaterial);
         }
