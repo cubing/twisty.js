@@ -3,11 +3,11 @@ var alg = (function (){
 
   var debug = false;
 
-  var sign = (function(){
+  var sign_w = (function(){
   
     //TODO 20110906: Slice moves.
-    var pattern = /((\d*)-)?(\d*)([UFRBLDufrbldxyz])([\d]*)('?)/g;
-    var pattern_move = /^((\d*)-)?(\d*)([UFRBLDufrbldxyz])([\d]*)('?)$/;
+    var pattern = /((\d*)-)?(\d*)([UFRBLDufrbldxyz]w?)([\d]*)('?)/g;
+    var pattern_move = /^((\d*)-)?(\d*)([UFRBLDufrbldxyz]w?)([\d]*)('?)$/;
 
     function stringToMove(moveString) {
 
@@ -21,7 +21,7 @@ var alg = (function (){
       var baseMove = parts[4]; 
       var amount = 1;
 
-      if (/[UFRBLD]/g.test(baseMove)) {
+      if (/^[UFRBLD]$/g.test(baseMove)) {
         var outEndSliceParsed = parseInt(parts[3]);
         if (!isNaN(outEndSliceParsed )) {
           outStartSlice = outEndSliceParsed;
@@ -29,9 +29,10 @@ var alg = (function (){
         }
       }
 
-      if (/[ufrbld]/g.test(baseMove)) {
+      if (/^[ufrbld]$/g.test(baseMove) ||
+          /^[UFRBLD]w$/g.test(baseMove)) {
 
-        baseMove = baseMove.toUpperCase();
+        baseMove = baseMove[0].toUpperCase();
         outEndSlice = 2;
 
         var outEndSliceParsed = parseInt(parts[3]);
@@ -45,7 +46,7 @@ var alg = (function (){
         }
       }
 
-      if (/[xyz]/g.test(baseMove)) {
+      if (/^[xyz]$/g.test(baseMove)) {
      
         outStartSlice = 1;
         outEndSlice = -1;
@@ -110,6 +111,6 @@ var alg = (function (){
   })();
 
   return {
-    sign: sign
+    sign_w: sign_w
   }
 })();
