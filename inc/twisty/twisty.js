@@ -806,10 +806,10 @@ twistyjs.TwistyScene = function() {
       85: [iS, oS+1, "R", 1],
       82: [iS, oS+1, "L", -1],
       77: [iS, oS+1, "R", -1],
-      86: [iS, oS+1, "L", 1],
+      86: [iS, oS, "F", -1],
       84: [iS, iSi, "L", -1],
       89: [iS, iSi, "R", 1],
-      78: [iS, iSi, "R", -1],
+      78: [iS, oS, "F", 1],
       66: [iS, iSi, "L", 1],
       190: [2, 2, "R", 1],//M'
       80: [iS, iSi, "F", 1],//y
