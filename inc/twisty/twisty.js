@@ -546,7 +546,7 @@ twistyjs.TwistyScene = function() {
 
     // Cube Materials
     var materials = [];
-    var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } );
+    var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1 } );
     borderMaterial.opacity = cubeOptions["opacity"];
     for (var i = 0; i < numSides; i++) {
       var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
