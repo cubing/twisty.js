@@ -130,6 +130,7 @@ twistyjs.TwistyScene = function() {
      * 3D Object Creation
      */
 
+    // TODO: Rename and spec twisty format.
     twisty = createTwisty(twistyType);
     scene.addObject(twisty["3d"]);
 
@@ -148,9 +149,9 @@ twistyjs.TwistyScene = function() {
 
     if(twistyType.allowDragging) {
       $(twistyContainer).css('cursor', 'move');
-      twistyContainer.addEventListener( 'mousedown', onDocumentMouseDown, false );
-      twistyContainer.addEventListener( 'touchstart', onDocumentTouchStart, false );
-      twistyContainer.addEventListener( 'touchmove', onDocumentTouchMove, false );
+      twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
+      twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
+      twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
     }
 
 
@@ -206,40 +207,38 @@ twistyjs.TwistyScene = function() {
     moveCamera(theta);
   }
 
-  function onDocumentMouseDown( event ) {
+  var rotating = false;
+
+  function onMouseDown( event ) {
+    console.log(event);
     event.preventDefault();
-    twistyContainer.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    twistyContainer.addEventListener( 'mouseup', onDocumentMouseUp, false );
-    twistyContainer.addEventListener( 'mouseout', onDocumentMouseOut, false );
+    rotating = true;
     mouseXLast = event.clientX;
   }
 
-  function onDocumentMouseMove( event ) {
-    mouseX = event.clientX;
-    that.cam((mouseXLast - mouseX)/256);
-    mouseXLast = mouseX;
+  function onMouseMove( event ) {
+    if (rotating) {
+      mouseX = event.clientX;
+      that.cam((mouseXLast - mouseX)/256);
+      mouseXLast = mouseX;
+    }
   }
 
-  function onDocumentMouseUp( event ) {
-    twistyContainer.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-    twistyContainer.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-    twistyContainer.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+  function onMouseUp( event ) {
+    rotating = false;
   }
 
-  function onDocumentMouseOut( event ) {
-    twistyContainer.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-    twistyContainer.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-    twistyContainer.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-  }
+  document.body.addEventListener( 'mousemove', onMouseMove, false );
+  document.body.addEventListener( 'mouseup', onMouseUp, false );
 
-  function onDocumentTouchStart( event ) {
+  function onTouchStart( event ) {
     if ( event.touches.length == 1 ) {
       event.preventDefault();
       mouseXLast = event.touches[0].pageX;
     }
   }
 
-  function onDocumentTouchMove( event ) {
+  function onTouchMove( event ) {
     if ( event.touches.length == 1 ) {
       event.preventDefault();
       mouseX = event.touches[0].pageX;
