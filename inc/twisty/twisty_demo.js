@@ -174,11 +174,32 @@ $(document).ready(function() {
     resetTimer();
   }
 
+  // From alg.garron.us
+  function escapeAlg(algstr){return algstr.replace(/\n/g, '%0A').replace(/-/g, '%2D').replace(/\'/g, '-').replace(/ /g, '_');}
+
+
+  function algUpdateCallback(alg_moves) {
+    var dim = $("#cubeDimension").val();
+    var algString = alg.sign_w.algToString(alg_moves, dim);
+    console.log(algString);
+    var text;
+    if (algString == "") {
+      $("#typed_alg").removeAttr("href")
+      $("#typed_alg").text("[Algorithm]");
+    }
+    else {
+      var url = "http://alg.garron.us/?alg=" + escapeAlg(algString);
+      $("#typed_alg").attr("href", url);
+      $("#typed_alg").text(algString);
+    }
+  }
+
   function reloadCube() {
     log("Current cube size: " + currentCubeSize);
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,
+      "algUpdateCallback": algUpdateCallback,
       "stickerBorder": $("#sticker_border").is(':checked'),
       allowDragging: $("#allow_dragging").is(':checked'),
       showFps: true

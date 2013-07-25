@@ -526,6 +526,7 @@ twistyjs.TwistyScene = function() {
       "stickerBorder": true,
       "stickerWidth": 1.8,
       "doubleSided": true,
+      "algUpdateCallback": null,
       "opacity": 1,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
@@ -733,6 +734,8 @@ twistyjs.TwistyScene = function() {
 
     }
 
+    var cumulativeAlgorithm = [];
+
     var advanceMoveCallback = function(twisty, currentMove) {
 
       var rott = matrix4Power(sidesRot[currentMove[2]], currentMove[3]);
@@ -761,6 +764,11 @@ twistyjs.TwistyScene = function() {
         }
       }
 
+      cumulativeAlgorithm.push(currentMove);
+      if (twisty["options"]["algUpdateCallback"]) {
+        console.log(cumulativeAlgorithm);
+        twisty["options"]["algUpdateCallback"](cumulativeAlgorithm);
+      }
     };
 
     function generateScramble(twisty) {
