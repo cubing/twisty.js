@@ -105,6 +105,15 @@ div.right {
   text-align: center;
 }
 
+#typed_alg {
+  font-size: 150%;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 #timer {
   background: #ACE;
   padding: 4px;
