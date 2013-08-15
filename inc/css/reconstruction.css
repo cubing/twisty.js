@@ -1,0 +1,32 @@
+div.left {
+  width: 67%;
+  padding: 10px;
+}
+
+div.right {
+  width: 33%;
+}
+
+div.reconstruction {
+  font-size: 200%;
+  font-family: Helvetica;
+}
+
+div.reconstruction div.row {
+  border: 1px solid #888;
+  padding: 2px 4px;
+}
+
+div.reconstruction div.comment {
+  display: inline;
+  font-family: monospace;
+  font-size: 130%;
+  color: #080;
+}
+
+div.reconstruction .label {
+  text-decoration: underline;
+}
+
+div.scramble {
+>

@@ -1,0 +1,115 @@
+<html>
+<head>
+
+<title>twisty.js</title>
+
+<link href="inc/css/style.css" rel="stylesheet" media="screen" type="text/css" />
+<link href="inc/css/reconstruction.css" rel="stylesheet" media="screen" type="text/css" />
+
+<script type="text/javascript" src="inc/lib/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="inc/lib/Three.js"></script>
+<script type="text/javascript" src="inc/lib/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/lib/Stats.js"></script>
+
+<script src="inc/twisty/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty.js" type="text/javascript"></script>
+<script src="inc/twisty/twisty_demo.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+  <div class="header">
+    <h1 class="title">
+      <a href="http://www.cubing.net/">cubing.net</a> &rarr; <a
+        href="./">twisty.js</a>
+    </h1>
+  </div>
+
+  <div class="content">
+
+    <div class="left">
+
+<div class="padded reconstruction">
+<div class="label">Scramble</div>
+<div class="scramble">U' B2 L2 D2 F2 U L2 D' B' L' U' R F2 D2 F U' R D'</div>
+<br>
+<div>
+<div class="label">Solve</div>
+<div class="row">x' <div class="comment">// inspection</div></div>
+<div class="row">R D R D R' <div class="comment">// cross</div></div>
+<div class="row">U R U R' y' U' R' U R <div class="comment">// 1st pair</div></div>
+<div class="row">d R' F R F' R' U' R <div class="comment">// 2nd pair</div></div>
+<div class="row">U R U R' <div class="comment">// 3rd pair</div></div>
+<div class="row">U' L' U2 L U L' U2 L <div class="comment">// 4th pair</div></div>
+<div class="row">r U2' R' U' R U' r' <div class="comment">// OLL(CP)</div></div>
+<div class="row">U' R U' R U R U R U' R' U' R2 U' <div class="comment">// EPLL</div></div>
+</div>
+</div>
+
+
+
+      <h2>Controls</h2>
+      <div class="padded center">
+          <p class="spacey">
+            <input id="cubeDimension" placeholder="Cube Dimension"
+              type="number" min="1" max="12" step="1" value="3" /> <br>
+            
+            <input type="checkbox" id="allow_dragging" checked="true"/>
+            <label for="allow_dragging">Allow Dragging</label>
+            <input type="checkbox" id="sticker_border" checked="true" />
+            <label for="sticker_border">Sticker Border</label>
+
+            <br>
+            <button id="alg_ccc">Cube-in-Cube-in-Cube</button>
+            <button id="lucasparity">lucasparity</button>
+            <button id="alg_superflip">Superflip</button>
+            
+            <br><br>
+            <input id="parse_alg" placeholder="Alg to parse."
+              type="text" value = "R U R' U R U2 R'"/>
+            <button id="parsed_alg1">Animate Alg (no slice moves)</button>
+            
+          </p>
+      </div>
+
+      <h2>Experimental Features</h2>
+      <div class="padded center">
+      <p class="spacey">
+        <button id="enableOfflineSupport">Enable Offline Access</button>
+        <button id="createCanvasPNG">Generate PNG image from
+          Canvas</button>
+      <div id="canvasPNG"></div>
+      <a id="typed_alg">[Algorithm]</a>
+      <br>
+      <br>
+      <div id="timer"></div>
+      </p>
+      </div>
+
+      <h2>twisty.js Info</h2>
+      <div class="padded">
+        <p class="spacey">
+          Notes: <a href="README.md">README.md</a> <br>
+          <span style="font-variant: small-caps;">GitHub</span>: <a
+            href="https://github.com/cubing/twisty.js">cubing/twisty.js</a>
+          <br> 3D Library: <a
+            href="https://github.com/mrdoob/three.js/">three.js</a> (by
+          mrdoob)
+        </p>
+      </div>
+
+      <h2>Debug</h2>
+      <div class="padded">
+        <div id="debug" class="hi">[Debug Panel]</div>
+      </div>
+
+
+    </div>
+    <div class="right checkered" id="twistyContainer">
+    </div>
+
+  </div>
+
+</body>
+</html>
