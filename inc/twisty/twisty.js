@@ -158,7 +158,13 @@ twistyjs.TwistyScene = function() {
     if(twistyType.showFps) {
       startStats();
     }
-    // resize creates the camera and calls render()
+
+    camera = new THREE.Camera( 1000, 1, 0, 1000 );
+    //moveCameraPure(0);
+    
+
+    // Keeps the entire cube in view while rotating:
+
     that.resize();
   }
 
@@ -166,9 +172,6 @@ twistyjs.TwistyScene = function() {
     // This function should be called after setting twistyContainer
     // to the desired size.
     var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
-    camera = new THREE.Camera( 30, 1, 0, 1000 );
-    moveCameraPure(0);
-    camera.target.position = new THREE.Vector3(0, -0.075, 0);
     renderer.setSize(min, min);
     $(twistyCanvas).css('position', 'absolute');
     $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
@@ -256,6 +259,8 @@ twistyjs.TwistyScene = function() {
   function moveCameraPure(theta) {
     cameraTheta = theta;
     camera.position = new THREE.Vector3(2.5*Math.sin(theta), 2, 2.5*Math.cos(theta));
+
+    camera.position = new THREE.Vector3(0, -0.42, 0.001);
   }
 
   function moveCameraDelta(deltaTheta) {

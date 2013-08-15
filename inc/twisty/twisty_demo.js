@@ -205,7 +205,6 @@ $(document).ready(function() {
       showFps: true
     });
     $("#cubeDimension").blur(); 
-    twistyScene.resize();
     cubeState = CubeState.solved;
     resetTimer();
   }
