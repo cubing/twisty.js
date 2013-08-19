@@ -133,10 +133,10 @@ for (var i = 0; i < numSides; i++) {
 
       var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes);
       stickerInterior.doubleSided = cubeOptions["doubleSided"];
-      sticker.addChild(stickerInterior);
+      sticker.children.push(stickerInterior);
 
       var positionMatrix = new THREE.Matrix4();
-      positionMatrix.setTranslation(
+      positionMatrix.makeTranslation(
           su*2 - cubeOptions["dimension"] + 1,
           -(sv*2 - cubeOptions["dimension"] + 1),
           cubeOptions["dimension"]
@@ -144,14 +144,14 @@ for (var i = 0; i < numSides; i++) {
 
       var transformationMatrix = new THREE.Matrix4();
       transformationMatrix.copy(sidesUV[i]);
-      transformationMatrix.multiplySelf(positionMatrix);
+      transformationMatrix.multiply(positionMatrix);
       sticker.matrix.copy(transformationMatrix); 
 
       sticker.matrixAutoUpdate = false;
-      sticker.update();
+      sticker.updateMatrix();
 
       facePieces.push([transformationMatrix, sticker]);
-      cubeObject.addChild(sticker);    
+      cubeObject.children.push(sticker);    
 
       }
     }
