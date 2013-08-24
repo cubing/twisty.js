@@ -165,12 +165,13 @@ twistyjs.TwistyScene = function() {
   this.resize = function() {
     // This function should be called after setting twistyContainer
     // to the desired size.
-    var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
-    camera = new THREE.PerspectiveCamera( 30, 1, 0, 1000 );
-    renderer.setSize(min, min);
-    $(twistyCanvas).css('position', 'absolute');
-    $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
-    $(twistyCanvas).css('left', ($(twistyContainer).width()-min)/2);
+
+    var w = $(twistyContainer).width();
+    var h = $(twistyContainer).height();
+    camera = new THREE.PerspectiveCamera( 30, w/h, 0.001, 1000 );
+    renderer.setSize(w, h);
+
+    moveCameraDelta(0);
 
     render();
   };
@@ -256,7 +257,7 @@ twistyjs.TwistyScene = function() {
     camera.position.x = 2.5*Math.sin(theta)
     camera.position.y = 2
     camera.position.z = 2.5*Math.cos(theta);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.lookAt(new THREE.Vector3(0, -0.075, 0));
   }
 
   function moveCameraDelta(deltaTheta) {
