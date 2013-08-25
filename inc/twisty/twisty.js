@@ -254,10 +254,12 @@ twistyjs.TwistyScene = function() {
 
   function moveCameraPure(theta) {
     cameraTheta = theta;
-    camera.position.x = 2.5*Math.sin(theta)
-    camera.position.y = 2
-    camera.position.z = 2.5*Math.cos(theta);
-    camera.lookAt(new THREE.Vector3(0, -0.075, 0));
+    scale = twisty.cameraScale();
+    console.log(scale);
+    camera.position.x = 2.5*Math.sin(theta) * scale;
+    camera.position.y = 2 * scale;
+    camera.position.z = 2.5*Math.cos(theta) * scale;
+    camera.lookAt(new THREE.Vector3(0, -0.075 * scale, 0));
   }
 
   function moveCameraDelta(deltaTheta) {

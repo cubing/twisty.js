@@ -37,7 +37,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1 } );
   borderMaterial.opacity = cubeOptions["opacity"];
   for (var i = 0; i < numSides; i++) {
-    var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
+    var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i], overdraw: 0.5 });
     material.opacity = cubeOptions["opacity"];
     materials.push(material);
   }
@@ -111,9 +111,6 @@ for (var i = 0; i < numSides; i++) {
   for (var su = 0; su < cubeOptions["dimension"]; su++) {
     for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-      var sticker = new THREE.Object3D();
-
-      
       var meshes = [ materials[i] ];
       if (cubeOptions["stickerBorder"]) {
         meshes.push(borderMaterial);
@@ -131,28 +128,24 @@ for (var i = 0; i < numSides; i++) {
         sticker.addChild(border);
       */
 
-      var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes);
-      stickerInterior.doubleSided = cubeOptions["doubleSided"];
-      sticker.children.push(stickerInterior);
+      meshes[0].side = THREE.DoubleSide;
+      var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes[0]);
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
           su*2 - cubeOptions["dimension"] + 1,
           -(sv*2 - cubeOptions["dimension"] + 1),
           cubeOptions["dimension"]
-      );    
+      );
 
       var transformationMatrix = new THREE.Matrix4();
       transformationMatrix.copy(sidesUV[i]);
       transformationMatrix.multiply(positionMatrix);
-      sticker.matrix.copy(transformationMatrix); 
 
-      sticker.matrixAutoUpdate = false;
-      sticker.updateMatrix();
+      sticker.applyMatrix(transformationMatrix);
 
       facePieces.push([transformationMatrix, sticker]);
-      cubeObject.children.push(sticker);    
-
+      cubeObject.children.push(sticker);
       }
     }
   }
@@ -161,8 +154,10 @@ for (var i = 0; i < numSides; i++) {
     return m.n14*v.x + m.n24*v.y + m.n34*v.z;
   }
 
-  var actualScale = cubeOptions["scale"] * 0.5 / cubeOptions["dimension"];
-  cubeObject.scale = new THREE.Vector3(actualScale, actualScale, actualScale);
+  var actualScale = 2 * cubeOptions["dimension"] / cubeOptions["scale"];
+  function cameraScale() {
+    return actualScale;
+  }
 
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
@@ -427,6 +422,7 @@ for (var i = 0; i < numSides; i++) {
     "options": cubeOptions,
     "3d": cubeObject,
     "cubePieces": cubePieces,
+    "cameraScale": cameraScale,
     "animateMoveCallback": animateMoveCallback,
     "advanceMoveCallback": advanceMoveCallback,
     "keydownCallback": keydownCallback,
