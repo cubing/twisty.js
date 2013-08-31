@@ -151,7 +151,7 @@ for (var i = 0; i < numSides; i++) {
   }
 
   function matrixVector3Dot(m, v) {
-    return m.n14*v.x + m.n24*v.y + m.n34*v.z;
+    return m.elements[3]*v.x + m.elements[7]*v.y + m.elements[11]*v.z;
   }
 
   var actualScale = 2 * cubeOptions["dimension"] / cubeOptions["scale"];
@@ -161,8 +161,9 @@ for (var i = 0; i < numSides; i++) {
 
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
+
     var rott = new THREE.Matrix4();
-    rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
+    rott.makeRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
     var state = twisty["cubePieces"];
 
@@ -182,16 +183,16 @@ for (var i = 0; i < numSides; i++) {
         }
 
         var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
+        console.log(layer);
         if (
             layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
             &&
             layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
            ) {
              var roty = rott.clone();
-             roty.multiplySelf(sticker[0]);
+             roty.multiply(sticker[0]);
 
-             sticker[1].matrix.copy(roty);
-             sticker[1].update();
+             sticker[1].applyMatrix(roty);
            }
       }
     }
@@ -202,15 +203,15 @@ for (var i = 0; i < numSides; i++) {
 
     var matrix = null;
     if (power < 0) {
-      var matrixIdentity = new THREE.Matrix4();
-      matrix = THREE.Matrix4.makeInvert(inMatrix, matrixIdentity);
+      matrix = new THREE.Matrix4();
+      matrix.getInverse(inMatrix);
     } else {
       matrix = inMatrix.clone();
     }
 
     var out = new THREE.Matrix4();
     for (var i=0; i < Math.abs(power); i++) {
-      out.multiplySelf(matrix);
+      out.multiply(matrix);
     }
 
     return out;
@@ -238,11 +239,11 @@ for (var i = 0; i < numSides; i++) {
             layer > twisty["options"]["dimension"] - 2*currentMove[1] - 0.5
            ) {
              var roty = rott.clone();
-             roty.multiplySelf(sticker[0]);
+             roty.multiply(sticker[0]);
 
-             sticker[1].matrix.copy(roty);
-             sticker[0].copy(roty);
-             sticker[1].update();
+             sticker[1].setMatrix(roty);
+             sticker[0] = roty;
+             //sticker[1].update();
            }
       }
     }
