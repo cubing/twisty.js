@@ -115,21 +115,23 @@ for (var i = 0; i < numSides; i++) {
       if (cubeOptions["stickerBorder"]) {
         meshes.push(borderMaterial);
       }
-      /* This is here purely for speed comparison purposes.
-       if (cubeOptions["stickerBorder"]) {
+
+       // if (cubeOptions["stickerBorder"]) {
         var geometry = new THREE.Geometry();
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
-
-        sticker.addChild(border);
-      */
+        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2, opacity: cubeOptions.opacity } ) );
+//      var border = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes[1]);
+// }
 
       meshes[0].side = THREE.DoubleSide;
-      var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes[0]);
+      var sticker = new THREE.Object3D();
+      var innerSticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes[0]);
+      sticker.add(innerSticker);
+      sticker.add(border);
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
@@ -143,9 +145,11 @@ for (var i = 0; i < numSides; i++) {
       transformationMatrix.multiply(positionMatrix);
 
       sticker.applyMatrix(transformationMatrix);
+      border.applyMatrix(transformationMatrix);
 
       facePieces.push([transformationMatrix, sticker]);
       cubeObject.children.push(sticker);
+      // cubeObject.children.push(border);
       }
     }
   }
