@@ -12,6 +12,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   //Defaults
   var cubeOptions = {
     "stickerBorder": true,
+    "cubies": true,
     "stickerWidth": 1.8,
     "doubleSided": true,
     "algUpdateCallback": null,
@@ -117,6 +118,12 @@ var borderTemplate = new THREE.Line( borderGeometry, new THREE.LineBasicMaterial
 
 var innerTemplate = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]));
 
+var w = 1.95;
+var cubieGeometry = new THREE.CubeGeometry(w, w, w);
+var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
+cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
+cubieTemplate.translateZ(-1);
+
 //Cube Object Generation
 for (var i = 0; i < numSides; i++) {
   var facePieces = [];
@@ -130,6 +137,11 @@ for (var i = 0; i < numSides; i++) {
 
   if (cubeOptions["stickerBorder"]) {
     stickerTemplate.add(borderTemplate.clone());
+  }
+
+  if (cubeOptions["cubies"]) {
+    // Easiest to make this one per sticker for now. Can be optimized later.
+    stickerTemplate.add(cubieTemplate.clone());
   }
 
   for (var su = 0; su < cubeOptions["dimension"]; su++) {
