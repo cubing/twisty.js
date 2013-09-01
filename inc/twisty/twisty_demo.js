@@ -180,18 +180,18 @@ $(document).ready(function() {
 
   function algUpdateCallback(alg_moves) {
     var dim = $("#cubeDimension").val();
-    var algString = alg.sign_w.algToString(alg_moves, dim);
-    console.log(algString);
-    var text;
-    if (algString == "") {
-      $("#typed_alg").removeAttr("href")
-      $("#typed_alg").text("[Algorithm]");
-    }
-    else {
-      var url = "http://alg.garron.us/?alg=" + escapeAlg(algString);
-      $("#typed_alg").attr("href", url);
-      $("#typed_alg").text(algString);
-    }
+    // var algString = alg.sign_w.algToString(alg_moves, dim);
+    // console.log(algString);
+    // var text;
+    // if (algString == "") {
+    //   $("#typed_alg").removeAttr("href")
+    //   $("#typed_alg").text("[Algorithm]");
+    // }
+    // else {
+    //   var url = "http://alg.garron.us/?alg=" + escapeAlg(algString);
+    //   $("#typed_alg").attr("href", url);
+    //   $("#typed_alg").text(algString);
+    // }
   }
 
   function reloadCube() {
