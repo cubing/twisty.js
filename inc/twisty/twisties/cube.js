@@ -99,13 +99,13 @@ var sidesUV = [
                ];
 
 var borderGeometry = new THREE.Geometry();
-var c = cubeOptions["stickerWidth"]/2;
+var c = cubeOptions["stickerWidth"]*0.51;
 borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(+c, -c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(+c, +c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(-c, +c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
-var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 4, opacity: cubeOptions.opacity});
+var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 8, opacity: cubeOptions.opacity});
 var borderTemplate = new THREE.Line(borderGeometry, borderMaterial);
 
 var innerGeometry = new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]);
