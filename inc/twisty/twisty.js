@@ -16,32 +16,6 @@ if(typeof(log) == "undefined") {
   };
 }
 
-// This fixes https://github.com/lgarron/twisty.js/issues/3
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function (oThis) {
-    if (typeof this !== "function") {
-      // closest thing possible to the ECMAScript 5 internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    }
-
-    var fSlice = Array.prototype.slice,
-        aArgs = fSlice.call(arguments, 1), 
-        fToBind = this, 
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP
-                                 ? this
-                                 : oThis || window,
-                               aArgs.concat(fSlice.call(arguments)));
-        };
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
-}
-
 if(typeof(assert) == "undefined") {
   // TODO - this is pretty lame, we could use something like stacktrace.js
   // to get some useful information here.
@@ -254,10 +228,12 @@ twistyjs.TwistyScene = function() {
 
   function moveCameraPure(theta) {
     cameraTheta = theta;
-    camera.position.x = 2.5*Math.sin(theta)
-    camera.position.y = 2
-    camera.position.z = 2.5*Math.cos(theta);
-    camera.lookAt(new THREE.Vector3(0, -0.075, 0));
+    scale = twisty.cameraScale();
+    console.log(scale);
+    camera.position.x = 2.5*Math.sin(theta) * scale;
+    camera.position.y = 2 * scale;
+    camera.position.z = 2.5*Math.cos(theta) * scale;
+    camera.lookAt(new THREE.Vector3(0, -0.075 * scale, 0));
   }
 
   function moveCameraDelta(deltaTheta) {
