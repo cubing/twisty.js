@@ -12,7 +12,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   //Defaults
   var cubeOptions = {
     "stickerBorder": true,
-    "cubies": true,
+    "cubies": false,
     "stickerWidth": 1.8,
     "doubleSided": true,
     "algUpdateCallback": null,
@@ -35,8 +35,6 @@ function createCubeTwisty(twistyScene, twistyParameters) {
 
   // Cube Materials
   var materials = [];
-  var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1 } );
-  borderMaterial.opacity = cubeOptions["opacity"];
   for (var i = 0; i < numSides; i++) {
     var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i], overdraw: 0.5 });
     material.opacity = cubeOptions["opacity"];
@@ -65,15 +63,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   var yyi = new THREE.Vector3(0, -1, 0);
   var zzi = new THREE.Vector3(0, 0, -1);
 
-  var side_index = {
-    "U": 0,
-    "L": 1,
-    "F": 2,
-    "R": 3,
-    "B": 4,
-    "D": 5
-  };
-  var index_side = [ "U", "L", "F", "R", "B", "D" ];
+  // var index_side = [ "U", "L", "F", "R", "B", "D" ];
 
   var sidesRot = {
     "U": axify(zz, yy, xxi),
@@ -109,14 +99,17 @@ var sidesUV = [
                ];
 
 var borderGeometry = new THREE.Geometry();
-borderGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-borderGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-borderGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-borderGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-borderGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-var borderTemplate = new THREE.Line( borderGeometry, new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 4, opacity: cubeOptions.opacity } ) );
+var c = cubeOptions["stickerWidth"]/2;
+borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
+borderGeometry.vertices.push( new THREE.Vector3(+c, -c, 0) );
+borderGeometry.vertices.push( new THREE.Vector3(+c, +c, 0) );
+borderGeometry.vertices.push( new THREE.Vector3(-c, +c, 0) );
+borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
+var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 4, opacity: cubeOptions.opacity});
+var borderTemplate = new THREE.Line(borderGeometry, borderMaterial);
 
-var innerTemplate = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]));
+var innerGeometry = new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]);
+var innerTemplate = new THREE.Mesh(innerGeometry);
 
 var w = 1.95;
 var cubieGeometry = new THREE.CubeGeometry(w, w, w);
@@ -156,8 +149,9 @@ for (var i = 0; i < numSides; i++) {
           cubeOptions["dimension"]
       );
 
+      positionMatrix.multiply(sidesUV[i]);
+
       sticker.applyMatrix(positionMatrix);
-      sticker.applyMatrix(sidesUV[i]);
 
       facePieces.push([positionMatrix, sticker]);
       cubeObject.add(sticker);
@@ -167,7 +161,7 @@ for (var i = 0; i < numSides; i++) {
   }
 
   function matrixVector3Dot(m, v) {
-    return m.n14*v.x + m.n24*v.y + m.n34*v.z;
+    return m.elements[12]*v.x + m.elements[13]*v.y + m.elements[14]*v.z;
   }
 
   var actualScale = 2 * cubeOptions["dimension"] / cubeOptions["scale"];
@@ -175,10 +169,13 @@ for (var i = 0; i < numSides; i++) {
     return actualScale;
   }
 
+  var lastMoveProgress = 0;
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
     var rott = new THREE.Matrix4();
-    rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
+    //rott.makeRotationAxis(sidesRotAxis[currentMove[2]], (moveProgress - lastMoveProgress) * currentMove[3] * Math.TAU/4);
+    lastMoveProgress = moveProgress;
+    rott.makeRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
     var state = twisty["cubePieces"];
 
@@ -204,10 +201,18 @@ for (var i = 0; i < numSides; i++) {
             layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
            ) {
              var roty = rott.clone();
-             roty.multiplySelf(sticker[0]);
+             roty.multiply(sticker[0]);
 
-             sticker[1].matrix.copy(roty);
-             sticker[1].update();
+             // console.log(sticker[1].position);
+             // console.log(sticker[1].rotation);
+             //  sticker[1].position.set(0,0,0);
+             //  sticker[1].rotation.set(0,0,0);
+             //  sticker[1].quaternion.set(0,0,0);
+             sticker[1].matrix.identity();
+              sticker[1].applyMatrix(roty);
+             // sticker[1].matrixAutoUpdate = false;
+             // sticker[1].matrix = rott;
+             // sticker[1].updateMatrix();
            }
       }
     }
@@ -226,7 +231,7 @@ for (var i = 0; i < numSides; i++) {
 
     var out = new THREE.Matrix4();
     for (var i=0; i < Math.abs(power); i++) {
-      out.multiplySelf(matrix);
+      out.multiply(matrix);
     }
 
     return out;
