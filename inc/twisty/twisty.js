@@ -62,6 +62,8 @@ twistyjs.TwistyScene = function() {
   var twistyCanvas;
   var cameraTheta = 0;
 
+  var twistyTypeCached;
+
   var stats = null;
 
   /* http://tauday.com/ ;-) */
@@ -89,6 +91,9 @@ twistyjs.TwistyScene = function() {
     moveList = [];
     currentMoveIdx = -1;
     moveProgress = 0;
+
+    twistyTypeCached = twistyType;
+
     // We may have an animation queued up that is tied to the twistyCanvas.
     // Since we're about to destroy our twistyCanvas, that animation request
     // will never fire. Thus, we must explicitly stop animating here.
@@ -305,6 +310,19 @@ twistyjs.TwistyScene = function() {
     }
     render();
   };
+
+  this.setIndex = function(idx) {
+    var moveListSaved = moveList;
+    console.log("blabla");
+    that.initializeTwisty(twistyTypeCached); // Hack
+    console.log("bleble");
+    moveList = moveListSaved;
+    while (currentMoveIdx < idx) {
+      startMove();
+      twisty["advanceMoveCallback"](twisty, currentMove());
+    }
+    render();
+  }
 
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {

@@ -109,6 +109,8 @@ var CubeState = {
 };
 var cubeState = null;
 
+var twistyScene;
+
 $(document).ready(function() {
 
   /*
@@ -120,7 +122,7 @@ $(document).ready(function() {
 
   log("Document ready.");
 
-  var twistyScene = new twistyjs.TwistyScene();
+  twistyScene = new twistyjs.TwistyScene();
   $("#twistyContainer").append($(twistyScene.getDomElement()));
 
   var currentCubeSize = parseInt($("#cubeDimension").val());
