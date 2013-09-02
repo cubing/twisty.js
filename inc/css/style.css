@@ -54,7 +54,7 @@ h1 a:hover {
 }
 
 div.header {
-  height: 96px;
+  height: 0;
   background: #ACE;
   z-index: 10;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
@@ -63,7 +63,7 @@ div.header {
 div.content {
   background: #E0F0FF;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
-  margin-top: 96px;
+  margin-top: 0;
   position: absolute;
   top: 0;
   left: 0;
