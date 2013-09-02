@@ -303,6 +303,7 @@ twistyjs.TwistyScene = function() {
   };
 
   this.stopAnimation = stopAnimation;
+  this.startAnimation = startAnimation;
 
   this.applyMoves = function(moves) {
     moveList = moveList.concat(moves);
@@ -312,6 +313,10 @@ twistyjs.TwistyScene = function() {
     }
     render();
   };
+
+  this.debug = function() {
+    console.log(currentMoveIdx);
+  }
 
   this.getMoveList = function() {
     return moveList;
@@ -332,7 +337,7 @@ twistyjs.TwistyScene = function() {
 
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
-    animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
+    //animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
   }
 
   var animationStep = 0.1;
