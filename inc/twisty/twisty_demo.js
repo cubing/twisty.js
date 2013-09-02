@@ -154,8 +154,18 @@ $(document).ready(function() {
   });
 
   $("#parsed_alg2").bind("click", function() {
-    twistyScene.addMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
-    twistyScene.setIndex(-1);
+    var init = alg.sign_w.stringToAlg($("#init").val());
+    var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
+    var type = $("#solver").is(':checked') ? "solver" : "generator";
+
+    twistyScene.setupAnimation(
+      algo,
+      {
+        init: init,
+        type: type
+      }
+    );
+
     moveList = twistyScene.getMoveList();
     var pl = $("#playback_alg");
     pl.empty();

@@ -65,6 +65,7 @@ twistyjs.TwistyScene = function() {
   var twistyTypeCached;
 
   var stats = null;
+  var mode = null;
 
   /* http://tauday.com/ ;-) */
   Math.TAU = Math.PI*2;
@@ -137,12 +138,42 @@ twistyjs.TwistyScene = function() {
       twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
     }
 
+    mode = null;
+
 
     if(twistyType.showFps) {
       startStats();
     }
     // resize creates the camera and calls render()
     that.resize();
+  }
+
+  this.setupAnimation = function(algIn, opts) {
+    opts = opts || {};
+    opts.init = (typeof opts.init === "undefined") ? [] : opts.init;
+    if (opts.type !== "solver") { opts.type = "generator"; }
+
+    console.log("---");
+    console.log(opts.init);
+    console.log(opts.type);
+
+    mode = "playback";
+
+    that.applyMoves(opts.init);
+
+    if (opts.type === "solver") {
+      console.log("alg", algIn);
+      var algInverse = alg.sign_w.invert(algIn);
+      console.log("alg", algInverse);
+      that.applyMoves(algInverse);
+      render();
+    }
+
+    that.addMoves(algIn);
+    stopAnimation();
+    currentMoveIdx = -1;
+
+    updateSpeed();
   }
 
   this.resize = function() {
@@ -330,32 +361,19 @@ twistyjs.TwistyScene = function() {
     render();
   }
 
-  this.setupAnimation = function(algIn, opts) {
-    opts = opts || {};
-    opts.init = opts.init || [];
-    if (opts.kind !== "solver") { opts.kind = "generator"; }
-
-    that.applyMoves(opts.init);
-
-    if (opts.kind === "generator") {
-      console.log("alg", algIn);
-      var algInverse = alg.sign_w.invert(algIn);
-      console.log("alg", algInverse);
-      that.applyMoves(algInverse);
-      render();
-    }
-
-    that.addMoves(algIn);
-    stopAnimation();
-    currentMoveIdx = -1;
-  }
-
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
-    //animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
+    if (mode === "playback") {
+      animationStep = defaultAnimationStep;
+    }
+    else {
+      animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
+    }
+
   }
 
-  var animationStep = 0.1;
+  var defaultAnimationStep = 0.1;
+  var animationStep = defaultAnimationStep;
 
   function stepAnimation() {
     moveProgress += animationStep;
