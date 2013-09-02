@@ -155,7 +155,7 @@ $(document).ready(function() {
 
   $("#parsed_alg2").bind("click", function() {
     twistyScene.addMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
-    twistyScene.stopAnimation();
+    twistyScene.setIndex(-1);
     moveList = twistyScene.getMoveList();
     var pl = $("#playback_alg");
     pl.empty();
@@ -169,7 +169,6 @@ $(document).ready(function() {
 
     f("Click:", -1);
     for (var i = 0; i < moveList.length; i += 1) {
-      console.log(moveList[i])
       moveString = alg.sign_w.algToString([moveList[i]]);
       f(moveString, i);
     }
@@ -274,7 +273,7 @@ $(document).ready(function() {
           // want to start the timer when that's happening, so we keep track
           // of the fact that we're scrambling.
           cubeState = CubeState.scrambling;
-          twistyScene.applyMoves(scramble);
+          twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
           cubeState = CubeState.scrambled;
           resetTimer();
         }

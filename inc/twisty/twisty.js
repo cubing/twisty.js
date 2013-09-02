@@ -305,10 +305,8 @@ twistyjs.TwistyScene = function() {
   this.startAnimation = startAnimation;
 
   this.applyMoves = function(moves) {
-    moveList = moveList.concat(moves);
-    while (currentMoveIdx+1 < moveList.length) {
-      startMove();
-      twisty["advanceMoveCallback"](twisty, currentMove());
+    for (i in moves) {
+      twisty["advanceMoveCallback"](twisty, moves[i]);
     }
     render();
   };
@@ -330,6 +328,26 @@ twistyjs.TwistyScene = function() {
       twisty["advanceMoveCallback"](twisty, currentMove());
     }
     render();
+  }
+
+  this.setupAnimation = function(algIn, opts) {
+    opts = opts || {};
+    opts.init = opts.init || [];
+    if (opts.kind !== "solver") { opts.kind = "generator"; }
+
+    that.applyMoves(opts.init);
+
+    if (opts.kind === "generator") {
+      console.log("alg", algIn);
+      var algInverse = alg.sign_w.invert(algIn);
+      console.log("alg", algInverse);
+      that.applyMoves(algInverse);
+      render();
+    }
+
+    that.addMoves(algIn);
+    stopAnimation();
+    currentMoveIdx = -1;
   }
 
   //TODO: Make time-based / framerate-compensating

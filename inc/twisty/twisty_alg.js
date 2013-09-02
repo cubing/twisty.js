@@ -193,9 +193,20 @@ var alg = (function (){
       return moveStrings.join(" ");
     }
 
+    function invert(algIn) {
+      var algInverse = [];
+      for (i in algIn) {
+        var move = algIn[i].slice(0); // Copy array.
+        move[3] *= -1;
+        algInverse.push(move);
+      }
+      return algInverse.reverse();
+    }
+
     return {
       algToString: algToString,
-      stringToAlg: stringToAlg
+      stringToAlg: stringToAlg,
+      invert: invert
     }
   })();
 
