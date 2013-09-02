@@ -301,6 +301,7 @@ twistyjs.TwistyScene = function() {
     updateSpeed();
   };
 
+  this.stopAnimation = stopAnimation;
 
   this.applyMoves = function(moves) {
     moveList = moveList.concat(moves);
@@ -310,6 +311,10 @@ twistyjs.TwistyScene = function() {
     }
     render();
   };
+
+  this.getMoveList = function() {
+    return moveList;
+  }
 
   this.setIndex = function(idx) {
     var moveListSaved = moveList;

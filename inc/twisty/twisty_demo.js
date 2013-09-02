@@ -148,6 +148,28 @@ $(document).ready(function() {
     twistyScene.animateMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
   });
 
+  $("#parsed_alg2").bind("click", function() {
+    twistyScene.addMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
+    twistyScene.stopAnimation();
+    moveList = twistyScene.getMoveList();
+    var pl = $("#playback_alg");
+    pl.empty();
+
+    function f(str, i) {
+      var el = $("<span>", {text: str});
+      var f = (function(idx) {twistyScene.setIndex(idx);}).bind(this, i);
+      el.click(f);
+      pl.append(el);
+    }
+
+    f("_", -1);
+    for (var i = 0; i < moveList.length; i += 1) {
+      console.log(moveList[i])
+      moveString = alg.sign_w.algToString([moveList[i]]);
+      f(moveString, i);
+    }
+  });
+
   twistyScene.cam(0);
 
   $("#enableOfflineSupport").bind("click", function() {

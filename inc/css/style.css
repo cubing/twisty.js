@@ -73,9 +73,9 @@ div.content {
 }
 
 div.left {
-  width: 33%;
+  width: 50%;
   height: 100%;
-  left: 0px;
+  right: 0px;
   position: absolute;
   overflow-y: auto;
   
@@ -84,9 +84,9 @@ div.left {
 }
 
 div.right {
-  width: 67%;
+  width: 50%;
   height: 100%;
-  right: 0px;
+  left: 0px;
   position: absolute;
 }
 
@@ -103,6 +103,19 @@ div.right {
 #cubeDimension {
   border-radius: 8px;
   text-align: center;
+}
+
+#playback_alg {
+  font-size: 200%;
+}
+
+#playback_alg span {
+  margin: 0em 0.1em;
+}
+
+#playback_alg span:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 #typed_alg {
