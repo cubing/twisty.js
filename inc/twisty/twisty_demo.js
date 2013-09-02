@@ -162,7 +162,7 @@ $(document).ready(function() {
       pl.append(el);
     }
 
-    f("_", -1);
+    f("Click:", -1);
     for (var i = 0; i < moveList.length; i += 1) {
       console.log(moveList[i])
       moveString = alg.sign_w.algToString([moveList[i]]);
