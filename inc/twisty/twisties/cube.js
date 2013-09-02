@@ -176,6 +176,7 @@ for (var i = 0; i < numSides; i++) {
     var rott = new THREE.Matrix4();
     //rott.makeRotationAxis(sidesRotAxis[currentMove[2]], (moveProgress - lastMoveProgress) * currentMove[3] * Math.TAU/4);
     lastMoveProgress = moveProgress;
+    console.log(currentMove);
     rott.makeRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
     var state = twisty["cubePieces"];

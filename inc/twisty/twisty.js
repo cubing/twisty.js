@@ -52,8 +52,11 @@ twistyjs.TwistyScene = function() {
   var twisty = null;
 
   var moveProgress = null;
-  var currentMove = null;
-  var moveQueue = [];
+  var currentMoveIdx = -1;
+  var moveList = [];
+  function currentMove() {
+    return moveList[currentMoveIdx];
+  }
 
   var camera, scene, renderer;
   var twistyCanvas;
@@ -83,8 +86,8 @@ twistyjs.TwistyScene = function() {
   };
 
   this.initializeTwisty = function(twistyType) {
-    moveQueue = [];
-    currentMove = null;
+    moveList = [];
+    currentMoveIdx = -1;
     moveProgress = 0;
     // We may have an animation queued up that is tied to the twistyCanvas.
     // Since we're about to destroy our twistyCanvas, that animation request
@@ -270,15 +273,16 @@ twistyjs.TwistyScene = function() {
   function startMove() {
     moveProgress = 0;
 
-    currentMove = moveQueue.shift();
+    currentMoveIdx += 1;
+    console.log("new");
     //log(moveToString(currentMove));
-    fireMoveStarted(currentMove);
+    fireMoveStarted(currentMove());
   }
 
   //TODO 20110906: Handle illegal moves robustly.
   function queueMoves(moves) {
-    moveQueue = moveQueue.concat(moves);
-    if (moveQueue.length > 0) {
+    moveList = moveList.concat(moves);
+    if (moveList.length > 0) {
       startAnimation();
     }
   }
@@ -294,17 +298,17 @@ twistyjs.TwistyScene = function() {
 
 
   this.applyMoves = function(moves) {
-    moveQueue = moves;
-    while (moveQueue.length > 0) {
+    moveList = moveList.concat(moves);
+    while (currentMoveIdx+1 < moveList.length) {
       startMove();
-      twisty["advanceMoveCallback"](twisty, currentMove);
+      twisty["advanceMoveCallback"](twisty, currentMove());
     }
     render();
   };
 
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
-    animationStep = Math.min(0.15 + 0.1*moveQueue.length, 1);
+    animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
   }
 
   var animationStep = 0.1;
@@ -313,15 +317,16 @@ twistyjs.TwistyScene = function() {
     moveProgress += animationStep;
 
     if (moveProgress < 1) {
-      twisty["animateMoveCallback"](twisty, currentMove, moveProgress);
+      console.log("blabla", currentMoveIdx, moveList);
+      twisty["animateMoveCallback"](twisty, currentMove(), moveProgress);
     }
     else {
-      twisty["advanceMoveCallback"](twisty, currentMove);
+      twisty["advanceMoveCallback"](twisty, currentMove());
 
-      fireMoveEnded(currentMove);
-      currentMove = null;
+      fireMoveEnded(currentMove());
+      //currentMoveIdx = -1;
 
-      if (moveQueue.length == 0) {
+      if (currentMoveIdx + 1 >= moveList.length) {
         stopAnimation();
       }
       else {
@@ -350,7 +355,7 @@ twistyjs.TwistyScene = function() {
   }
   function startAnimation() {
     if(pendingAnimationLoop === null) {
-      //log("Starting move queue: " + movesToString(moveQueue));
+      //log("Starting move queue: " + movesToString(moveList));
       startMove();
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
     }
