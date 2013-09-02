@@ -97,7 +97,6 @@ var alg = (function (){
     }
 
     function algSimplify(alg) {
-          console.log("start");
       var algOut = [];
       for (var i = 0; i < alg.length; i++) {
         var move = alg[i];
@@ -114,9 +113,8 @@ var alg = (function (){
         else {
           algOut.push(move.slice(0));
         }
-        console.log(JSON.stringify(algOut));
+        //console.log(JSON.stringify(algOut));
       }
-      console.log("end");
       return algOut;
     }
 

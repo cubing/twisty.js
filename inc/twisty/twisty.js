@@ -280,7 +280,6 @@ twistyjs.TwistyScene = function() {
     moveProgress = 0;
 
     currentMoveIdx += 1;
-    console.log("new");
     //log(moveToString(currentMove));
     fireMoveStarted(currentMove());
   }
@@ -324,9 +323,7 @@ twistyjs.TwistyScene = function() {
 
   this.setIndex = function(idx) {
     var moveListSaved = moveList;
-    console.log("blabla");
     that.initializeTwisty(twistyTypeCached); // Hack
-    console.log("bleble");
     moveList = moveListSaved;
     while (currentMoveIdx < idx) {
       startMove();
@@ -346,7 +343,6 @@ twistyjs.TwistyScene = function() {
     moveProgress += animationStep;
 
     if (moveProgress < 1) {
-      console.log("blabla", currentMoveIdx, moveList);
       twisty["animateMoveCallback"](twisty, currentMove(), moveProgress);
     }
     else {

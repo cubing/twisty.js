@@ -156,7 +156,6 @@ $(document).ready(function() {
   $("#parsed_alg2").bind("click", function() {
     twistyScene.addMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
     twistyScene.stopAnimation();
-    twistyScene.setIndex(-1);
     moveList = twistyScene.getMoveList();
     var pl = $("#playback_alg");
     pl.empty();
