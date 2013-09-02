@@ -120,7 +120,8 @@ twistyjs.TwistyScene = function() {
      * Go!
      */
 
-    renderer = new THREE.CanvasRenderer();
+    rendererType = twistyType.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
+    renderer = new rendererType({antialias: true});
     twistyCanvas = renderer.domElement;
 
     twistyContainer.appendChild(twistyCanvas);

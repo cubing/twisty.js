@@ -140,6 +140,8 @@ $(document).ready(function() {
     twistyScene.animateMoves(lucasparity);
   });
 
+  $('input[name="renderer"]').click(reloadCube);
+
   $("#alg_superflip").bind("click", function() {
     twistyScene.animateMoves(superflip);
   });
@@ -220,9 +222,13 @@ $(document).ready(function() {
 
   function reloadCube() {
     log("Current cube size: " + currentCubeSize);
+
+    renderer = THREE[$('input[name="renderer"]:checked').val() + "Renderer"]; //TODO: Unsafe
+
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,
+      "renderer": renderer,
       "algUpdateCallback": algUpdateCallback,
       "stickerBorder": $("#sticker_border").is(':checked'),
       allowDragging: $("#allow_dragging").is(':checked'),
