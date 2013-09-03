@@ -138,7 +138,7 @@ twistyjs.TwistyScene = function() {
       twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
     }
 
-    mode = null;
+    var mode = null;
 
 
     if(twistyType.showFps) {
@@ -160,12 +160,14 @@ twistyjs.TwistyScene = function() {
     mode = "playback";
 
     that.applyMoves(opts.init);
+    preMoves = opts.init;
 
     if (opts.type === "solve") {
       console.log("alg", algIn);
       var algInverse = alg.sign_w.invert(algIn);
       console.log("alg", algInverse);
       that.applyMoves(algInverse);
+      preMoves = preMoves.concat(algInverse);
       render();
     }
 
@@ -350,10 +352,15 @@ twistyjs.TwistyScene = function() {
     return moveList;
   }
 
+  var preMoves;
+
   this.setIndex = function(idx) {
     var moveListSaved = moveList;
     that.initializeTwisty(twistyTypeCached); // Hack
     moveList = moveListSaved;
+    if (mode === "playback") {
+      that.applyMoves(preMoves);
+    }
     while (currentMoveIdx < idx) {
       startMove();
       twisty["advanceMoveCallback"](twisty, currentMove());
