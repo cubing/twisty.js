@@ -149,6 +149,12 @@ $(document).ready(function() {
 
   $("#play").click(twistyScene.startAnimation);
   $("#pause").click(twistyScene.stopAnimation);
+  $("#rewind").click(function() {
+    twistyScene.setIndex(-1);
+  });
+  $("#fast_forward").click(function() {
+    twistyScene.setIndex(twistyScene.getMoveList().length-1);
+  });
 
   $("#alg_superflip").bind("click", function() {
     twistyScene.animateMoves(superflip);
