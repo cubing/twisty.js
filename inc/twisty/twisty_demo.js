@@ -131,6 +131,7 @@ $(document).ready(function() {
   $("#cubeDimension").bind("input", reDimensionCube);
   $("#allow_dragging").bind("change", reloadCube);
   $("#sticker_border").bind("change", reloadCube);
+  $("#cubies").bind("change", reloadCube);
   $("#hint_stickers").bind("change", reloadCube);
 
   $('input[name="stage"]').bind("change", reloadCube);
@@ -247,6 +248,7 @@ $(document).ready(function() {
       "renderer": renderer,
       "stage": stage,
       "algUpdateCallback": algUpdateCallback,
+      "cubies": $("#cubies").is(':checked'),
       "hintStickers": $("#hint_stickers").is(':checked'),
       "stickerBorder": $("#sticker_border").is(':checked'),
       allowDragging: $("#allow_dragging").is(':checked'),
