@@ -60,14 +60,18 @@
             Stage:
             <input type="radio" name="stage" value="full" id="stage_full" checked="true"></input>
             <label for="stage_full">Full</label>
-            <input type="radio" name="stage" value="PLL" id="stage_PLL" checked="true"></input>
+            <input type="radio" name="stage" value="F2L" id="stage_F2L"></input>
+            <label for="stage_F2L">F2L</label>
+            <input type="radio" name="stage" value="PLL" id="stage_PLL"></input>
             <label for="stage_PLL">PLL</label>
+            <input type="radio" name="stage" value="OLL" id="stage_OLL"></input>
+            <label for="stage_OLL">OLL</label>
             
             <br>
             Init: <input id="init" placeholder="Init." type="text" value = ""/>
             <br>
             <input id="parse_alg" placeholder="Alg to parse." type="text" value = "R2 U R U R' U' R' U' R' U R'"/>
-            <input type="checkbox" id="solver" checked="true"/><label for="solver">Solver</label>
+            <input type="checkbox" id="solve" checked="true"/><label for="solve">Solve</label>
             <br>
             <button id="parsed_alg1">Animate Alg (no slice moves)</button>
             <button id="parsed_alg2">Dynamic Playback</button>

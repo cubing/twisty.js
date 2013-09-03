@@ -151,7 +151,7 @@ twistyjs.TwistyScene = function() {
   this.setupAnimation = function(algIn, opts) {
     opts = opts || {};
     opts.init = (typeof opts.init === "undefined") ? [] : opts.init;
-    if (opts.type !== "solver") { opts.type = "generator"; }
+    if (opts.type !== "solve") { opts.type = "gen"; }
 
     console.log("---");
     console.log(opts.init);
@@ -161,7 +161,7 @@ twistyjs.TwistyScene = function() {
 
     that.applyMoves(opts.init);
 
-    if (opts.type === "solver") {
+    if (opts.type === "solve") {
       console.log("alg", algIn);
       var algInverse = alg.sign_w.invert(algIn);
       console.log("alg", algInverse);

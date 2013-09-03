@@ -131,6 +131,7 @@ $(document).ready(function() {
   $("#cubeDimension").bind("input", reDimensionCube);
   $("#allow_dragging").bind("change", reloadCube);
   $("#sticker_border").bind("change", reloadCube);
+  $('input[name="stage"]').bind("change", reloadCube);
 
   $("#alg_ccc").bind("click", function() {
     twistyScene.animateMoves(makeCCC(parseInt($("#cubeDimension").val())));
@@ -156,7 +157,7 @@ $(document).ready(function() {
   $("#parsed_alg2").bind("click", function() {
     var init = alg.sign_w.stringToAlg($("#init").val());
     var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
-    var type = $("#solver").is(':checked') ? "solver" : "generator";
+    var type = $("#solve").is(':checked') ? "solve" : "gen";
 
     twistyScene.setupAnimation(
       algo,
