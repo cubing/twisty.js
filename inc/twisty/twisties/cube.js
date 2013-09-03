@@ -141,6 +141,7 @@ for (var i = 0; i < numSides; i++) {
     for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
       sticker = stickerTemplate.clone();
+      sticker.children[0].material = materials[su+sv];
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
