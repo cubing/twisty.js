@@ -151,7 +151,7 @@ twistyjs.TwistyScene = function() {
   this.setupAnimation = function(algIn, opts) {
     opts = opts || {};
     opts.init = (typeof opts.init === "undefined") ? [] : opts.init;
-    if (opts.type !== "solve") { opts.type = "gen"; }
+    if (opts.type !== "solve") { opts.type = "generator"; }
 
     console.log("---");
     console.log(opts.init);

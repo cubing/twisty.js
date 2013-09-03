@@ -16,6 +16,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
     "stickerWidth": 1.8,
     "doubleSided": true,
     "algUpdateCallback": null,
+    "hintStickers": false,
     "opacity": 1,
     "dimension": 3,
     "colors": [0x444444, 0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00,
@@ -38,14 +39,17 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   var numSides = 6;
 
   // Cube Materials
-  var materials = [];
+  var materials = {"singleSided": [], "doubleSided": []};
   for (var i = 0; i < cubeOptions["colors"].length; i++) {
-    var material = new THREE.MeshBasicMaterial( { color: cubeOptions["colors"][i], overdraw: 0.5 });
-    material.opacity = cubeOptions["opacity"];
-    if (cubeOptions["doubleSided"]) {
-      material.side = THREE.DoubleSide;
+    for (var j = 0; j < 2; j++) {
+      var side = ["singleSided", "doubleSided"][j];
+      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["colors"][i], overdraw: 0.5 });
+      if (side === "doubleSided") {
+        material.side = THREE.DoubleSide;
+      }
+      material.opacity = cubeOptions["opacity"];
+      materials[side].push(material);
     }
-    materials.push(material);
   }
 
   // Stickering for stages.
@@ -156,11 +160,18 @@ var borderTemplate = new THREE.Line(borderGeometry, borderMaterial);
 var innerGeometry = new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]);
 var innerTemplate = new THREE.Mesh(innerGeometry);
 
+var hintGeometry = innerGeometry.clone();
+var hintTemplate = new THREE.Mesh(hintGeometry);
+hintTemplate.rotateY(Math.TAU/2);
+hintTemplate.translateZ(-3);
+
 var w = 1.95;
 var cubieGeometry = new THREE.CubeGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
 cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
 cubieTemplate.translateZ(-1);
+
+var side = cubeOptions["doubleSided"] ? "doubleSided" : "singleSided";
 
 //Cube Object Generation
 for (var i = 0; i < numSides; i++) {
@@ -170,16 +181,19 @@ for (var i = 0; i < numSides; i++) {
   var stickerTemplate = new THREE.Object3D();
 
   var innerSticker = innerTemplate.clone();
-  innerSticker.material = materials[i];
   stickerTemplate.add(innerSticker);
 
+  if (cubeOptions["hintStickers"]) {
+    stickerTemplate.add(hintTemplate);
+  }
+
   if (cubeOptions["stickerBorder"]) {
-    stickerTemplate.add(borderTemplate.clone());
+    stickerTemplate.add(borderTemplate);
   }
 
   if (cubeOptions["cubies"]) {
     // Easiest to make this one per sticker for now. Can be optimized later.
-    stickerTemplate.add(cubieTemplate.clone());
+    stickerTemplate.add(cubieTemplate);
   }
 
   for (var su = 0; su < cubeOptions["dimension"]; su++) {
@@ -187,8 +201,15 @@ for (var i = 0; i < numSides; i++) {
 
       sticker = stickerTemplate.clone();
 
-      var material = materials[stickers[i][su + 3*sv]];
+      var material = materials[side][stickers[i][su + 3*sv]];
       sticker.children[0].material = material;
+
+
+      if (cubeOptions["hintStickers"]) {
+        var material2 = materials["singleSided"][stickers[i][su + 3*sv]];
+        sticker.children[1].material = material2;
+        console.log(sticker);
+      }
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
@@ -214,6 +235,9 @@ for (var i = 0; i < numSides; i++) {
   }
 
   var actualScale = 2 * cubeOptions["dimension"] / cubeOptions["scale"];
+  if (cubeOptions["hintStickers"]) {
+    actualScale *= 1.2;
+  }
   function cameraScale() {
     return actualScale;
   }
