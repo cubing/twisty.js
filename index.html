@@ -55,12 +55,19 @@
             <label for="renderer_WebGL">WebGL</label>
             <input type="radio" name="renderer" value="SVG" id="renderer_SVG"></input>
             <label for="renderer_SVG">SVG</label>
+
+            <br>
+            Stage:
+            <input type="radio" name="stage" value="full" id="stage_full" checked="true"></input>
+            <label for="stage_full">Full</label>
+            <input type="radio" name="stage" value="PLL" id="stage_PLL" checked="true"></input>
+            <label for="stage_PLL">PLL</label>
             
             <br>
-            Init: <input id="init" placeholder="Init." type="text" value = "D2"/>
+            Init: <input id="init" placeholder="Init." type="text" value = ""/>
             <br>
-            <input id="parse_alg" placeholder="Alg to parse." type="text" value = "R U R' U R U2 R'"/>
-            <input type="checkbox" id="solver"/><label for="solver">Solver</label>
+            <input id="parse_alg" placeholder="Alg to parse." type="text" value = "R2 U R U R' U' R' U' R' U R'"/>
+            <input type="checkbox" id="solver" checked="true"/><label for="solver">Solver</label>
             <br>
             <button id="parsed_alg1">Animate Alg (no slice moves)</button>
             <button id="parsed_alg2">Dynamic Playback</button>

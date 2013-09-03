@@ -235,12 +235,14 @@ $(document).ready(function() {
   function reloadCube() {
     log("Current cube size: " + currentCubeSize);
 
-    renderer = THREE[$('input[name="renderer"]:checked').val() + "Renderer"]; //TODO: Unsafe
+    var renderer = THREE[$('input[name="renderer"]:checked').val() + "Renderer"]; //TODO: Unsafe
+    var stage = $('input[name="stage"]:checked').val();
 
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,
       "renderer": renderer,
+      "stage": stage,
       "algUpdateCallback": algUpdateCallback,
       "stickerBorder": $("#sticker_border").is(':checked'),
       allowDragging: $("#allow_dragging").is(':checked'),

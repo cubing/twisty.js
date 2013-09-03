@@ -18,9 +18,13 @@ function createCubeTwisty(twistyScene, twistyParameters) {
     "algUpdateCallback": null,
     "opacity": 1,
     "dimension": 3,
-    "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
+    "colors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00, 0x444444,
+    // TODO: Handle extra colors procedurally
+               0xaaaaaa, 0x884400, 0x008800, 0x660000, 0x000088, 0x888800, 0x222222],
+    "stage": "full",
     "scale": 1,
   };
+
 
   // Passed Parameters
   for (option in cubeOptions) {
@@ -35,13 +39,38 @@ function createCubeTwisty(twistyScene, twistyParameters) {
 
   // Cube Materials
   var materials = [];
-  for (var i = 0; i < numSides; i++) {
-    var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i], overdraw: 0.5 });
+  for (var i = 0; i < cubeOptions["colors"].length; i++) {
+    var material = new THREE.MeshBasicMaterial( { color: cubeOptions["colors"][i], overdraw: 0.5 });
     material.opacity = cubeOptions["opacity"];
     if (cubeOptions["doubleSided"]) {
       material.side = THREE.DoubleSide;
     }
     materials.push(material);
+  }
+
+  // Stickering for stages.
+  var stageStickers = {};
+  stageStickers["full"] = [
+    [0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1],
+    [2,2,2,2,2,2,2,2,2],
+    [3,3,3,3,3,3,3,3,3],
+    [4,4,4,4,4,4,4,4,4],
+    [5,5,5,5,5,5,5,5,5]
+  ];
+  stageStickers["PLL"] = [
+    [0,0,0,0,0,0,0,0,0],
+    [1,1,1,8,8,8,8,8,8],
+    [2,2,2,9,9,9,9,9,9],
+    [3,3,3,10,10,10,10,10,10],
+    [4,4,4,11,11,11,11,11,11],
+    [5,5,5,5,5,5,5,5,5]
+  ];
+
+  var stickers = stageStickers["full"];
+  console.log("sdfsdf", cubeOptions["stage"] in stageStickers);
+  if (cubeOptions["stage"] in stageStickers) {
+    stickers = stageStickers[cubeOptions["stage"]];
   }
 
   // Cube Helper Linear Algebra
@@ -141,6 +170,9 @@ for (var i = 0; i < numSides; i++) {
     for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
       sticker = stickerTemplate.clone();
+
+      var material = materials[stickers[i][su + 3*sv]];
+      sticker.children[0].material = material;
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
