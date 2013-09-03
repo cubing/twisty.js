@@ -371,19 +371,25 @@ twistyjs.TwistyScene = function() {
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
     if (mode === "playback") {
-      animationStep = defaultAnimationStep;
+      animationStep = baseAnimationStep;
     }
     else {
-      animationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
+      baseAnimationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
     }
 
   }
 
-  var defaultAnimationStep = 0.1;
-  var animationStep = defaultAnimationStep;
+  function stepAmount() {
+    var factor = 3; // Tuned constant; equals the maximum ratio of a long move vs. a quarter turn.
+    var currentAmount = Math.abs(currentMove()[3]);
+    return baseAnimationStep * currentAmount / (1 + (factor*(currentAmount - 1)));
+  }
+
+  var baseAnimationStep = 0.1;
+  var animationStep = baseAnimationStep;
 
   function stepAnimation() {
-    moveProgress += animationStep;
+    moveProgress += stepAmount();
 
     if (moveProgress < 1) {
       twisty["animateMoveCallback"](twisty, currentMove(), moveProgress);
