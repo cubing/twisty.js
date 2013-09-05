@@ -366,6 +366,11 @@ twistyjs.TwistyScene = function() {
     render();
   }
 
+  this.debug = {};
+  this.debug.getIndex = function() {
+    return currentMoveIdx;
+  }
+
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
     if (mode === "playback") {
