@@ -148,7 +148,7 @@ $(document).ready(function() {
   $('input[name="renderer"]').click(reloadCube);
 
   $("#play").click(twistyScene.startAnimation);
-  $("#pause").click(twistyScene.stopAnimation);
+  $("#pause").click(twistyScene.stopPlayback);
   $("#rewind").click(function() {
     twistyScene.setIndex(-1);
   });

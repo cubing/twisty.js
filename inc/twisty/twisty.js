@@ -345,15 +345,12 @@ twistyjs.TwistyScene = function() {
     render();
   };
 
-  this.debug = function() {
-    console.log(currentMoveIdx);
-  }
-
   this.getMoveList = function() {
     return moveList;
   }
 
   var preMoves;
+  var stopPlaybackSoon = false;
 
   this.setIndex = function(idx) {
     var moveListSaved = moveList;
@@ -401,7 +398,7 @@ twistyjs.TwistyScene = function() {
       fireMoveEnded(currentMove());
       //currentMoveIdx = -1;
 
-      if (currentMoveIdx + 1 >= moveList.length) {
+      if (currentMoveIdx + 1 >= moveList.length || stopPlaybackSoon) {
         stopAnimation();
       }
       else {
@@ -409,6 +406,10 @@ twistyjs.TwistyScene = function() {
       }
 
     }
+  }
+
+  this.stopPlayback = function() {
+    stopPlaybackSoon = true;
   }
 
   function startStats() {
@@ -429,6 +430,7 @@ twistyjs.TwistyScene = function() {
     }
   }
   function startAnimation() {
+    stopPlaybackSoon = false;
     if(pendingAnimationLoop === null) {
       //log("Starting move queue: " + movesToString(moveList));
       startMove();
