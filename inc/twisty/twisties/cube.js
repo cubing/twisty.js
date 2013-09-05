@@ -201,14 +201,18 @@ for (var i = 0; i < numSides; i++) {
 
       sticker = stickerTemplate.clone();
 
-      var material = materials[side][stickers[i][su + 3*sv]];
+      var material = materials[side][i+1];
+      var material2 = materials["singleSided"][i+1];
+
+      if (cubeOptions["dimension"] == 3) {
+        var material = materials[side][stickers[i][su + 3*sv]];
+        var material2 = materials["singleSided"][stickers[i][su + 3*sv]];
+      }
+
       sticker.children[0].material = material;
 
-
       if (cubeOptions["hintStickers"]) {
-        var material2 = materials["singleSided"][stickers[i][su + 3*sv]];
         sticker.children[1].material = material2;
-        console.log(sticker);
       }
 
       var positionMatrix = new THREE.Matrix4();
