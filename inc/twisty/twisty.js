@@ -181,14 +181,16 @@ twistyjs.TwistyScene = function() {
   this.resize = function() {
     // This function should be called after setting twistyContainer
     // to the desired size.
-    var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
-    camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
+    var w = $(twistyContainer).width();
+    var h = $(twistyContainer).height();
+    camera = new THREE.PerspectiveCamera( 30, w/h, 0.001, 1000 );
 
     moveCameraDelta(0);
-    renderer.setSize(min, min);
+    renderer.setSize(w, h);
     $(twistyCanvas).css('position', 'absolute');
-    $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
-    $(twistyCanvas).css('left', ($(twistyContainer).width()-min)/2);
+    $(twistyCanvas).css('top', 0);
+    $(twistyCanvas).css('left', 0);
+
 
     render();
   };
@@ -438,6 +440,9 @@ twistyjs.TwistyScene = function() {
     stopPlaybackSoon = false;
     if(pendingAnimationLoop === null) {
       //log("Starting move queue: " + movesToString(moveList));
+      while (moveList[currentMoveIdx+1][2] === ".") {
+        currentMoveIdx++; // Don't start animating on a pause.
+      }
       startMove();
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
     }
