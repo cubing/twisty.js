@@ -5,14 +5,14 @@ var alg = (function (){
 
   var sign_w = (function(){
   
-    //TODO 20110906: Slice moves.
     // Note: we need to use direct regexp syntax instead of the RegExp constructor,
     // else we seem to lose longest matches.
-    var pattern = /(((\d*)-)?(\d*)([UFRBLDufrbldxyz]w?)([\d]*)('?)|((\/\/)|(\/\*)|(\*\/)|(\n)|(\.)))/g;
-    var pattern_move = /^((\d*)-)?(\d*)([UFRBLDufrbldxyz]w?)([\d]*)('?)$/;
+    var pattern = /(((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)|((\/\/)|(\/\*)|(\*\/)|(\n)|(\.)))/g;
+    var pattern_move = /^((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)$/;
 
     var move_uppercase = /^[UFRBLD]$/;
     var move_lowercase = /^[ufrbld]$/;
+    var move_slice = /^[MES]$/;
     var move_wide = /^[UFRBLD]w$/;
     var move_rotation = /^[xyz]$/;
 
@@ -51,6 +51,16 @@ var alg = (function (){
         if (!isNaN(outStartSliceParsed )) {
           outStartSlice = outStartSliceParsed ;
         }
+      }
+
+      if (move_slice.test(baseMove)) {
+        // Use qq's suggestion for now.
+        outStartSlice = 2;
+        outEndSlice = -2;
+        
+        var sliceMap = {"M": "L", "E": "D", "S": "F"};
+        
+        baseMove = sliceMap[baseMove];
       }
 
       if (move_rotation.test(baseMove)) {
