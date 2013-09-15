@@ -395,32 +395,22 @@ for (var i = 0; i < numSides; i++) {
   var oS = 1;
   var iSi = cubeOptions["dimension"];
   var cubeKeyMapping = {
-    73: [iS, oS, "R", 1],
-    75: [iS, oS, "R", -1],
-    87: [iS, oS, "B", 1],
-    79: [iS, oS, "B", -1],
-    83: [iS, oS, "D", 1],
-    76: [iS, oS, "D", -1],
-    68: [iS, oS, "L", 1],
-    69: [iS, oS, "L", -1],
-    74: [iS, oS, "U", 1],
-    70: [iS, oS, "U", -1],
-    72: [iS, oS, "F", 1],
-    71: [iS, oS, "F", -1],
-    186: [iS, iSi, "U", 1],//y
-    59: [iS, iSi, "U", 1],//y (TODO - why is this needed for firefox?)
-    65: [iS, iSi, "U", -1],//y'
-    85: [iS, oS+1, "R", 1],
-    82: [iS, oS+1, "L", -1],
-    77: [iS, oS+1, "R", -1],
-    86: [iS, oS, "F", -1],
-    84: [iS, iSi, "L", -1],
-    89: [iS, iSi, "R", 1],
-    78: [iS, oS, "F", 1],
-    66: [iS, iSi, "L", 1],
-    190: [2, 2, "R", 1],//M'
-    80: [iS, iSi, "F", 1],//y
-    81: [iS, iSi, "F", -1],//y'
+    73: "R", 75: "R'",
+    87: "B", 79: "B'",
+    83: "D", 76: "D'",
+    68: "L", 69: "L'",
+    74: "U", 70: "U'",
+    72: "F", 71: "F'", // Heise
+    78: "F", 86: "F'", //Kirjava
+
+    67: "l", 82: "l'",
+    85: "r", 77: "r'",
+
+    84: "x", 89: "x", 66: "x'", // 84 (T) and 89 (Y) are alternatives.
+    186: "y", 59: "y", 65: "y'", // 186 is WebKit, 59 is Mozilla; see http://unixpapa.com/js/key.html
+    80: "z", 81: "z'",
+
+    190: "M'",
   }
   var keydownCallback = function(twisty, e) {
     if(e.altKey || e.ctrlKey) {
@@ -429,7 +419,8 @@ for (var i = 0; i < numSides; i++) {
 
     var keyCode = e.keyCode;
     if (keyCode in cubeKeyMapping) {
-      twistyScene.addMoves([cubeKeyMapping[keyCode]]);
+      var move = alg.sign_w.stringToAlg(cubeKeyMapping[keyCode]);
+      twistyScene.addMoves(move);
     }
   };
 

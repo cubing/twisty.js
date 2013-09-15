@@ -4,10 +4,9 @@ var alg = (function (){
   var debug = false;
 
   var patterns = {
-    uppercase: /^[UFRBLD]$/,
-    lowercase: /^[ufrbld]$/,
+    single: /^[UFRBLD]$/,
+    wide: /^([ufrbld])|([UFRBLD]w)$/,
     slice: /^[MES]$/,
-    wide: /^[UFRBLD]w$/,
     rotation: /^[xyz]$/
   };
 
@@ -26,23 +25,16 @@ var alg = (function (){
     move.amount = orig.amount;
     move.base = directionMap[orig.base];
 
-    if (patterns.uppercase.test(orig.base)) {
+    if (patterns.single.test(orig.base)) {
       move.startLayer = orig.layer || 1;
       move.endLayer = move.startLayer;
-    }
-
-    if (patterns.lowercase.test(orig.base) ||
-        patterns.wide.test(orig.base)) {
+    } else if (patterns.wide.test(orig.base)) {
       move.startLayer = orig.startLayer || 1;
       move.endLayer = orig.endLayer || 2;
-    }
-
-    if (patterns.slice.test(orig.base)) {
+    } else if (patterns.slice.test(orig.base)) {
       move.startLayer = 2;
       move.endLayer = -2;
-    }
-
-    if (patterns.rotation.test(orig.base)) {
+    } else if (patterns.rotation.test(orig.base)) {
       move.startLayer = 1;
       move.endLayer = -1;
     }
@@ -71,15 +63,12 @@ var alg = (function (){
         amount: 1
       }
 
-      if (patterns.uppercase.test(move.base)) {
+      if (patterns.single.test(move.base)) {
         var layerParsed = parseInt(parts[3]);
         if (!isNaN(layerParsed )) {
           move.layer = layerParsed;
         }
-      }
-
-      if (patterns.lowercase.test(move.base) ||
-          patterns.wide.test(move.base)) {
+      } else if (patterns.wide.test(move.base)) {
 
         var outEndLayerParsed = parseInt(parts[3]);
         if (!isNaN(outEndLayerParsed )) {
@@ -89,16 +78,10 @@ var alg = (function (){
           if (!isNaN(outStartLayerParsed )) {
             move.startLayer = outStartLayerParsed;
           }
-        } else {
-          move.endLayer = 2;
         }
-      }
-
-      if (patterns.slice.test(move.base)) {
+      } else if (patterns.slice.test(move.base)) {
         // pass
-      }
-
-      if (patterns.rotation.test(move.base)) {
+      } else if (patterns.rotation.test(move.base)) {
         // pass
       }
       
@@ -181,69 +164,42 @@ var alg = (function (){
       var moveStrings = [];
       for (i in alg) {
 
-        var iS = alg[i].startLayer;
-        var oS = alg[i].endLayer;
+        var tL = alg[i].layer;
+        var sL = alg[i].startLayer;
+        var oL = alg[i].endLayer;
         var move = alg[i].base;
         var amount = Math.abs(alg[i].amount);
         var amountDir = (alg[i].amount > 0) ? 1 : -1; // Mutable
 
-        var moveString = "";
+        var prefix = "";
+        var suffix = "";
 
-        // Move logic
-        if (iS == 1 && oS == 1) {
-          moveString += move;
-        }
-        else if (iS == 1 && oS == dimension) {
-          var rotationMap = {
-            "U": ["y", 1],
-            "F": ["z", 1],
-            "R": ["x", 1],
-            "B": ["z", -1],
-            "L": ["x", -1],
-            "D": ["y", -1],
+        // Prefix logic
+        if (patterns.single.test(alg[i].base)) {
+          if (alg[i].layer) {
+            prefix = alg[i].layer.toString();
           }
-          moveString += rotationMap[move][0];
-          amountDir *= rotationMap[move][1];
-        }
-        else if (iS == 1 && oS == 2) {
-          moveString += move.toLowerCase();
-        }
-        else if (dimension == 3 && iS == 2 && oS == 2) {
-          var sliceMap = {
-            "U": ["E", -1],
-            "F": ["S", 1],
-            "R": ["M", -1],
-            "B": ["S", -1],
-            "L": ["M", 1],
-            "D": ["E", 1],
+        } else if (patterns.wide.test(alg[i].base)) {
+          if (alg[i].endLayer) {
+            prefix = alg[i].endLayer.toString();
+            if (alg[i].startLayer) {
+              prefix = alg[i].startLayer.toString() + "-" + prefix;
+            }
           }
-          moveString += sliceMap[move][0];
-          amountDir *= sliceMap[move][1];
-        }
-        else if (iS == 1) {
-          moveString += oS + move.toLowerCase();
-        }
-        else if (iS == oS) {
-          moveString += iS + move;
-        }
-        else {
-          // TODO: Negative indices.
-          moveString += iS + "-" + oS + move.toLowerCase();
         }
 
         // Suffix Logic
-        var suffix = "";
         if (amount == 0) {
           continue;
-        }
-        if (amount > 1) {
+        } else if (amount > 1) {
           suffix += "" + amount;
         }
-        if (alg[i].amount < 0) {
+
+        if (amountDir === -1) {
           suffix += "'";
         }
 
-        moveString += suffix;
+        moveString = prefix + alg[i].base + suffix;
         moveStrings.push(moveString);
       }
       return moveStrings.join(" ");
