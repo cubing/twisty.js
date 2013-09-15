@@ -117,7 +117,7 @@ var alg = (function (){
         if (moveStrings[i] === "//") { inLineComment = true; continue; }
         if (moveStrings[i] === "\n") { inLineComment = false; alg.push([1, 1, ".", 1]); continue; }
         if (moveStrings[i] === ".")  { alg.push([1, 1, ".", 1]); continue; }
-        if (moveStrings[i] === "/*") { inLongComment = true; continue; }
+        if (moveStrings[i] === "/*" && !inLineComment) { inLongComment = true; continue; }
         if (moveStrings[i] === "*/") { 
           if (debug && !inLongComment) { console.err("Closing a comment that wasn't opened!");}
           inLongComment = false;
