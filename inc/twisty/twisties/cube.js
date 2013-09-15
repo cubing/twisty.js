@@ -249,14 +249,16 @@ for (var i = 0; i < numSides; i++) {
   var lastMoveProgress = 0;
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
-    if (currentMove[2] == ".") {
+    var canonical = alg.sign_w.canonicalizeMove(currentMove);
+
+    if (canonical.base == ".") {
       return; // Pause
     }
 
     var rott = new THREE.Matrix4();
-    //rott.makeRotationAxis(sidesRotAxis[currentMove[2]], (moveProgress - lastMoveProgress) * currentMove[3] * Math.TAU/4);
+    //rott.makeRotationAxis(sidesRotAxis[canonical.base], (moveProgress - lastMoveProgress) * canonical.amount * Math.TAU/4);
     lastMoveProgress = moveProgress;
-    rott.makeRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
+    rott.makeRotationAxis(sidesRotAxis[canonical.base], moveProgress * canonical.amount * Math.TAU/4);
 
     var state = twisty["cubePieces"];
 
@@ -269,13 +271,13 @@ for (var i = 0; i < numSides; i++) {
 
         // Support negative layer indices (e.g. for rotations)
         //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy. 
-        var layerStart = currentMove[0];
-        var layerEnd = currentMove[1];
+        var layerStart = canonical.startLayer;
+        var layerEnd = canonical.endLayer;
         if (layerEnd < 0) {
           layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
         }
 
-        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
+        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[canonical.base]);
         if (
             layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
             &&
@@ -323,11 +325,13 @@ for (var i = 0; i < numSides; i++) {
 
   var advanceMoveCallback = function(twisty, currentMove) {
 
-    if (currentMove[2] === ".") {
+    var canonical = alg.sign_w.canonicalizeMove(currentMove);
+
+    if (canonical.base === ".") {
       return; // Pause
     }
 
-    var rott = matrix4Power(sidesRot[currentMove[2]], currentMove[3]);
+    var rott = matrix4Power(sidesRot[canonical.base], canonical.amount);
 
     var state = twisty["cubePieces"];
 
@@ -337,13 +341,13 @@ for (var i = 0; i < numSides; i++) {
         // TODO - sticker isn't really a good name for this --jfly
         var sticker = state[faceIndex][stickerIndex];
 
-        var layerStart = currentMove[0];
-        var layerEnd = currentMove[1];
+        var layerStart = canonical.startLayer;
+        var layerEnd = canonical.endLayer;
         if (layerEnd < 0) {
           layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
         }
 
-        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
+        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[canonical.base]);
         if (
             layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
             &&
@@ -360,7 +364,7 @@ for (var i = 0; i < numSides; i++) {
       }
     }
 
-    cumulativeAlgorithm.push(currentMove);
+    cumulativeAlgorithm.push(canonical);
     if (twisty["options"]["algUpdateCallback"]) {
       twisty["options"]["algUpdateCallback"](cumulativeAlgorithm);
     }
@@ -522,7 +526,7 @@ for (var i = 0; i < numSides; i++) {
   };
 
   var isInspectionLegalMove = function(twisty, move) {
-    if(move[0] == 1 && move[1] == twisty["options"]["dimension"]) {
+    if(move.startLayer == 1 && move.endLayer == twisty["options"]["dimension"]) {
       return true;
     }
     return false;

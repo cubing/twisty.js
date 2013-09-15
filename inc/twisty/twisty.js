@@ -386,7 +386,7 @@ twistyjs.TwistyScene = function() {
 
   function stepAmount() {
     var factor = 3; // Tuned constant; equals the maximum ratio of a long move vs. a quarter turn.
-    var currentAmount = Math.abs(currentMove()[3]);
+    var currentAmount = Math.abs(currentMove().amount);
     return baseAnimationStep * currentAmount / (1 + (factor*(currentAmount - 1)));
   }
 

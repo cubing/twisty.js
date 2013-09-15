@@ -3,18 +3,59 @@ var alg = (function (){
 
   var debug = false;
 
+  var patterns = {
+    uppercase: /^[UFRBLD]$/,
+    lowercase: /^[ufrbld]$/,
+    slice: /^[MES]$/,
+    wide: /^[UFRBLD]w$/,
+    rotation: /^[xyz]$/
+  };
+
+  var directionMap = {
+    "U": "U", "Uw": "U", "u": "U",           "y": "U",
+    "F": "F", "Fw": "F", "f": "F", "S": "F", "z": "F",
+    "R": "R", "Rw": "R", "r": "R",           "x": "R",
+    "B": "B", "Bw": "B", "b": "B",
+    "L": "L", "Lw": "L", "l": "L", "M": "L",
+    "D": "D", "Dw": "D", "d": "D", "E": "D"
+  };
+
+  function canonicalizeMove(orig) {
+    var move = {};
+
+    move.amount = orig.amount;
+    move.base = directionMap[orig.base];
+
+    if (patterns.uppercase.test(orig.base)) {
+      move.startLayer = orig.layer || 1;
+      move.endLayer = move.startLayer;
+    }
+
+    if (patterns.lowercase.test(orig.base) ||
+        patterns.wide.test(orig.base)) {
+      move.startLayer = orig.startLayer || 1;
+      move.endLayer = orig.endLayer || 2;
+    }
+
+    if (patterns.slice.test(orig.base)) {
+      move.startLayer = 2;
+      move.endLayer = -2;
+    }
+
+    if (patterns.rotation.test(orig.base)) {
+      move.startLayer = 1;
+      move.endLayer = -1;
+    }
+
+    return move;
+  }
+
   var sign_w = (function(){
-  
+
     // Note: we need to use direct regexp syntax instead of the RegExp constructor,
     // else we seem to lose longest matches.
     var pattern = /(((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)|((\/\/)|(\/\*)|(\*\/)|(\n)|(\.)))/g;
     var pattern_move = /^((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)$/;
-
-    var move_uppercase = /^[UFRBLD]$/;
-    var move_lowercase = /^[ufrbld]$/;
-    var move_slice = /^[MES]$/;
-    var move_wide = /^[UFRBLD]w$/;
-    var move_rotation = /^[xyz]$/;
 
     function stringToMove(moveString) {
 
@@ -23,70 +64,57 @@ var alg = (function (){
       var parts = pattern_move.exec(moveString);
       if (debug) console.log(parts);
 
-      var outStartSlice = 1;
-      var outEndSlice = 1; 
-      var baseMove = parts[4]; 
-      var amount = 1;
+      var move = {
+        // startLayer: 1,
+        // endLayer: 1,
+        base: parts[4],
+        amount: 1
+      }
 
-      if (move_uppercase.test(baseMove)) {
-        var outEndSliceParsed = parseInt(parts[3]);
-        if (!isNaN(outEndSliceParsed )) {
-          outStartSlice = outEndSliceParsed;
-          outEndSlice = outEndSliceParsed;
+      if (patterns.uppercase.test(move.base)) {
+        var layerParsed = parseInt(parts[3]);
+        if (!isNaN(layerParsed )) {
+          move.layer = layerParsed;
         }
       }
 
-      if (move_lowercase.test(baseMove) ||
-          move_wide.test(baseMove)) {
+      if (patterns.lowercase.test(move.base) ||
+          patterns.wide.test(move.base)) {
 
-        baseMove = baseMove[0].toUpperCase();
-        outEndSlice = 2;
+        var outEndLayerParsed = parseInt(parts[3]);
+        if (!isNaN(outEndLayerParsed )) {
+          move.endLayer = outEndLayerParsed;
 
-        var outEndSliceParsed = parseInt(parts[3]);
-        if (!isNaN(outEndSliceParsed )) {
-          outEndSlice = outEndSliceParsed;
-        }
-
-        var outStartSliceParsed = parseInt(parts[2]);
-        if (!isNaN(outStartSliceParsed )) {
-          outStartSlice = outStartSliceParsed ;
+          var outStartLayerParsed = parseInt(parts[2]);
+          if (!isNaN(outStartLayerParsed )) {
+            move.startLayer = outStartLayerParsed;
+          }
+        } else {
+          move.endLayer = 2;
         }
       }
 
-      if (move_slice.test(baseMove)) {
-        // Use qq's suggestion for now.
-        outStartSlice = 2;
-        outEndSlice = -2;
-        
-        var sliceMap = {"M": "L", "E": "D", "S": "F"};
-        
-        baseMove = sliceMap[baseMove];
+      if (patterns.slice.test(move.base)) {
+        // pass
       }
 
-      if (move_rotation.test(baseMove)) {
-     
-        outStartSlice = 1;
-        outEndSlice = -1;
-        
-        var sliceMap = {"x": "R", "y": "U", "z": "F"};
-        
-        baseMove = sliceMap[baseMove];
-        
+      if (patterns.rotation.test(move.base)) {
+        // pass
       }
       
       /* Amount */
       
       var amountParsed = parseInt(parts[5]);
       if (!isNaN(amountParsed)) {
-        amount = amountParsed;
+        move.amount = amountParsed;
       }
       if (parts[6] == "'") {
-        amount *= -1;
+        move.amount *= -1;
       }
       
       /* Return */
       
-      return [outStartSlice, outEndSlice, baseMove, amount];
+      return move;
       
     }
 
@@ -129,17 +157,17 @@ var alg = (function (){
       for (var i = 0; i < alg.length; i++) {
         var move = alg[i];
         if (algOut.length > 0 &&
-            algOut[algOut.length-1][0] == move[0] &&
-            algOut[algOut.length-1][1] == move[1] &&
-            algOut[algOut.length-1][2] == move[2]) {
-          algOut[algOut.length-1][3] += move[3];
-          algOut[algOut.length-1][3] = (((algOut[algOut.length-1][3] + 1 % 4) + 4) % 4) -1; // TODO: R2'
-          if (algOut[algOut.length-1][3] == 0) {
+            algOut[algOut.length-1].startLayer == move.startLayer &&
+            algOut[algOut.length-1].endLayer == move.endLayer &&
+            algOut[algOut.length-1].base == move.base) {
+          algOut[algOut.length-1].amount += move[3];
+          algOut[algOut.length-1].amount = (((algOut[algOut.length-1][3] + 1 % 4) + 4) % 4) -1; // TODO: R2'
+          if (algOut[algOut.length-1].amount == 0) {
             algOut.pop();
           }
         }
         else {
-          algOut.push(move.slice(0));
+          algOut.push(cloneMove(move));
         }
         //console.log(JSON.stringify(algOut));
       }
@@ -153,11 +181,11 @@ var alg = (function (){
       var moveStrings = [];
       for (i in alg) {
 
-        var iS = alg[i][0];
-        var oS = alg[i][1];
-        var move = alg[i][2];
-        var amount = Math.abs(alg[i][3]);
-        var amountDir = (alg[i][3] > 0) ? 1 : -1; // Mutable
+        var iS = alg[i].startLayer;
+        var oS = alg[i].endLayer;
+        var move = alg[i].base;
+        var amount = Math.abs(alg[i].amount);
+        var amountDir = (alg[i].amount > 0) ? 1 : -1; // Mutable
 
         var moveString = "";
 
@@ -211,7 +239,7 @@ var alg = (function (){
         if (amount > 1) {
           suffix += "" + amount;
         }
-        if (alg[i][3] < 0) {
+        if (alg[i].amount < 0) {
           suffix += "'";
         }
 
@@ -221,11 +249,19 @@ var alg = (function (){
       return moveStrings.join(" ");
     }
 
+    function cloneMove(move) {
+      var newMove = {};
+      for (i in move) {
+        newMove[i] = move[i]
+      }
+      return newMove;
+    }
+
     function invert(algIn) {
       var algInverse = [];
       for (i in algIn) {
-        var move = algIn[i].slice(0); // Copy array.
-        move[3] *= -1;
+        var move = cloneMove(algIn[i]);
+        move.amount *= -1;
         algInverse.push(move);
       }
       return algInverse.reverse();
@@ -234,7 +270,8 @@ var alg = (function (){
     return {
       algToString: algToString,
       stringToAlg: stringToAlg,
-      invert: invert
+      invert: invert,
+      canonicalizeMove: canonicalizeMove
     }
   })();
 
