@@ -16,7 +16,8 @@ var alg = (function (){
     "R": "R", "Rw": "R", "r": "R",           "x": "R",
     "B": "B", "Bw": "B", "b": "B",
     "L": "L", "Lw": "L", "l": "L", "M": "L",
-    "D": "D", "Dw": "D", "d": "D", "E": "D"
+    "D": "D", "Dw": "D", "d": "D", "E": "D",
+    ".": "."
   };
 
   function canonicalizeMove(orig) {
@@ -115,8 +116,8 @@ var alg = (function (){
 
 
         if (moveStrings[i] === "//") { inLineComment = true; continue; }
-        if (moveStrings[i] === "\n") { inLineComment = false; alg.push([1, 1, ".", 1]); continue; }
-        if (moveStrings[i] === ".")  { alg.push([1, 1, ".", 1]); continue; }
+        if (moveStrings[i] === "\n") { inLineComment = false; alg.push({base: ".", amount: 1}); continue; }
+        if (moveStrings[i] === ".")  { alg.push({base: ".", amount: 1}); continue; }
         if (moveStrings[i] === "/*" && !inLineComment) { inLongComment = true; continue; }
         if (moveStrings[i] === "*/") { 
           if (debug && !inLongComment) { console.err("Closing a comment that wasn't opened!");}

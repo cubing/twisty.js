@@ -439,7 +439,7 @@ twistyjs.TwistyScene = function() {
     stopPlaybackSoon = false;
     if(pendingAnimationLoop === null) {
       //log("Starting move queue: " + movesToString(moveList));
-      while (moveList[currentMoveIdx+1][2] === ".") {
+      while (moveList[currentMoveIdx+1].base === ".") {
         currentMoveIdx++; // Don't start animating on a pause.
       }
       startMove();
