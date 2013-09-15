@@ -344,7 +344,7 @@ var logCounter = 0;
 
 function log(obj) {
   if(typeof(console) !== "undefined" && console.log) {
-    console.log(obj);
+    //console.log(obj);
   }
   var previousHTML = $("#debug").html();
   previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;

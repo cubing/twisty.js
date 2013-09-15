@@ -274,7 +274,6 @@ twistyjs.TwistyScene = function() {
   function moveCameraPure(theta) {
     cameraTheta = theta;
     scale = twisty.cameraScale();
-    console.log(scale);
     camera.position.x = 2.5*Math.sin(theta) * scale;
     camera.position.y = 2 * scale;
     camera.position.z = 2.5*Math.cos(theta) * scale;

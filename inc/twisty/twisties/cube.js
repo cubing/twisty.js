@@ -88,7 +88,6 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   ];
 
   var stickers = stageStickers["full"];
-  console.log("sdfsdf", cubeOptions["stage"] in stageStickers);
   if (cubeOptions["stage"] in stageStickers) {
     stickers = stageStickers[cubeOptions["stage"]];
   }
