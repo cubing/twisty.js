@@ -6,7 +6,7 @@
 /* The parser puts a boundary after the last of a
    set of alternatives, so we get around this by repeating */
 
-\s+                    return 'WHITESPACE'
+[^\S\r\n]+             return 'WHITESPACE'
 [0-9]+                 return 'NUMBER'
 "-"                    return 'DASH'
 Rw|Fw|Uw|Bw|Lw|Dw|Dw   return 'BASE_W'
@@ -84,7 +84,6 @@ BLOCK
 OPTIONAL_WHITESPACE
     : WHITESPACE
     | /* nothing */
-    | NEWLINE
     | OPTIONAL_WHITESPACE OPTIONAL_WHITESPACE
     ;
 
@@ -103,6 +102,8 @@ REPEATED
         {$1.amount = 1; $$ = $1;}
     | REPEATABLE AMOUNT
         {$1.amount = $2; $$ = $1;}
+    | NEWLINE
+        {$$ = {type: "move", base: ".", amount: 1};}
     ;
 
 ALG
