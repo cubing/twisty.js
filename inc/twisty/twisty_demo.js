@@ -164,13 +164,18 @@ $(document).ready(function() {
   });
 
   $("#parsed_alg1").bind("click", function() {
-    twistyScene.animateMoves(alg.sign_w.stringToAlg($("#parse_alg").val()));
+    var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
+    var moves = alg.sign_w.algToMoves(algo);
+    twistyScene.animateMoves(moves);
   });
 
   $("#parsed_alg2").bind("click", function() {
     var init = alg.sign_w.stringToAlg($("#init").val());
     var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
     var type = $("#solve").is(':checked') ? "solve" : "gen";
+
+    init = alg.sign_w.algToMoves(init);
+    algo = alg.sign_w.algToMoves(algo);
 
     twistyScene.setupAnimation(
       algo,

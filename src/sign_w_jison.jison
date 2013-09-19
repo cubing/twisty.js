@@ -36,7 +36,7 @@ expressions
     : ALG EOF
         { typeof console !== 'undefined' ? console.log($1) : print($1); return $1; }
     | OPTIONAL_WHITESPACE EOF
-        { $$ = []; }
+        { return []; }
     ;
 
 LAYER
@@ -72,13 +72,13 @@ BASE
 
 BLOCK
     : BASE
-        {$$ = {base: $1, amount: 1};}
+        {$$ = {type: "move", base: $1};}
     | LAYER BASE_UPPERCASE
-        {$$ = {base: $2, layer: $1, amount: 1};}
+        {$$ = {type: "move", base: $2, layer: $1};}
     | LAYER BASE_WIDE
-        {$$ = {base: $2, endLayer: $1, amount: 1};}
+        {$$ = {type: "move", base: $2, endLayer: $1};}
     | LAYER DASH LAYER BASE_WIDE
-        {$$ = {base: $4, startLayer: $1, endLayer: $3, amount: 1};}
+        {$$ = {type: "move", base: $4, startLayer: $1, endLayer: $3};}
     ;
 
 OPTIONAL_WHITESPACE
@@ -95,13 +95,14 @@ REPEATABLE
     | OPEN_BRACKET ALG COLON ALG CLOSE_BRACKET
         {$$ = {"type": "conjugate", "A": $2, "B": $4};}
     | OPEN_PARENTHESIS ALG CLOSE_PARENTHESIS
-        {$$ = [$2];}
+        {$$ = {"type": "group", "A": $2};}
     ;
 
 REPEATED
     : REPEATABLE
+        {$1.amount = 1; $$ = $1;}
     | REPEATABLE AMOUNT
-        {$1.amount *= $2; $$ = $1;}
+        {$1.amount = $2; $$ = $1;}
     ;
 
 ALG
