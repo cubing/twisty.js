@@ -45,97 +45,6 @@ var alg = (function (){
 
   var sign_w = (function(){
 
-    // Note: we need to use direct regexp syntax instead of the RegExp constructor,
-    // else we seem to lose longest matches.
-    var pattern = /(((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)|((\/\/)|(\/\*)|(\*\/)|(\n)|(\.)))/g;
-    var pattern_move = /^((\d*)-)?(\d*)([UFRBLDMESufrbldxyz]w?)([\d]*)('?)$/;
-
-    function stringToMove(moveString) {
-
-      if (debug) console.log("[Move] " + moveString);
-      
-      var parts = pattern_move.exec(moveString);
-      if (debug) console.log(parts);
-
-      var move = {
-        // startLayer: 1,
-        // endLayer: 1,
-        base: parts[4],
-        amount: 1
-      }
-
-      if (patterns.single.test(move.base)) {
-        var layerParsed = parseInt(parts[3]);
-        if (!isNaN(layerParsed )) {
-          move.layer = layerParsed;
-        }
-      } else if (patterns.wide.test(move.base)) {
-
-        var outEndLayerParsed = parseInt(parts[3]);
-        if (!isNaN(outEndLayerParsed )) {
-          move.endLayer = outEndLayerParsed;
-
-          var outStartLayerParsed = parseInt(parts[2]);
-          if (!isNaN(outStartLayerParsed )) {
-            move.startLayer = outStartLayerParsed;
-          }
-        }
-      } else if (patterns.slice.test(move.base)) {
-        // pass
-      } else if (patterns.rotation.test(move.base)) {
-        // pass
-      }
-      
-      /* Amount */
-      
-      var amountParsed = parseInt(parts[5]);
-      if (!isNaN(amountParsed)) {
-        move.amount = amountParsed;
-      }
-      if (parts[6] == "'") {
-        move.amount *= -1;
-      }
-      
-      /* Return */
-      
-      return move;
-      
-    }
-
-    function stringToAlg(algString) {
-      
-      var moveStrings = algString.match(pattern);
-      var alg = [];
-      
-      if (debug) console.log(moveStrings);
-      
-      var inLineComment = false;
-      var inLongComment = false;
-
-      for (i in moveStrings) {
-
-
-        if (moveStrings[i] === "//") { inLineComment = true; continue; }
-        if (moveStrings[i] === "\n") { inLineComment = false; alg.push({base: ".", amount: 1}); continue; }
-        if (moveStrings[i] === ".")  { alg.push({base: ".", amount: 1}); continue; }
-        if (moveStrings[i] === "/*" && !inLineComment) { inLongComment = true; continue; }
-        if (moveStrings[i] === "*/") { 
-          if (debug && !inLongComment) { console.err("Closing a comment that wasn't opened!");}
-          inLongComment = false;
-          continue;
-        }
-        if (inLineComment || inLongComment) { continue; }
-
-        var move = stringToMove(moveStrings[i]);
-        alg.push(move);
-      }
-      
-      if (debug) console.log(alg);
-      
-      return alg;
-      
-    }
-
     function algSimplify(alg) {
       var algOut = [];
       for (var i = 0; i < alg.length; i++) {
@@ -222,6 +131,10 @@ var alg = (function (){
         algInverse.push(move);
       }
       return algInverse.reverse();
+    }
+
+    function stringToAlg(algString) {
+      return sign_w_jison.parse(algString);
     }
 
     return {
