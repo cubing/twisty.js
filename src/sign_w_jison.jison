@@ -19,6 +19,12 @@ M|E|S|S                return 'BASE_SLICE'
 "//"[^\n\r]*           /* ignore comment */
 "/*"[^]*?"*/"          /* ignore comment */
 [\n\r]                 return 'NEWLINE'
+"["                    return 'OPEN_BRACKET'
+"]"                    return 'CLOSE_BRACKET'
+"("                    return 'OPEN_PARENTHESIS'
+")"                    return 'CLOSE_PARENTHESIS'
+","                    return 'COMMA'
+":"                    return 'COLON'
 <<EOF>>                return 'EOF'
 .                      return 'INVALID'
 
@@ -27,9 +33,10 @@ M|E|S|S                return 'BASE_SLICE'
 %% /* language grammar */
 
 expressions
-    : e EOF
-        { typeof console !== 'undefined' ? console.log($1) : print($1);
-          return $1; }
+    : ALG EOF
+        { typeof console !== 'undefined' ? console.log($1) : print($1); return $1; }
+    | OPTIONAL_WHITESPACE EOF
+        { $$ = []; }
     ;
 
 LAYER
@@ -74,12 +81,6 @@ BLOCK
         {$$ = {base: $4, startLayer: $1, endLayer: $3, amount: 1};}
     ;
 
-MOVE
-    : BLOCK
-    | BLOCK AMOUNT
-        {$1.amount *= $2; $$ = $1;}
-    ;
-
 OPTIONAL_WHITESPACE
     : WHITESPACE
     | /* nothing */
@@ -87,18 +88,25 @@ OPTIONAL_WHITESPACE
     | OPTIONAL_WHITESPACE OPTIONAL_WHITESPACE
     ;
 
+REPEATABLE
+    : BLOCK
+    | OPEN_BRACKET ALG COMMA ALG CLOSE_BRACKET
+        {$$ = {"type": "commutator", "A": $2, "B": $4};}
+    | OPEN_BRACKET ALG COLON ALG CLOSE_BRACKET
+        {$$ = {"type": "conjugate", "A": $2, "B": $4};}
+    | OPEN_PARENTHESIS ALG CLOSE_PARENTHESIS
+        {$$ = [$2];}
+    ;
+
+REPEATED
+    : REPEATABLE
+    | REPEATABLE AMOUNT
+        {$1.amount *= $2; $$ = $1;}
+    ;
+
 ALG
-    : MOVE
-        {$$ = [$1];}
-    | ALG OPTIONAL_WHITESPACE MOVE
-        {$1.push($3); $$ = $1;}
+    : OPTIONAL_WHITESPACE REPEATED OPTIONAL_WHITESPACE
+        {$$ = [$2];}
+    | ALG ALG
+        {$$ = $1.concat($2);}
     ;
-
-
-e
-    : OPTIONAL_WHITESPACE ALG OPTIONAL_WHITESPACE
-        {$$ = $2;}
-    | OPTIONAL_WHITESPACE
-        {$$ = [];}
-    ;
-
