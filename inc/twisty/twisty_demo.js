@@ -156,6 +156,10 @@ $(document).ready(function() {
   $("#fast_forward").click(function() {
     twistyScene.setIndex(twistyScene.getMoveList().length-1);
   });
+  $("#speed").bind("change", function() {
+    var speed = $('#speed')[0].valueAsNumber
+    twistyScene.setSpeed(speed);
+  });
 
   $("#alg_superflip").bind("click", function() {
     var once = "M' U' M' U' M' U' M' U' x y ";
@@ -256,12 +260,14 @@ $(document).ready(function() {
 
     var renderer = THREE[$('input[name="renderer"]:checked').val() + "Renderer"]; //TODO: Unsafe
     var stage = $('input[name="stage"]:checked').val();
+    var speed = $('#speed')[0].valueAsNumber;
 
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,
       "renderer": renderer,
       "stage": stage,
+      "speed": speed,
       "algUpdateCallback": algUpdateCallback,
       "doubleSided": $("#double_sided").is(':checked'),
       "cubies": $("#cubies").is(':checked'),
