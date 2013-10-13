@@ -108,7 +108,7 @@ REPEATED
 
 ALG
     : OPTIONAL_WHITESPACE REPEATED OPTIONAL_WHITESPACE
-        {$$ = [$2];}
+        {$$ = [$2]; $REPEATED.location = @REPEATED;}
     | ALG ALG
         {$$ = $1.concat($2);}
     ;

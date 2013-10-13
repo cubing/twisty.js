@@ -114,7 +114,7 @@ case 27:$$[$0-1].amount = $$[$0]; this.$ = $$[$0-1];
 break;
 case 28:this.$ = {type: "move", base: ".", amount: 1};
 break;
-case 29:this.$ = [$$[$0-1]];
+case 29:this.$ = [$$[$0-1]]; $$[$0-1].location = _$[$0-1];
 break;
 case 30:this.$ = $$[$0-1].concat($$[$0]);
 break;
