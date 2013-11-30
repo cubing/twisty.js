@@ -1,4 +1,3 @@
-
 var alg = (function (){
 
   var debug = false;
@@ -53,10 +52,15 @@ var alg = (function (){
             algOut[algOut.length-1].startLayer == move.startLayer &&
             algOut[algOut.length-1].endLayer == move.endLayer &&
             algOut[algOut.length-1].base == move.base) {
-          algOut[algOut.length-1].amount += move[3];
-          algOut[algOut.length-1].amount = (((algOut[algOut.length-1][3] + 1 % 4) + 4) % 4) -1; // TODO: R2'
-          if (algOut[algOut.length-1].amount == 0) {
+          var amount = algOut[algOut.length-1].amount + move.amount;
+          // Mod to [-2, -1, 0, 1, 2]
+          // x | 0 truncates x towards 0.
+          amount = amount - 4 * ((amount / 4) | 0);
+          if (amount == 0) {
             algOut.pop();
+          }
+          else {
+            algOut[algOut.length-1].amount = amount;
           }
         }
         else {
