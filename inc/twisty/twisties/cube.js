@@ -1,7 +1,7 @@
 /*
  * Rubik's Cube NxNxN
  */
-function createCubeTwisty(twistyScene, twistyParameters) {
+function createCubeTwisty(twistyScene, twistyParameters, scene) {
 
   log("Creating cube twisty.");
 
@@ -173,14 +173,14 @@ cubieTemplate.translateZ(-1);
 var side = cubeOptions["doubleSided"] ? "doubleSided" : "singleSided";
 
 //Cube Object Generation
-for (var i = 0; i < numSides; i++) {
+for (var i = 0; i < 1; i++) {
   var facePieces = [];
   cubePieces.push(facePieces);
 
   var stickerTemplate = new THREE.Object3D();
 
   var innerSticker = innerTemplate.clone();
-  stickerTemplate.add(innerSticker);
+  scene.add(innerSticker);
 
   if (cubeOptions["hintStickers"]) {
     stickerTemplate.add(hintTemplate);
@@ -192,11 +192,11 @@ for (var i = 0; i < numSides; i++) {
 
   if (cubeOptions["cubies"]) {
     // Easiest to make this one per sticker for now. Can be optimized later.
-    stickerTemplate.add(cubieTemplate);
+    scene.add(cubieTemplate);
   }
 
-  for (var su = 0; su < cubeOptions["dimension"]; su++) {
-    for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
+  for (var su = 0; su < 1; su++) {
+    for (var sv = 0; sv < 1; sv++) {
 
       sticker = stickerTemplate.clone();
 
@@ -210,24 +210,24 @@ for (var i = 0; i < numSides; i++) {
 
       sticker.children[0].material = material;
 
-      if (cubeOptions["hintStickers"]) {
-        sticker.children[1].material = material2;
-      }
+      // if (cubeOptions["hintStickers"]) {
+      //   sticker.children[1].material = material2;
+      // }
 
-      var positionMatrix = new THREE.Matrix4();
-      positionMatrix.makeTranslation(
-          su*2 - cubeOptions["dimension"] + 1,
-          -(sv*2 - cubeOptions["dimension"] + 1),
-          cubeOptions["dimension"]
-      );
+      // var positionMatrix = new THREE.Matrix4();
+      // positionMatrix.makeTranslation(
+      //     su*2 - cubeOptions["dimension"] + 1,
+      //     -(sv*2 - cubeOptions["dimension"] + 1),
+      //     cubeOptions["dimension"]
+      // );
 
-      var x = sidesUV[i].clone();
-      x.multiply(positionMatrix);
+      // var x = sidesUV[i].clone();
+      // x.multiply(positionMatrix);
 
-      sticker.applyMatrix(x);
+      // sticker.applyMatrix(x);
 
-      facePieces.push([x, sticker]);
-      cubeObject.add(sticker);
+      // facePieces.push([x, sticker]);
+      scene.add(sticker);
 
       }
     }

@@ -114,8 +114,7 @@ twistyjs.TwistyScene = function() {
      */
 
     // TODO: Rename and spec twisty format.
-    twisty = createTwisty(twistyType);
-    scene.add(twisty["3d"]);
+    twisty = createTwisty(twistyType, scene);
 
     /*
      * Go!
@@ -469,7 +468,7 @@ twistyjs.TwistyScene = function() {
     }
   }
 
-  function createTwisty(twistyType) {
+  function createTwisty(twistyType, scene) {
     var twistyCreateFunction = twisties[twistyType.type];
     if(!twistyCreateFunction) {
       err('Twisty type "' + twistyType.type + '" is not recognized!');
@@ -490,7 +489,7 @@ twistyjs.TwistyScene = function() {
     //      Maybe this isn't an important case to optimize for, but to me
     //      it's evidence that having a persistent TwistyScene is the right
     //      way to go.
-    return twistyCreateFunction(that, twistyType);
+    return twistyCreateFunction(that, twistyType, scene);
   }
 
 };
