@@ -126,8 +126,7 @@ var alg = (function (){
       return suffix;
     }
 
-    function algToString(algIn, dimension) {
-      var alg = algSimplify(algIn);
+    function algToString(alg, dimension) {
 
       var moveStrings = [];
       for (i in alg) {
@@ -218,6 +217,7 @@ var alg = (function (){
 
     return {
       algToString: algToString,
+      algSimplify: algSimplify,
       stringToAlg: stringToAlg,
       invert: invert,
       canonicalizeMove: canonicalizeMove,
