@@ -42,6 +42,15 @@ var alg = (function (){
     return move;
   }
 
+  function round(x) {
+    // We want to round:
+    //    2.6 to  3
+    //    2.5 to  2
+    //   -2.5 to -2
+    var antiSignish = x < 0 ? 1 : -1; // When can we haz ES6?
+    return Math.round(-Math.abs(x)) * antiSignish;
+  }
+
   var sign_w = (function(){
 
     function algSimplify(alg) {
@@ -55,7 +64,7 @@ var alg = (function (){
           var amount = algOut[algOut.length-1].amount + move.amount;
           // Mod to [-2, -1, 0, 1, 2]
           // x | 0 truncates x towards 0.
-          amount = amount - 4 * ((amount / 4) | 0);
+          amount = amount - 4 * round(amount / 4);
           if (amount == 0) {
             algOut.pop();
           }
