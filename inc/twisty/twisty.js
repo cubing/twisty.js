@@ -41,11 +41,7 @@ if(typeof(log) == "undefined") {
  * 
  */
 
-var twisties = {};
-twistyjs.registerTwisty = function(twistyName, twistyConstructor) {
-  assert(!(twistyName in twisties));
-  twisties[twistyName] = twistyConstructor;
-};
+twistyjs.twisties = {};
 
 twistyjs.TwistyScene = function() {
   // that=this is a Crockford convention for accessing "this" inside of methods.
@@ -477,7 +473,7 @@ twistyjs.TwistyScene = function() {
   }
 
   function createTwisty(twistyType) {
-    var twistyCreateFunction = twisties[twistyType.type];
+    var twistyCreateFunction = twistyjs.twisties[twistyType.type];
     if(!twistyCreateFunction) {
       err('Twisty type "' + twistyType.type + '" is not recognized!');
       return null;

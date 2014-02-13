@@ -541,4 +541,4 @@ for (var i = 0; i < numSides; i++) {
 
 }
 
-twistyjs.registerTwisty("cube", createCubeTwisty);
+twistyjs.twisties["cube"] = createCubeTwisty;

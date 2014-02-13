@@ -33,4 +33,4 @@ function createPlaneTwisty(twistyScene, twistyType) {
 
 }
 
-twistyjs.registerTwisty("plane", createPlaneTwisty);
+twistyjs.twisties["plane"] = createPlaneTwisty;
