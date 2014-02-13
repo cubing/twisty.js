@@ -14,6 +14,8 @@
  * 
  */
 
+"use strict";
+
 var cache = window.applicationCache;
 function updateReadyCache() {
   window.applicationCache.swapCache();
@@ -189,7 +191,7 @@ $(document).ready(function() {
       }
     );
 
-    moveList = twistyScene.getMoveList();
+    var moveList = twistyScene.getMoveList();
     var pl = $("#playback_alg");
     pl.empty();
 
@@ -202,7 +204,7 @@ $(document).ready(function() {
 
     f("Click:", -1);
     for (var i = 0; i < moveList.length; i += 1) {
-      moveString = alg.sign_w.algToString([moveList[i]]);
+      var moveString = alg.sign_w.algToString([moveList[i]]);
       f(moveString, i);
     }
   });

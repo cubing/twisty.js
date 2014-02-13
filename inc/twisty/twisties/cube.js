@@ -1,6 +1,9 @@
 /*
  * Rubik's Cube NxNxN
  */
+
+"use strict";
+
 function createCubeTwisty(twistyScene, twistyParameters) {
 
   log("Creating cube twisty.");
@@ -28,7 +31,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
 
 
   // Passed Parameters
-  for (option in cubeOptions) {
+  for (var option in cubeOptions) {
     if(option in twistyParameters) {
       log("Setting option \"" + option + "\" to " + twistyParameters[option]);
       cubeOptions[option] = twistyParameters[option];
@@ -167,7 +170,7 @@ hintTemplate.translateZ(-3);
 var w = 1.95;
 var cubieGeometry = new THREE.CubeGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
-cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
+var cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
 cubieTemplate.translateZ(-1);
 
 var side = cubeOptions["doubleSided"] ? "doubleSided" : "singleSided";
@@ -198,7 +201,7 @@ for (var i = 0; i < numSides; i++) {
   for (var su = 0; su < cubeOptions["dimension"]; su++) {
     for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-      sticker = stickerTemplate.clone();
+      var sticker = stickerTemplate.clone();
 
       var material = materials[side][i+1];
       var material2 = materials["singleSided"][i+1];

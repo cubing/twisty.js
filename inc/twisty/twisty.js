@@ -6,20 +6,12 @@
  * 
  */
 
-var twistyjs = {};
-
-(function() {
-
-if(typeof(log) == "undefined") {
-  log = function(s) {
-    console.log(s);
-  };
-}
+"use strict";
 
 if(typeof(assert) == "undefined") {
   // TODO - this is pretty lame, we could use something like stacktrace.js
   // to get some useful information here.
-  assert = function(cond, str) {
+  var assert = function(cond, str) {
     if(!cond) {
       if(str) {
         throw str;
@@ -27,6 +19,16 @@ if(typeof(assert) == "undefined") {
         throw "Assertion Error";
       }
     }
+  };
+}
+
+var twistyjs = {};
+
+(function() {
+
+if(typeof(log) == "undefined") {
+  var log = function(s) {
+    console.log(s);
   };
 }
 
@@ -121,7 +123,7 @@ twistyjs.TwistyScene = function() {
      * Go!
      */
 
-    rendererType = twistyType.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
+    var rendererType = twistyType.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
     renderer = new rendererType({antialias: true});
     twistyCanvas = renderer.domElement;
 
@@ -276,7 +278,7 @@ twistyjs.TwistyScene = function() {
 
   function moveCameraPure(theta) {
     cameraTheta = theta;
-    scale = twisty.cameraScale();
+    var scale = twisty.cameraScale();
     camera.position.x = 2.5*Math.sin(theta) * scale;
     camera.position.y = 2 * scale;
     camera.position.z = 2.5*Math.cos(theta) * scale;
