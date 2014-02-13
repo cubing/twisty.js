@@ -60,9 +60,13 @@ twistyjs.TwistyScene = function() {
     return moveList[currentMoveIdx];
   }
 
-  var camera, scene, renderer;
-  var twistyCanvas;
-  var cameraTheta = 0;
+  var view = {
+    camera: null,
+    scene: null,
+    renderer: null,
+    canvas: null,
+    cameraTheta: null
+  }
 
   var twistyTypeCached;
 
@@ -84,7 +88,7 @@ twistyjs.TwistyScene = function() {
     return twistyContainer;
   };
   this.getCanvas = function() {
-    return twistyCanvas;
+    return view.canvas;
   };
   this.getTwisty = function() {
     return twisty;
@@ -109,7 +113,7 @@ twistyjs.TwistyScene = function() {
      * Scene Setup
      */
 
-    scene = new THREE.Scene();
+    view.scene = new THREE.Scene();
 
     /*
      * 3D Object Creation
@@ -117,17 +121,17 @@ twistyjs.TwistyScene = function() {
 
     // TODO: Rename and spec twisty format.
     twisty = createTwisty(twistyType);
-    scene.add(twisty["3d"]);
+    view.scene.add(twisty["3d"]);
 
     /*
      * Go!
      */
 
     var rendererType = twistyType.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
-    renderer = new rendererType({antialias: true});
-    twistyCanvas = renderer.domElement;
+    view.renderer = new rendererType({antialias: true});
+    view.canvas = view.renderer.domElement;
 
-    twistyContainer.appendChild(twistyCanvas);
+    twistyContainer.appendChild(view.canvas);
 
 
     //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
@@ -189,13 +193,13 @@ twistyjs.TwistyScene = function() {
     // This function should be called after setting twistyContainer
     // to the desired size.
     var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
-    camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
+    view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
     moveCameraDelta(0);
-    renderer.setSize(min, min);
-    $(twistyCanvas).css('position', 'absolute');
-    $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
-    $(twistyCanvas).css('left', ($(twistyContainer).width()-min)/2);
+    view.renderer.setSize(min, min);
+    $(view.canvas).css('position', 'absolute');
+    $(view.canvas).css('top', ($(twistyContainer).height()-min)/2);
+    $(view.canvas).css('left', ($(twistyContainer).width()-min)/2);
 
     render();
   };
@@ -273,21 +277,21 @@ twistyjs.TwistyScene = function() {
 
 
   function render() {
-    renderer.render(scene, camera);
+    view.renderer.render(view.scene, view.camera);
   }
 
   function moveCameraPure(theta) {
-    cameraTheta = theta;
+    view.cameraTheta = theta;
     var scale = twisty.cameraScale();
-    camera.position.x = 2.5*Math.sin(theta) * scale;
-    camera.position.y = 2 * scale;
-    camera.position.z = 2.5*Math.cos(theta) * scale;
-    camera.lookAt(new THREE.Vector3(0, -0.075 * scale, 0));
+    view.camera.position.x = 2.5*Math.sin(theta) * scale;
+    view.camera.position.y = 2 * scale;
+    view.camera.position.z = 2.5*Math.cos(theta) * scale;
+    view.camera.lookAt(new THREE.Vector3(0, -0.075 * scale, 0));
   }
 
   function moveCameraDelta(deltaTheta) {
-    cameraTheta += deltaTheta;
-    moveCameraPure(cameraTheta);
+    view.cameraTheta += deltaTheta;
+    moveCameraPure(view.cameraTheta);
     render();
   }
 
@@ -452,7 +456,7 @@ twistyjs.TwistyScene = function() {
         currentMoveIdx++; // Don't start animating on a pause.
       }
       startMove();
-      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
+      pendingAnimationLoop = requestAnimFrame(animateLoop, view.canvas);
     }
   }
   function animateLoop() {
@@ -467,7 +471,7 @@ twistyjs.TwistyScene = function() {
     // We check pendingAnimationLoop first, because the loop
     // may have been cancelled during stepAnimation().
     if(pendingAnimationLoop !== null) {
-      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
+      pendingAnimationLoop = requestAnimFrame(animateLoop, view.canvas);
     }
   }
 
