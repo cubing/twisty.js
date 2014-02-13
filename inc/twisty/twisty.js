@@ -53,11 +53,12 @@ twistyjs.TwistyScene = function() {
 
   var twisty = null;
 
-  var moveProgress = null;
-  var currentMoveIdx = -1;
-  var moveList = [];
-  function currentMove() {
-    return moveList[currentMoveIdx];
+  var model = {
+    moveProgress: null,
+    currentMoveIdx: -1,
+    moveList: [],
+    twistyType: null,
+    mode: null
   }
 
   var view = {
@@ -65,27 +66,33 @@ twistyjs.TwistyScene = function() {
     scene: null,
     renderer: null,
     canvas: null,
-    cameraTheta: null
+    container: null,
+    cameraTheta: null,
+    theta: null,
+    rotating: false
   }
 
-  var twistyTypeCached;
-
-  var stats = null;
-  var mode = null;
+  var debug = {
+    status: null
+  }
 
   /* http://tauday.com/ ;-) */
   Math.TAU = Math.PI*2;
 
+  function currentMove() {
+    return model.moveList[model.currentMoveIdx];
+  }
+
   /*
    * Initialization Methods
    */
-  var twistyContainer = $('<div/>');
-  twistyContainer.css('width', '100%');
-  twistyContainer.css('height', '100%');
-  twistyContainer = twistyContainer[0];
+  view.twistyContainer = $('<div/>');
+  view.twistyContainer.css('width', '100%');
+  view.twistyContainer.css('height', '100%');
+  view.twistyContainer = view.twistyContainer[0];
 
   this.getDomElement = function() {
-    return twistyContainer;
+    return view.twistyContainer;
   };
   this.getCanvas = function() {
     return view.canvas;
@@ -95,19 +102,19 @@ twistyjs.TwistyScene = function() {
   };
 
   this.initializeTwisty = function(twistyType) {
-    moveList = [];
-    currentMoveIdx = -1;
-    moveProgress = 0;
+    model.moveList = [];
+    model.currentMoveIdx = -1;
+    model.moveProgress = 0;
 
-    twistyTypeCached = twistyType;
+    model.twistyType = twistyType;
 
     // We may have an animation queued up that is tied to the twistyCanvas.
     // Since we're about to destroy our twistyCanvas, that animation request
     // will never fire. Thus, we must explicitly stop animating here.
     stopAnimation();
 
-    $(twistyContainer).empty();
-    log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
+    $(view.twistyContainer).empty();
+    log("Canvas Size: " + $(view.twistyContainer).width() + " x " + $(view.twistyContainer).height());
 
     /*
      * Scene Setup
@@ -131,17 +138,17 @@ twistyjs.TwistyScene = function() {
     view.renderer = new rendererType({antialias: true});
     view.canvas = view.renderer.domElement;
 
-    twistyContainer.appendChild(view.canvas);
+    view.twistyContainer.appendChild(view.canvas);
 
 
     //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
     //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
 
     if(twistyType.allowDragging) {
-      $(twistyContainer).css('cursor', 'move');
-      twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
-      twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
-      twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
+      $(view.twistyContainer).css('cursor', 'move');
+      view.twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
+      view.twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
+      view.twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
     }
 
     var mode = null;
@@ -168,7 +175,7 @@ twistyjs.TwistyScene = function() {
     console.log(opts.init);
     console.log(opts.type);
 
-    mode = "playback";
+    model.mode = "playback";
 
     that.applyMoves(opts.init);
     preMoves = opts.init;
@@ -184,22 +191,22 @@ twistyjs.TwistyScene = function() {
 
     that.addMoves(algIn);
     stopAnimation();
-    currentMoveIdx = -1;
+    model.currentMoveIdx = -1;
 
     updateSpeed();
   }
 
   this.resize = function() {
-    // This function should be called after setting twistyContainer
+    // This function should be called after setting view.twistyContainer
     // to the desired size.
-    var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
+    var min = Math.min($(view.twistyContainer).width(), $(view.twistyContainer).height());
     view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
     moveCameraDelta(0);
     view.renderer.setSize(min, min);
     $(view.canvas).css('position', 'absolute');
-    $(view.canvas).css('top', ($(twistyContainer).height()-min)/2);
-    $(view.canvas).css('left', ($(twistyContainer).width()-min)/2);
+    $(view.canvas).css('top', ($(view.twistyContainer).height()-min)/2);
+    $(view.canvas).css('left', ($(view.twistyContainer).width()-min)/2);
 
     render();
   };
@@ -225,34 +232,28 @@ twistyjs.TwistyScene = function() {
   };
 
 
-
-  var theta = 0;
-  var mouseXLast = 0;
-
   this.cam = function(deltaTheta) {
-    theta += deltaTheta;
-    moveCamera(theta);
+    view.theta += deltaTheta;
+    moveCamera(view.theta);
   }
-
-  var rotating = false;
 
   function onMouseDown( event ) {
     console.log(event);
     event.preventDefault();
-    rotating = true;
-    mouseXLast = event.clientX;
+    view.rotating = true;
+    view.mouseXLast = event.clientX;
   }
 
   function onMouseMove( event ) {
-    if (rotating) {
-      mouseX = event.clientX;
-      that.cam((mouseXLast - mouseX)/256);
-      mouseXLast = mouseX;
+    if (view.rotating) {
+      view.mouseX = event.clientX;
+      that.cam((view.mouseXLast - view.mouseX)/256);
+      view.mouseXLast = view.mouseX;
     }
   }
 
   function onMouseUp( event ) {
-    rotating = false;
+    view.rotating = false;
   }
 
   document.body.addEventListener( 'mousemove', onMouseMove, false );
@@ -321,17 +322,17 @@ twistyjs.TwistyScene = function() {
   }
 
   function startMove() {
-    moveProgress = 0;
+    model.moveProgress = 0;
 
-    currentMoveIdx += 1;
+    model.currentMoveIdx += 1;
     //log(moveToString(currentMove));
     fireMoveStarted(currentMove());
   }
 
   //TODO 20110906: Handle illegal moves robustly.
   function queueMoves(moves) {
-    moveList = moveList.concat(moves);
-    if (moveList.length > 0) {
+    model.moveList = model.moveList.concat(moves);
+    if (model.moveList.length > 0) {
       startAnimation();
     }
   }
@@ -356,20 +357,20 @@ twistyjs.TwistyScene = function() {
   };
 
   this.getMoveList = function() {
-    return moveList;
+    return model.moveList;
   }
 
   var preMoves;
   var stopPlaybackSoon = false;
 
   this.setIndex = function(idx) {
-    var moveListSaved = moveList;
-    that.initializeTwisty(twistyTypeCached); // Hack
-    moveList = moveListSaved;
-    if (mode === "playback") {
+    var moveListSaved = model.moveList;
+    that.initializeTwisty(model.twistyType); // Hack
+    model.moveList = moveListSaved;
+    if (model.mode === "playback") {
       that.applyMoves(preMoves);
     }
-    while (currentMoveIdx < idx) {
+    while (model.currentMoveIdx < idx) {
       startMove();
       twisty["advanceMoveCallback"](twisty, currentMove());
     }
@@ -378,16 +379,16 @@ twistyjs.TwistyScene = function() {
 
   this.debug = {};
   this.debug.getIndex = function() {
-    return currentMoveIdx;
+    return model.currentMoveIdx;
   }
 
   //TODO: Make time-based / framerate-compensating
   function updateSpeed() {
-    if (mode === "playback") {
+    if (model.mode === "playback") {
       animationStep = baseAnimationStep;
     }
     else {
-      baseAnimationStep = Math.min(0.15 + 0.1*(moveList.length - currentMoveIdx-1), 1);
+      baseAnimationStep = Math.min(0.15 + 0.1*(model.moveList.length - model.currentMoveIdx-1), 1);
     }
 
   }
@@ -406,18 +407,18 @@ twistyjs.TwistyScene = function() {
   var animationStep = baseAnimationStep;
 
   function stepAnimation() {
-    moveProgress += stepAmount();
+    model.moveProgress += stepAmount();
 
-    if (moveProgress < 1) {
-      twisty["animateMoveCallback"](twisty, currentMove(), moveProgress);
+    if (model.moveProgress < 1) {
+      twisty["animateMoveCallback"](twisty, currentMove(), model.moveProgress);
     }
     else {
       twisty["advanceMoveCallback"](twisty, currentMove());
 
       fireMoveEnded(currentMove());
-      //currentMoveIdx = -1;
+      //model.currentMoveIdx = -1;
 
-      if (currentMoveIdx + 1 >= moveList.length || stopPlaybackSoon) {
+      if (model.currentMoveIdx + 1 >= model.moveList.length || stopPlaybackSoon) {
         stopAnimation();
       }
       else {
@@ -432,12 +433,12 @@ twistyjs.TwistyScene = function() {
   }
 
   function startStats() {
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '0px';
-    stats.domElement.style.left = '0px';
-    twistyContainer.appendChild( stats.domElement );
-    $(stats.domElement).click();
+    debug.stats = new Stats();
+    debug.stats.domElement.style.position = 'absolute';
+    debug.stats.domElement.style.top = '0px';
+    debug.stats.domElement.style.left = '0px';
+    view.twistyContainer.appendChild( debug.stats.domElement );
+    $(debug.stats.domElement).click();
   }
 
 
@@ -451,9 +452,9 @@ twistyjs.TwistyScene = function() {
   function startAnimation() {
     stopPlaybackSoon = false;
     if(pendingAnimationLoop === null) {
-      //log("Starting move queue: " + movesToString(moveList));
-      while (moveList[currentMoveIdx+1].base === ".") {
-        currentMoveIdx++; // Don't start animating on a pause.
+      //log("Starting move queue: " + movesToString(model.moveList));
+      while (model.moveList[model.currentMoveIdx+1].base === ".") {
+        model.currentMoveIdx++; // Don't start animating on a pause.
       }
       startMove();
       pendingAnimationLoop = requestAnimFrame(animateLoop, view.canvas);
@@ -463,8 +464,8 @@ twistyjs.TwistyScene = function() {
     stepAnimation();
     render();
 
-    if (stats) {
-      stats.update(); 
+    if (debug.stats) {
+      debug.stats.update(); 
     }
 
     // That was fun, lets do it again!
@@ -485,7 +486,7 @@ twistyjs.TwistyScene = function() {
     // TODO - discuss the class heirarchy with Lucas
     //  Does it make sense for a TwistyScene to have an addMoves method?
     //  Scene implies (potentially) multiple twisties.
-    //   Perhaps rename TwistyScene -> TwistyContainer?
+    //   Perhaps rename TwistyScene -> view.TwistyContainer?
     //  Alertatively, TwistyScene could become a Twisty base class, 
     //  and twisty instances inherit useful stuff like addMoves.
     //
