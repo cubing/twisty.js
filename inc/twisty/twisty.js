@@ -1,4 +1,4 @@
-/*
+ /*
  * twisty.js
  * 
  * Started by Lucas Garron, July 22, 2011 at WSOH
@@ -6,20 +6,12 @@
  * 
  */
 
-var twistyjs = {};
-
-(function() {
-
-if(typeof(log) == "undefined") {
-  log = function(s) {
-    console.log(s);
-  };
-}
+"use strict";
 
 if(typeof(assert) == "undefined") {
   // TODO - this is pretty lame, we could use something like stacktrace.js
   // to get some useful information here.
-  assert = function(cond, str) {
+  var assert = function(cond, str) {
     if(!cond) {
       if(str) {
         throw str;
@@ -30,16 +22,27 @@ if(typeof(assert) == "undefined") {
   };
 }
 
+var twistyjs = {};
+
+(function() {
+
+if(typeof(log) == "undefined") {
+  var log = function(s) {
+    console.log(s);
+  };
+}
+
 /****************
- * 
+ *
  * Twisty Plugins
  *
  * Plugins register themselves by calling twistyjs.registerTwisty.
  * This lets plugins be defined in different files.
- * 
+ *
  */
 
 var twisties = {};
+
 twistyjs.registerTwisty = function(twistyName, twistyConstructor) {
   assert(!(twistyName in twisties));
   twisties[twistyName] = twistyConstructor;
@@ -49,95 +52,87 @@ twistyjs.TwistyScene = function() {
   // that=this is a Crockford convention for accessing "this" inside of methods.
   var that = this;
 
-  var twisty = null;
-
-  var moveProgress = null;
-  var currentMoveIdx = -1;
-  var moveList = [];
-  function currentMove() {
-    return moveList[currentMoveIdx];
+  var twisty = {
+    type: null
   }
 
-  var camera, scene, renderer;
-  var twistyCanvas;
-  var cameraTheta = 0;
+  var view = {
+    camera: null,
+    cameraTheta: null,
+    scene: null,
+    renderer: null,
+    dom_container: null,
+    dom_canvas: null
+  }
 
-  var twistyTypeCached;
+  var animation = {
+    time: 0,
+    setup: null,
+    alg: null
+    // mode: null
+  }
 
-  var stats = null;
-  var mode = null;
+  var debug = {
+    stats: null
+  }
 
   /* http://tauday.com/ ;-) */
   Math.TAU = Math.PI*2;
 
-  /*
-   * Initialization Methods
-   */
-  var twistyContainer = $('<div/>');
-  twistyContainer.css('width', '100%');
-  twistyContainer.css('height', '100%');
-  twistyContainer = twistyContainer[0];
+  // this.getDomElement = function() {
+  //   return twistyContainer;
+  // };
+  // this.getCanvas = function() {
+  //   return view.dom_canvas;
+  // };
+  // this.getTwisty = function() {
+  //   return twisty;
+  // };
+
+  this.initializeScene = function() {
+
+    // Set up DOM container
+    var dom_container = $('<div/>');
+    dom_container.css('width', '100%');
+    dom_container.css('height', '100%');
+    view.dom_container = dom_container[0];
+
+    var rendererType = twisty.type.renderer || THREE.CanvasRenderer;
+    view.renderer = new rendererType({antialias: true});
+
+    view.dom_container.appendChild(view.renderer.domElement);
+
+    view.scene = new THREE.Scene();
+  }
+
+  this.initializeAnimation = function() {
+
+  }
 
   this.getDomElement = function() {
-    return twistyContainer;
-  };
-  this.getCanvas = function() {
-    return twistyCanvas;
-  };
-  this.getTwisty = function() {
-    return twisty;
-  };
+    return view.dom_container;
+  }
+
 
   this.initializeTwisty = function(twistyType) {
-    moveList = [];
-    currentMoveIdx = -1;
-    moveProgress = 0;
 
-    twistyTypeCached = twistyType;
+    twisty.type = twistyType;
 
-    // We may have an animation queued up that is tied to the twistyCanvas.
-    // Since we're about to destroy our twistyCanvas, that animation request
-    // will never fire. Thus, we must explicitly stop animating here.
-    stopAnimation();
+    this.initializeScene();
+    this.initializeAnimation();
 
-    $(twistyContainer).empty();
-    log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
-
-    /*
-     * Scene Setup
-     */
-
-    scene = new THREE.Scene();
-
-    /*
-     * 3D Object Creation
-     */
-
-    // TODO: Rename and spec twisty format.
-    twisty = createTwisty(twistyType, scene);
-
-    /*
-     * Go!
-     */
-
-    rendererType = twistyType.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
-    renderer = new rendererType({antialias: true});
-    twistyCanvas = renderer.domElement;
-
-    twistyContainer.appendChild(twistyCanvas);
+    twisty = createTwisty(twistyType, view.scene);
 
 
     //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
     //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
 
-    if(twistyType.allowDragging) {
-      $(twistyContainer).css('cursor', 'move');
-      twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
-      twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
-      twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
-    }
-
-    var mode = null;
+    // if(twistyType.allowDragging) {
+    //   $(twistyContainer).css('cursor', 'move');
+    //   twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
+    //   twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
+    //   twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
+    // }
 
 
     if(twistyType.showFps) {
@@ -186,13 +181,13 @@ twistyjs.TwistyScene = function() {
     // This function should be called after setting twistyContainer
     // to the desired size.
     var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
-    camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
+    view.camera = new THREE.PerspectiveCamera( 60, 1, 1, 8 );
 
     moveCameraDelta(0);
-    renderer.setSize(min, min);
-    $(twistyCanvas).css('position', 'absolute');
-    $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
-    $(twistyCanvas).css('left', ($(twistyContainer).width()-min)/2);
+    view.renderer.setSize(min, min);
+    $(view.dom_canvas).css('position', 'absolute');
+    $(view.dom_canvas).css('top', ($(twistyContainer).height()-min)/2);
+    $(view.dom_canvas).css('left', ($(twistyContainer).width()-min)/2);
 
     render();
   };
@@ -270,21 +265,22 @@ twistyjs.TwistyScene = function() {
 
 
   function render() {
-    renderer.render(scene, camera);
+    view.renderer.render(view.scene, view.camera);
   }
 
   function moveCameraPure(theta) {
-    cameraTheta = theta;
-    scale = twisty.cameraScale();
-    camera.position.x = 2.5*Math.sin(theta) * scale;
-    camera.position.y = 2 * scale;
-    camera.position.z = 2.5*Math.cos(theta) * scale;
-    camera.lookAt(new THREE.Vector3(0, -0.075 * scale, 0));
+    view.cameraTheta = theta;
+    view.scale = twisty.cameraScale();
+    view.camera.position.x = 2.5*Math.sin(theta) * view.scale;
+    view.camera.position.y = 2 * view.scale;
+    view.camera.position.z = 2.5*Math.cos(theta) * view.scale;
+    view.camera.lookAt(new THREE.Vector3(0, -0.075 * view.scale, 0));
+    view.camera.updateProjectionMatrix();
   }
 
   function moveCameraDelta(deltaTheta) {
-    cameraTheta += deltaTheta;
-    moveCameraPure(cameraTheta);
+    view.cameraTheta += deltaTheta;
+    moveCameraPure(view.cameraTheta);
     render();
   }
 
@@ -425,12 +421,12 @@ twistyjs.TwistyScene = function() {
   }
 
   function startStats() {
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '0px';
-    stats.domElement.style.left = '0px';
-    twistyContainer.appendChild( stats.domElement );
-    $(stats.domElement).click();
+    debug.stats = new Stats();
+    debug.stats.domElement.style.position = 'absolute';
+    debug.stats.domElement.style.top = '0px';
+    debug.stats.domElement.style.left = '0px';
+    twistyContainer.appendChild( debug.stats.domElement );
+    $(debug.stats.domElement).click();
   }
 
 
@@ -449,7 +445,7 @@ twistyjs.TwistyScene = function() {
         currentMoveIdx++; // Don't start animating on a pause.
       }
       startMove();
-      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
+      pendingAnimationLoop = requestAnimFrame(animateLoop, view.dom_canvas);
     }
   }
   function animateLoop() {
@@ -464,7 +460,7 @@ twistyjs.TwistyScene = function() {
     // We check pendingAnimationLoop first, because the loop
     // may have been cancelled during stepAnimation().
     if(pendingAnimationLoop !== null) {
-      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
+      pendingAnimationLoop = requestAnimFrame(animateLoop, view.dom_canvas);
     }
   }
 

@@ -27,6 +27,7 @@ function createPlaneTwisty(twistyScene, twistyType) {
   return {
     "type": twistyType,
     "3d": plane,
+    "cameraScale": function() {return 1},
     "updateTwistyCallback": updateTwistyCallback,
     "keydownCallback": updateTwistyCallback
   };
