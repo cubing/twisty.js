@@ -124,9 +124,6 @@ $(document).ready(function() {
 
   log("Document ready.");
 
-  twistyScene = new twistyjs.TwistyScene();
-  $("#twistyContainer").append($(twistyScene.getDomElement()));
-
   var currentCubeSize = parseInt($("#cubeDimension").val());
   reloadCube();
 
@@ -240,23 +237,6 @@ $(document).ready(function() {
   // From alg.garron.us
   function escapeAlg(algstr){return algstr.replace(/\n/g, '%0A').replace(/-/g, '%2D').replace(/\'/g, '-').replace(/ /g, '_');}
 
-
-  function algUpdateCallback(alg_moves) {
-    var dim = $("#cubeDimension").val();
-    // var algString = alg.sign_w.algToString(alg_moves, dim);
-    // console.log(algString);
-    // var text;
-    // if (algString == "") {
-    //   $("#typed_alg").removeAttr("href")
-    //   $("#typed_alg").text("[Algorithm]");
-    // }
-    // else {
-    //   var url = "http://alg.garron.us/?alg=" + escapeAlg(algString);
-    //   $("#typed_alg").attr("href", url);
-    //   $("#typed_alg").text(algString);
-    // }
-  }
-
   function reloadCube() {
     log("Current cube size: " + currentCubeSize);
 
@@ -264,19 +244,23 @@ $(document).ready(function() {
     var stage = $('input[name="stage"]:checked').val();
     var speed = $('#speed')[0].valueAsNumber;
 
+    twistyScene = new twistyjs.TwistyScene({
+      renderer: renderer,
+      allowDragging: $("#allow_dragging").is(':checked'),
+      "speed": speed,
+      showFps: true
+    });
+    $("#twistyContainer").empty();
+    $("#twistyContainer").append($(twistyScene.getDomElement()));
+
     twistyScene.initializeTwisty({
       "type": "cube",
       "dimension": currentCubeSize,
-      "renderer": renderer,
       "stage": stage,
-      "speed": speed,
-      "algUpdateCallback": algUpdateCallback,
       "doubleSided": $("#double_sided").is(':checked'),
       "cubies": $("#cubies").is(':checked'),
       "hintStickers": $("#hint_stickers").is(':checked'),
-      "stickerBorder": $("#sticker_border").is(':checked'),
-      allowDragging: $("#allow_dragging").is(':checked'),
-      showFps: true
+      "stickerBorder": $("#sticker_border").is(':checked')
     });
     $("#cubeDimension").blur(); 
     twistyScene.resize();
