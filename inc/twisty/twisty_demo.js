@@ -188,7 +188,7 @@ $(document).ready(function() {
       }
     );
 
-    var moveList = twistyScene.getMoveList();
+    var moveList = twistyScene.getMoveList();f
     var pl = $("#playback_alg");
     pl.empty();
 
@@ -206,7 +206,7 @@ $(document).ready(function() {
     }
   });
 
-  twistyScene.cam(0);
+  twistyScene.setCameraTheta(0);
 
   $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "inc/offline/offline.html";
