@@ -1,3 +1,5 @@
+var aaa, bbb;
+
 /*
  * that.twisty.js
  * 
@@ -26,12 +28,6 @@ var twistyjs = {};
 
 (function() {
 
-if(typeof(log) == "undefined") {
-  var log = function(s) {
-    console.log(s);
-  };
-}
-
 /****************
  * 
  * that.twisty Plugins
@@ -51,12 +47,12 @@ twistyjs.TwistyScene = function(options) {
     moveProgress: null,
     currentMoveIdx: -1,
     moveList: [],
+    preMoveList: [],
     twisty: null,
     mode: null,
 
     time: null,
     position: 0,
-    animating: false
   }
 
   var view = {
@@ -67,7 +63,7 @@ twistyjs.TwistyScene = function(options) {
     container: null,
     cameraTheta: null,
     theta: null,
-    rotating: false
+    animating: false
   }
 
   this.debug = {
@@ -86,7 +82,6 @@ twistyjs.TwistyScene = function(options) {
   view.initialize = function(options) {
 
     options = options || {};
-    console.log(options);
 
     /*
      * Initialization Methods
@@ -97,7 +92,7 @@ twistyjs.TwistyScene = function(options) {
     view.twistyContainer = view.twistyContainer[0];
 
     $(view.twistyContainer).empty();
-    log("Canvas Size: " + $(view.twistyContainer).width() + " x " + $(view.twistyContainer).height());
+    // log("Canvas Size: " + $(view.twistyContainer).width() + " x " + $(view.twistyContainer).height());
 
     /*
      * Scene Setup
@@ -107,7 +102,7 @@ twistyjs.TwistyScene = function(options) {
 
 
     if (typeof(that.speed) === "undefined") {
-      that.speed = options.speed || 1;
+      that.speed = options.speed || 3;
     }
 
 
@@ -152,13 +147,6 @@ twistyjs.TwistyScene = function(options) {
     return that.twisty;
   };
 
-  this.startAllowDragging = function() {
-    $(view.twistyContainer).css('cursor', 'move');
-    view.twistyContainer.addEventListener( 'mousedown', onMouseDown, false );
-    view.twistyContainer.addEventListener( 'touchstart', onTouchStart, false );
-    view.twistyContainer.addEventListener( 'touchmove', onTouchMove, false );
-  }
-
   this.initializeTwisty = function(twistyType) {
 
     model.moveList = [];
@@ -177,29 +165,27 @@ twistyjs.TwistyScene = function(options) {
     opts.init = (typeof opts.init === "undefined") ? [] : opts.init;
     if (opts.type !== "solve") { opts.type = "generator"; }
 
-    console.log("---");
-    console.log(opts.init);
-    console.log(opts.type);
+    // console.log("---");
+    // console.log(opts.init);
+    // console.log(opts.type);
 
     model.mode = "playback";
 
     that.applyMoves(opts.init);
-    preMoves = opts.init;
+    model.preMoveList = opts.init;
 
     if (opts.type === "solve") {
-      console.log("alg", algIn);
+      // console.log("alg", algIn);
       var algInverse = alg.sign_w.invert(algIn);
-      console.log("alg", algInverse);
+      // console.log("alg", algInverse);
       that.applyMoves(algInverse);
-      preMoves = preMoves.concat(algInverse);
-      render();
+      model.preMoveList = model.preMoveList.concat(algInverse);
+      renderOnce();
     }
 
     that.addMoves(algIn);
     stopAnimation();
     model.currentMoveIdx = -1;
-
-    updateSpeed();
   }
 
   this.resize = function() {
@@ -214,7 +200,7 @@ twistyjs.TwistyScene = function(options) {
     $(view.canvas).css('top', ($(view.twistyContainer).height()-min)/2);
     $(view.canvas).css('left', ($(view.twistyContainer).width()-min)/2);
 
-    render();
+    renderOnce();
   };
 
   this.keydown = function(e) {
@@ -238,46 +224,62 @@ twistyjs.TwistyScene = function(options) {
   };
 
 
-  this.cam = function(deltaTheta) {
-    view.theta += deltaTheta;
-    moveCamera(view.theta);
+  /******** Dragging/Rotation ********/
+
+  this.startAllowDragging = function() {
+    $(view.twistyContainer).css("cursor", "move");
+    view.twistyContainer.addEventListener("mousedown", onStart, false );
+    view.twistyContainer.addEventListener("touchstart", onStart, false );
   }
 
-  function onMouseDown( event ) {
-    console.log(event);
+  var listeners = {
+    "mouse": {
+      "mousemove": onMove,
+      "mouseup": onEnd
+    },
+    "touch": {
+      "touchmove": onMove,
+      "touchend": onEnd
+    }
+  }
+
+  function eventKind(event) {
+    if (event instanceof MouseEvent) {
+      return "mouse";
+    }
+    else if (event instanceof TouchEvent) {
+      return "touch";
+    }
+    throw "Unknown event kind.";
+  }
+
+  function onStart(event) {
+    var kind = eventKind(event);
+
+    view.mouseXLast = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
     event.preventDefault();
-    view.rotating = true;
-    view.mouseXLast = event.clientX;
-  }
+    renderOnce();
 
-  function onMouseMove( event ) {
-    if (view.rotating) {
-      view.mouseX = event.clientX;
-      that.cam((view.mouseXLast - view.mouseX)/256);
-      view.mouseXLast = view.mouseX;
+    for (listener in listeners[kind]) {
+      window.addEventListener(listener, listeners[kind][listener], false);
     }
   }
 
-  function onMouseUp( event ) {
-    view.rotating = false;
+  function onMove(event) {
+    var kind = eventKind(event);
+
+    view.mouseX = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
+    event.preventDefault();
+    that.cam((view.mouseXLast - view.mouseX)/256);
+    view.mouseXLast = view.mouseX;
+
+    renderOnce();
   }
 
-  document.body.addEventListener( 'mousemove', onMouseMove, false );
-  document.body.addEventListener( 'mouseup', onMouseUp, false );
-
-  function onTouchStart( event ) {
-    if ( event.touches.length == 1 ) {
-      event.preventDefault();
-      mouseXLast = event.touches[0].pageX;
-    }
-  }
-
-  function onTouchMove( event ) {
-    if ( event.touches.length == 1 ) {
-      event.preventDefault();
-      mouseX = event.touches[0].pageX;
-      that.cam((mouseXLast - mouseX)/256);
-      mouseXLast = mouseX;
+  function onEnd(event) {
+    var kind = eventKind(event);
+    for (listener in listeners[kind]) {
+      window.removeEventListener(listener, listeners[kind][listener], false);
     }
   }
 
@@ -285,6 +287,19 @@ twistyjs.TwistyScene = function(options) {
 
   function render() {
     view.renderer.render(view.scene, view.camera);
+    that.debug.stats.update();
+  }
+
+  function renderOnce() {
+    if (!view.animating) {
+      render();
+    }
+  }
+
+
+  this.cam = function(deltaTheta) {
+    view.theta += deltaTheta;
+    moveCamera(view.theta);
   }
 
   function moveCameraPure(theta) {
@@ -309,7 +324,6 @@ twistyjs.TwistyScene = function(options) {
 
   var moveListeners = [];
   this.addMoveListener = function(listener) {
-    console.log(listener);
     moveListeners.push(listener);
   };
   this.removeMoveListener = function(listener) {
@@ -350,7 +364,7 @@ twistyjs.TwistyScene = function(options) {
 
   this.addMoves = function(moves) {
     queueMoves(moves);
-    updateSpeed();
+    triggerAnimation();
   };
 
   this.stopAnimation = stopAnimation;
@@ -360,82 +374,28 @@ twistyjs.TwistyScene = function(options) {
     for (i in moves) {
       that.twisty["advanceMoveCallback"](that.twisty, moves[i]);
     }
-    render();
   };
 
   this.getMoveList = function() {
     return model.moveList;
   }
 
-  var preMoves;
-  var stopPlaybackSoon = false;
-
   this.setIndex = function(idx) {
     var moveListSaved = model.moveList;
     that.initializeTwisty(model.twistyType); // Hack
     model.moveList = moveListSaved;
     if (model.mode === "playback") {
-      that.applyMoves(preMoves);
+      that.applyMoves(model.preMoveList);
     }
     while (model.currentMoveIdx < idx) {
       startMove();
       that.twisty["advanceMoveCallback"](that.twisty, currentMove());
     }
-    render();
+    renderOnce();
   }
 
   this.debug.getIndex = function() {
     return model.currentMoveIdx;
-  }
-
-  //TODO: Make time-based / framerate-compensating
-  function updateSpeed() {
-    if (model.mode === "playback") {
-      animationStep = baseAnimationStep;
-    }
-    else {
-      baseAnimationStep = Math.min(0.15 + 0.1*(model.moveList.length - model.currentMoveIdx-1), 1);
-    }
-
-  }
-
-  this.setSpeed = function(speed) {
-    that.speed = speed;
-  }
-
-  function stepAmount() {
-    var factor = 3; // Tuned constant; equals the maximum ratio of a long move vs. a quarter turn.
-    var currentAmount = Math.abs(currentMove().amount);
-    return baseAnimationStep * currentAmount / (1 + (factor*(currentAmount - 1))) * that.speed;
-  }
-
-  var baseAnimationStep = 0.1;
-  var animationStep = baseAnimationStep;
-
-  function stepAnimation() {
-    model.moveProgress += stepAmount();
-
-    if (model.moveProgress < 1) {
-      that.twisty["animateMoveCallback"](that.twisty, currentMove(), model.moveProgress);
-    }
-    else {
-      that.twisty["advanceMoveCallback"](that.twisty, currentMove());
-
-      fireMoveEnded(currentMove());
-      //model.currentMoveIdx = -1;
-
-      if (model.currentMoveIdx + 1 >= model.moveList.length || stopPlaybackSoon) {
-        stopAnimation();
-      }
-      else {
-        startMove();
-      }
-
-    }
-  }
-
-  this.stopPlayback = function() {
-    stopPlaybackSoon = true;
   }
 
   function startStats() {
@@ -456,76 +416,56 @@ twistyjs.TwistyScene = function(options) {
   }
 
   function triggerAnimation() {
-    if (!model.animating) {
+    if (!view.animating) {
       model.time = Date.now();
-      model.animating = true;
+      view.animating = true;
       animFrame();
     }
   }
 
   function animFrame() {
+
     //TODO: Handle non-animating rotation.
-    if (model.animating) {
-      var newTime = Date.now();
-      var delta = newTime - model.time;
-      var newPosition = model.position + delta * that.speed / 1000;
+    if (view.animating) {
 
-      if (newPosition > totalLength()) {
-        newPosition = totalLength();
-        model.animating = false;
+      var prevTime = model.time;
+      var prevPosition = model.position;
+
+      model.time = Date.now();
+      model.position = prevPosition + (model.time - prevTime) * that.speed / 1000;
+
+      if (model.position > totalLength()) {
+        model.position = totalLength();
+        view.animating = false;
       }
 
-      var currentMove = model.moveList[Math.floor(newPosition)];
-      if (Math.floor(newPosition) > Math.floor(model.position)) {
-        var lastMove = model.moveList[Math.floor(model.position)];
-        that.twisty["animateMoveCallback"](that.twisty, lastMove, 1);
-        that.twisty["advanceMoveCallback"](that.twisty, lastMove);
+      // If we finished a move, snap to the beginning of the next.
+      if (Math.floor(model.position) > Math.floor(prevPosition)) {
+        // TODO: Skip multpile moves.
+        var prevMove = model.moveList[Math.floor(prevPosition)];
+        that.twisty["animateMoveCallback"](that.twisty, prevMove, 1);
+        that.twisty["advanceMoveCallback"](that.twisty, prevMove);
       }
-      console.log("a", currentMove, newPosition % 1);
-      that.twisty["animateMoveCallback"](that.twisty, currentMove, newPosition % 1);
-      view.renderer.render(view.scene, view.camera);
-
-      model.time = newTime;
-      model.position = newPosition;
-
-      if (model.animating) {
-        console.log(model.time, model.position)
-        requestAnimFrame(animFrame);
+      else {
+        var currentMove = model.moveList[Math.floor(model.position)];
+        // console.log("cur", currentMove);
+        that.twisty["animateMoveCallback"](that.twisty, currentMove, model.position % 1);
       }
+    }
 
-      that.debug.stats.update();
+    render();
+
+    if (view.animating) {
+      requestAnimFrame(animFrame);
     }
   }
 
-  this.totalLength = totalLength;
-  this.triggerAnimation = triggerAnimation;
-  this.animFrame = animFrame;
-
-
-  var pendingAnimationLoop = null;
   function stopAnimation() {
-    if(pendingAnimationLoop !== null) {
-      cancelRequestAnimFrame(pendingAnimationLoop);
-      pendingAnimationLoop = null;
-    }
+    // TODO: Graceful stopping.
+    view.animating = false
   }
   function startAnimation() {
     triggerAnimation();
-  }
-  function animateLoop() {
-    stepAnimation();
-    render();
-
-    if (that.debug.stats) {
-      that.debug.stats.update(); 
-    }
-
-    // That was fun, lets do it again!
-    // We check pendingAnimationLoop first, because the loop
-    // may have been cancelled during stepAnimation().
-    if(pendingAnimationLoop !== null) {
-      pendingAnimationLoop = requestAnimFrame(animateLoop, view.canvas);
-    }
   }
 
   function createTwisty(twistyType) {
