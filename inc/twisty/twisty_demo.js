@@ -248,7 +248,7 @@ $(document).ready(function() {
       renderer: renderer,
       allowDragging: $("#allow_dragging").is(':checked'),
       "speed": speed,
-      showFps: true
+      stats: true
     });
     $("#twistyContainer").empty();
     $("#twistyContainer").append($(twistyScene.getDomElement()));

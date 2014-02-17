@@ -44,15 +44,13 @@ twistyjs.TwistyScene = function(options) {
   var that = this;
 
   var model = {
-    moveProgress: null,
-    currentMoveIdx: -1,
     moveList: [],
     preMoveList: [],
     twisty: null,
     mode: null,
 
     time: null,
-    position: 0,
+    position: null,
   }
 
   var view = {
@@ -79,63 +77,57 @@ twistyjs.TwistyScene = function(options) {
     return model.moveList[model.currentMoveIdx];
   }
 
+  function getOptions(input, defaults) {
+    var output = {};
+    for (var key in defaults) {
+      output[key] = (key in input) ? input[key] : defaults[key];
+    }
+    return output;
+  }
+
+  var initializeDefaults = {
+    speed: 3, // qtps
+    renderer: THREE.CanvasRenderer,
+    allowDragging: true,
+    stats: true
+  }
+
   view.initialize = function(options) {
-
-    options = options || {};
-
-    /*
-     * Initialization Methods
-     */
-    view.twistyContainer = $('<div/>');
-    view.twistyContainer.css('width', '100%');
-    view.twistyContainer.css('height', '100%');
-    view.twistyContainer = view.twistyContainer[0];
-
-    $(view.twistyContainer).empty();
-    // log("Canvas Size: " + $(view.twistyContainer).width() + " x " + $(view.twistyContainer).height());
-
-    /*
-     * Scene Setup
-     */
+    options = getOptions(options, initializeDefaults);
 
     view.scene = new THREE.Scene();
+    view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
-
-    if (typeof(that.speed) === "undefined") {
-      that.speed = options.speed || 3;
-    }
-
-
-    /*
-     * Go!
-     */
-
-    var rendererType = options.renderer || THREE.CanvasRenderer; // TODO: Standardize option handling in this function.
+    var rendererType = options.renderer; // TODO: Standardize option handling in this function.
     view.renderer = new rendererType({antialias: true});
+
     view.canvas = view.renderer.domElement;
+    $(view.canvas).css('position', 'absolute');
+    $(view.canvas).css('top', 0);
+    $(view.canvas).css('left', 0);
 
-
+    var container = $('<div/>');
+    container.css('width', '100%');
+    container.css('height', '100%');
+    view.twistyContainer = container[0];
     view.twistyContainer.appendChild(view.canvas);
 
-    if (options.allowDragging) {
-      that.startAllowDragging();
-    }
-
-    //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
-    //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
-    var mode = null;
-
-
-    if(options.showFps) {
-      startStats();
-    }
-
+    view.speed = options.speed;
+    if (options.allowDragging) { that.startAllowDragging(); }
+    if (options.stats) { startStats(); }
   }
 
-  var initialize = function(options) {
-    view.initialize(options);
-  }
+  this.initializeTwisty = function(twistyType) {
 
+    model.position = 0;
+    model.moveList = [];
+
+    that.twisty = createTwisty(twistyType);
+    view.scene.add(that.twisty["3d"]);
+
+    // resize creates the camera and calls render()
+    that.resize();
+  }
 
   this.getDomElement = function() {
     return view.twistyContainer;
@@ -146,19 +138,6 @@ twistyjs.TwistyScene = function(options) {
   this.getTwisty = function() {
     return that.twisty;
   };
-
-  this.initializeTwisty = function(twistyType) {
-
-    model.moveList = [];
-    model.currentMoveIdx = -1;
-    model.moveProgress = 0;
-
-    that.twisty = createTwisty(twistyType);
-    view.scene.add(that.twisty["3d"]);
-
-    // resize creates the camera and calls render()
-    that.resize();
-  }
 
   this.setupAnimation = function(algIn, opts) {
     opts = opts || {};
@@ -189,17 +168,15 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.resize = function() {
-    // This function should be called after setting view.twistyContainer
-    // to the desired size.
-    var min = Math.min($(view.twistyContainer).width(), $(view.twistyContainer).height());
-    view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
+
+    var width = $(view.twistyContainer).width();
+    var height = $(view.twistyContainer).height()
+
+    var min = Math.min(width, height);
+    view.camera.setViewOffset(min,  min, (min - width)/2, (min - height)/2, width, height);
 
     moveCameraDelta(0);
-    view.renderer.setSize(min, min);
-    $(view.canvas).css('position', 'absolute');
-    $(view.canvas).css('top', ($(view.twistyContainer).height()-min)/2);
-    $(view.canvas).css('left', ($(view.twistyContainer).width()-min)/2);
-
+    view.renderer.setSize(width, height);
     renderOnce();
   };
 
@@ -434,7 +411,7 @@ twistyjs.TwistyScene = function(options) {
       var prevPosition = model.position;
 
       model.time = Date.now();
-      model.position = prevPosition + (model.time - prevTime) * that.speed / 1000;
+      model.position = prevPosition + (model.time - prevTime) * view.speed / 1000;
 
       if (model.position > totalLength()) {
         model.position = totalLength();
@@ -494,7 +471,7 @@ twistyjs.TwistyScene = function(options) {
     return twistyCreateFunction(that, twistyType);
   }
 
-  initialize(options);
+  view.initialize(options);
 
 };
 
