@@ -52,7 +52,11 @@ twistyjs.TwistyScene = function(options) {
     currentMoveIdx: -1,
     moveList: [],
     twisty: null,
-    mode: null
+    mode: null,
+
+    time: null,
+    position: 0,
+    animating: false
   }
 
   var view = {
@@ -295,16 +299,17 @@ twistyjs.TwistyScene = function(options) {
   function moveCameraDelta(deltaTheta) {
     view.cameraTheta += deltaTheta;
     moveCameraPure(view.cameraTheta);
-    render();
+    // render();
   }
 
   function moveCamera(theta) {
     moveCameraPure(theta);
-    render();
+    // render();
   }
 
   var moveListeners = [];
   this.addMoveListener = function(listener) {
+    console.log(listener);
     moveListeners.push(listener);
   };
   this.removeMoveListener = function(listener) {
@@ -334,9 +339,9 @@ twistyjs.TwistyScene = function(options) {
   //TODO 20110906: Handle illegal moves robustly.
   function queueMoves(moves) {
     model.moveList = model.moveList.concat(moves);
-    if (model.moveList.length > 0) {
-      startAnimation();
-    }
+    // if (model.moveList.length > 0) {
+    //   startAnimation();
+    // }
   }
   this.animateMoves = function(moves) {
     animationStep = 0.1;
@@ -442,6 +447,60 @@ twistyjs.TwistyScene = function(options) {
     $(that.debug.stats.domElement).click();
   }
 
+  function totalLength() {
+    // var total = 0;
+    // for (var move in model.moveList) {
+    //   total += 1;
+    // }
+    return model.moveList.length;
+  }
+
+  function triggerAnimation() {
+    if (!model.animating) {
+      model.time = Date.now();
+      model.animating = true;
+      animFrame();
+    }
+  }
+
+  function animFrame() {
+    //TODO: Handle non-animating rotation.
+    if (model.animating) {
+      var newTime = Date.now();
+      var delta = newTime - model.time;
+      var newPosition = model.position + delta * that.speed / 1000;
+
+      if (newPosition > totalLength()) {
+        newPosition = totalLength();
+        model.animating = false;
+      }
+
+      var currentMove = model.moveList[Math.floor(newPosition)];
+      if (Math.floor(newPosition) > Math.floor(model.position)) {
+        var lastMove = model.moveList[Math.floor(model.position)];
+        that.twisty["animateMoveCallback"](that.twisty, lastMove, 1);
+        that.twisty["advanceMoveCallback"](that.twisty, lastMove);
+      }
+      console.log("a", currentMove, newPosition % 1);
+      that.twisty["animateMoveCallback"](that.twisty, currentMove, newPosition % 1);
+      view.renderer.render(view.scene, view.camera);
+
+      model.time = newTime;
+      model.position = newPosition;
+
+      if (model.animating) {
+        console.log(model.time, model.position)
+        requestAnimFrame(animFrame);
+      }
+
+      that.debug.stats.update();
+    }
+  }
+
+  this.totalLength = totalLength;
+  this.triggerAnimation = triggerAnimation;
+  this.animFrame = animFrame;
+
 
   var pendingAnimationLoop = null;
   function stopAnimation() {
@@ -451,15 +510,7 @@ twistyjs.TwistyScene = function(options) {
     }
   }
   function startAnimation() {
-    stopPlaybackSoon = false;
-    if(pendingAnimationLoop === null) {
-      //log("Starting move queue: " + movesToString(model.moveList));
-      while (model.moveList[model.currentMoveIdx+1].base === ".") {
-        model.currentMoveIdx++; // Don't start animating on a pause.
-      }
-      startMove();
-      pendingAnimationLoop = requestAnimFrame(animateLoop, view.canvas);
-    }
+    triggerAnimation();
   }
   function animateLoop() {
     stepAnimation();
