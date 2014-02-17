@@ -213,11 +213,13 @@ twistyjs.TwistyScene = function(options) {
       case 37:
         moveCameraDelta(Math.TAU/48);
         e.preventDefault();
+        renderOnce();
         break;
 
       case 39:
         moveCameraDelta(-Math.TAU/48);
         e.preventDefault();
+        renderOnce();
         break;
 
     }
