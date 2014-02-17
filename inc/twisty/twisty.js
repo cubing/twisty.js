@@ -409,6 +409,7 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.play.skip = function() {
+    setAnimating(false);
     that.setIndex(model.moveList.length);
   }
 
