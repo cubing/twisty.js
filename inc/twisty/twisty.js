@@ -444,7 +444,7 @@ twistyjs.TwistyScene = function(options) {
 
     model.position = position;
 
-    if (position > 0 && position < totalLength()) {
+    if (position < totalLength()) {
       var currentMove = model.moveList[Math.floor(model.position)];
       model.twisty["animateMoveCallback"](model.twisty, currentMove, model.position % 1);
     }
