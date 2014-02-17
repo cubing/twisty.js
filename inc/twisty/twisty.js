@@ -66,7 +66,10 @@ twistyjs.TwistyScene = function(options) {
     cameraTheta: null,
     mouseXLast: null,
 
-    listeners: [],
+    listeners: {
+      animating: [],
+      position: []
+    },
 
     speed: null,
 
@@ -85,7 +88,7 @@ twistyjs.TwistyScene = function(options) {
 
 
   var iniDefaults = {
-    speed: 3, // qtps
+    speed: 1, // qtps is 3*speed
     renderer: THREE.CanvasRenderer,
     allowDragging: true,
     stats: false
@@ -267,19 +270,19 @@ twistyjs.TwistyScene = function(options) {
 
   /******** Control: Move Listeners ********/
 
-  this.addAnimationListener = function(listener) {
-    control.listeners.push(listener);
+  this.addListener = function(kind, listener) {
+    control.listeners[kind].push(listener);
   };
 
-  this.removeAnimationListener = function(listener) {
-    var index = control.listeners.indexOf(listener);
+  this.removeListener = function(kind, listener) {
+    var index = control.listeners[kind].indexOf(listener);
     assert(index >= 0);
-    delete control.listeners[index];
+    delete control.listeners[kind][index];
   };
 
-  function fireAnimation() {
-    for(var i = 0; i < control.listeners.length; i++) {
-      control.listeners[i]();
+  function fireListener(kind, data) {
+    for(var i = 0; i < control.listeners[kind].length; i++) {
+      control.listeners[kind][i](data);
     }
   }
 
@@ -300,7 +303,7 @@ twistyjs.TwistyScene = function(options) {
   function triggerAnimation() {
     if (!control.animating) {
       model.time = Date.now();
-      control.animating = true;
+      setAnimating(true);
       animFrame();
     }
   }
@@ -313,7 +316,7 @@ twistyjs.TwistyScene = function(options) {
       var prevPosition = model.position;
 
       model.time = Date.now();
-      model.position = prevPosition + (model.time - prevTime) * control.speed / 1000;
+      model.position = prevPosition + (model.time - prevTime) * control.speed * 3 / 1000;
 
       if (Math.floor(model.position) > Math.floor(prevPosition)) {
         // If we finished a move, snap to the beginning of the next. (Will never skip a move.)
@@ -324,7 +327,7 @@ twistyjs.TwistyScene = function(options) {
 
         if (control.stopAfterNextMove) {
           control.stopAfterNextMove = false;
-          control.animating = false;
+          setAnimating(false);
         }
       }
       else {
@@ -334,12 +337,12 @@ twistyjs.TwistyScene = function(options) {
 
       if (model.position >= totalLength()) {
         model.position = totalLength();
-        control.animating = false;
+        setAnimating(false);
       }
     }
 
     render();
-    fireAnimation();
+    fireListener("position", model.position);
 
     if (control.animating) {
       requestAnimFrame(animFrame);
@@ -348,6 +351,11 @@ twistyjs.TwistyScene = function(options) {
 
   function totalLength() {
     return model.moveList.length;
+  }
+
+  function setAnimating(value) {
+    control.animating = value;
+    fireListener("animating", control.animating);
   }
 
 
@@ -361,7 +369,7 @@ twistyjs.TwistyScene = function(options) {
   this.setupAnimation = function(algIn, options) {
     options = getOptions(options, setupDefaults);
 
-    model.animating = false;
+    setAnimating(false);
 
     model.preMoveList = options.init;
     if (options.type === "solve") {
@@ -387,7 +395,7 @@ twistyjs.TwistyScene = function(options) {
   this.play = {}
 
   this.play.reset = function() {
-    control.animating = false;
+    setAnimating(false);
     that.setIndex(0);
   }
 
@@ -436,6 +444,7 @@ twistyjs.TwistyScene = function(options) {
     }
 
     renderOnce();
+    // fireAnimation();
   }
 
   this.getPosition = function() {
