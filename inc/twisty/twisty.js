@@ -66,6 +66,8 @@ twistyjs.TwistyScene = function(options) {
     cameraTheta: null,
     mouseXLast: null,
 
+    listeners: [],
+
     speed: null,
 
     animating: false,
@@ -86,7 +88,7 @@ twistyjs.TwistyScene = function(options) {
     speed: 3, // qtps
     renderer: THREE.CanvasRenderer,
     allowDragging: true,
-    stats: true
+    stats: false
   }
 
   function initialize(options) {
@@ -149,7 +151,9 @@ twistyjs.TwistyScene = function(options) {
 
   function render() {
     view.renderer.render(view.scene, view.camera);
-    that.debug.stats.update();
+    if (that.debug.stats) {
+      that.debug.stats.update();
+    }
   }
 
   function renderOnce() {
@@ -263,23 +267,30 @@ twistyjs.TwistyScene = function(options) {
 
   /******** Control: Move Listeners ********/
 
-  // var moveListeners = [];
-  this.addMoveListener = function(listener) {
-  //   moveListeners.push(listener);
+  this.addAnimationListener = function(listener) {
+    control.listeners.push(listener);
   };
-  // this.removeMoveListener = function(listener) {
-  //   var index = moveListeners.indexOf(listener);
-  //   assert(index >= 0);
-  //   delete moveListeners[index];
-  // };
+
+  this.removeAnimationListener = function(listener) {
+    var index = control.listeners.indexOf(listener);
+    assert(index >= 0);
+    delete control.listeners[index];
+  };
+
+  function fireAnimation() {
+    for(var i = 0; i < control.listeners.length; i++) {
+      control.listeners[i]();
+    }
+  }
+
   // function fireMoveStarted(move) {
-  //   for(var i = 0; i < moveListeners.length; i++) {
-  //     moveListeners[i](move, true);
+  //   for(var i = 0; i < control.listeners.length; i++) {
+  //     control.listeners[i](move, true);
   //   }
   // }
   // function fireMoveEnded(move) {
-  //   for(var i = 0; i < moveListeners.length; i++) {
-  //     moveListeners[i](move, false);
+  //   for(var i = 0; i < control.listeners.length; i++) {
+  //     control.listeners[i](move, false);
   //   }
   // }
 
@@ -328,6 +339,7 @@ twistyjs.TwistyScene = function(options) {
     }
 
     render();
+    fireAnimation();
 
     if (control.animating) {
       requestAnimFrame(animFrame);
@@ -404,17 +416,24 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.setPosition = function(position) {
+    var preMoveListSaved = model.preMoveList;
     var moveListSaved = model.moveList;
 
     // Hack
     view.scene.remove(model.twisty["3d"]);
     that.initializeTwisty(model.twisty.type);
+    model.preMoveList = preMoveListSaved;
     model.moveList = moveListSaved;
 
     that.applyMoves(model.preMoveList);
     that.applyMoves(model.moveList.slice(0, position)); // Works with fractional positions
 
     model.position = position;
+
+    if (position > 0 && position < totalLength()) {
+      var currentMove = model.moveList[Math.floor(model.position)];
+      model.twisty["animateMoveCallback"](model.twisty, currentMove, model.position % 1);
+    }
 
     renderOnce();
   }

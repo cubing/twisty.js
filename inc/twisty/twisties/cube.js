@@ -6,7 +6,7 @@
 
 function createCubeTwisty(twistyScene, twistyParameters) {
 
-  log("Creating cube twisty.");
+  // log("Creating cube twisty.");
 
   // Cube Variables
   var cubeObject = new THREE.Object3D();
@@ -33,7 +33,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
   // Passed Parameters
   for (var option in cubeOptions) {
     if(option in twistyParameters) {
-      log("Setting option \"" + option + "\" to " + twistyParameters[option]);
+      // log("Setting option \"" + option + "\" to " + twistyParameters[option]);
       cubeOptions[option] = twistyParameters[option];
     }
   };

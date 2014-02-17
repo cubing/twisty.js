@@ -308,26 +308,26 @@ $(document).ready(function() {
     twistyScene.keydown(e);
   });
 
-  twistyScene.addMoveListener(function(move, started) {
-    if(started) {
-      if(cubeState == CubeState.scrambling) {
-        // We don't want to start the timer if we're scrambling the cube.
-      } else if(cubeState == CubeState.scrambled) {
-        var twisty = twistyScene.getTwisty();
-        if(twisty.isInspectionLegalMove(twisty, move)) {
-          return;
-        }
-        startTimer();
-        cubeState = CubeState.solving;
-      }
-    } else {
-      var twisty = twistyScene.getTwisty();
-      if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
-        cubeState = CubeState.solved;
-        stopTimer();
-      }
-    }
-  });
+  // twistyScene.addMoveListener(function(move, started) {
+  //   if(started) {
+  //     if(cubeState == CubeState.scrambling) {
+  //       // We don't want to start the timer if we're scrambling the cube.
+  //     } else if(cubeState == CubeState.scrambled) {
+  //       var twisty = twistyScene.getTwisty();
+  //       if(twisty.isInspectionLegalMove(twisty, move)) {
+  //         return;
+  //       }
+  //       startTimer();
+  //       cubeState = CubeState.solving;
+  //     }
+  //   } else {
+  //     var twisty = twistyScene.getTwisty();
+  //     if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
+  //       cubeState = CubeState.solved;
+  //       stopTimer();
+  //     }
+  //   }
+  // });
 
 });
 
