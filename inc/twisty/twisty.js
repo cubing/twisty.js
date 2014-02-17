@@ -405,7 +405,7 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.play.pause = function() {
-    control.stopAfterNextMove = true;
+    setAnimating(false);
   }
 
   this.play.skip = function() {
