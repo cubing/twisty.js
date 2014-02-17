@@ -2,10 +2,10 @@ var aaa, bbb;
 
 /*
  * that.twisty.js
- * 
+ *
  * Started by Lucas Garron, July 22, 2011 at WSOH
  * Made classy by Jeremy Fleischman, October 7, 2011 during the flight to worlds
- * 
+ *
  */
 
 "use strict";
@@ -29,12 +29,12 @@ var twistyjs = {};
 (function() {
 
 /****************
- * 
+ *
  * that.twisty Plugins
  *
  * Plugins register themselves by calling twistyjs.registerTwisty.
  * This lets plugins be defined in different files.
- * 
+ *
  */
 
 twistyjs.twisties = {};
