@@ -424,17 +424,22 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.setPosition = function(position) {
-    var preMoveListSaved = model.preMoveList;
-    var moveListSaved = model.moveList;
 
-    // Hack
-    view.scene.remove(model.twisty["3d"]);
-    that.initializeTwisty(model.twisty.type);
-    model.preMoveList = preMoveListSaved;
-    model.moveList = moveListSaved;
+    // If we're somewhere on the same move, don't recalculate position.
+    // Else, recalculate from the beginning, since we don't have something clever yet.
+    if (Math.floor(position) !== that.getIndex()) {
+      var preMoveListSaved = model.preMoveList;
+      var moveListSaved = model.moveList;
 
-    that.applyMoves(model.preMoveList);
-    that.applyMoves(model.moveList.slice(0, position)); // Works with fractional positions
+      // Hack
+      view.scene.remove(model.twisty["3d"]);
+      that.initializeTwisty(model.twisty.type);
+      model.preMoveList = preMoveListSaved;
+      model.moveList = moveListSaved;
+
+      that.applyMoves(model.preMoveList);
+      that.applyMoves(model.moveList.slice(0, position)); // Works with fractional positions
+    }
 
     model.position = position;
 
