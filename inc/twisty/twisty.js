@@ -98,19 +98,14 @@ twistyjs.TwistyScene = function(options) {
     view.scene = new THREE.Scene();
     view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
-    var rendererType = options.renderer; // TODO: Standardize option handling in this function.
-    view.renderer = new rendererType({antialias: true});
+    view.renderer = new options.renderer({antialias: true});
 
     view.canvas = view.renderer.domElement;
-    $(view.canvas).css('position', 'absolute');
-    $(view.canvas).css('top', 0);
-    $(view.canvas).css('left', 0);
+    $(view.canvas).css('position', 'absolute').css('top', 0).css('left', 0);
 
-    var container = $('<div/>');
-    container.css('width', '100%');
-    container.css('height', '100%');
-    view.twistyContainer = container[0];
-    view.twistyContainer.appendChild(view.canvas);
+    var container = $('<div/>').css('width', '100%').css('height', '100%');
+    view.container = container[0];
+    container.append(view.canvas);
 
     view.speed = options.speed;
     if (options.allowDragging) { that.startAllowDragging(); }
@@ -130,48 +125,34 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.getDomElement = function() {
-    return view.twistyContainer;
+    return view.container;
   };
-  this.getCanvas = function() {
-    return view.canvas;
-  };
-  this.getTwisty = function() {
-    return that.twisty;
-  };
+
+  var setupDefaults = {
+    init: [],
+    type: "generator"
+  }
 
   this.setupAnimation = function(algIn, opts) {
-    opts = opts || {};
-    opts.init = (typeof opts.init === "undefined") ? [] : opts.init;
-    if (opts.type !== "solve") { opts.type = "generator"; }
+    opts = getOptions(opts, setupDefaults);
 
-    // console.log("---");
-    // console.log(opts.init);
-    // console.log(opts.type);
+    model.animating = false;
 
-    model.mode = "playback";
-
-    that.applyMoves(opts.init);
     model.preMoveList = opts.init;
-
     if (opts.type === "solve") {
-      // console.log("alg", algIn);
       var algInverse = alg.sign_w.invert(algIn);
-      // console.log("alg", algInverse);
-      that.applyMoves(algInverse);
       model.preMoveList = model.preMoveList.concat(algInverse);
-      renderOnce();
     }
+    that.applyMoves(model.preMoveList);
 
-    that.addMoves(algIn);
-    stopAnimation();
-    model.currentMoveIdx = -1;
+    model.moveList = algIn;
+
+    renderOnce();
   }
 
   this.resize = function() {
-
-    var width = $(view.twistyContainer).width();
-    var height = $(view.twistyContainer).height()
-
+    var width = $(view.container).width();
+    var height = $(view.container).height()
     var min = Math.min(width, height);
     view.camera.setViewOffset(min,  min, (min - width)/2, (min - height)/2, width, height);
 
@@ -202,13 +183,24 @@ twistyjs.TwistyScene = function(options) {
     }
   };
 
+  /******** Debugging ********/
+
+  function startStats() {
+    that.debug.stats = new Stats();
+    that.debug.stats.domElement.style.position = 'absolute';
+    that.debug.stats.domElement.style.top = '0px';
+    that.debug.stats.domElement.style.left = '0px';
+    view.container.appendChild( that.debug.stats.domElement );
+    $(that.debug.stats.domElement).click();
+  }
+
 
   /******** Dragging/Rotation ********/
 
   this.startAllowDragging = function() {
-    $(view.twistyContainer).css("cursor", "move");
-    view.twistyContainer.addEventListener("mousedown", onStart, false );
-    view.twistyContainer.addEventListener("touchstart", onStart, false );
+    $(view.container).css("cursor", "move");
+    view.container.addEventListener("mousedown", onStart, false );
+    view.container.addEventListener("touchstart", onStart, false );
   }
 
   var listeners = {
@@ -271,7 +263,7 @@ twistyjs.TwistyScene = function(options) {
 
   function renderOnce() {
     if (!view.animating) {
-      render();
+      requestAnimFrame(render);
     }
   }
 
@@ -301,48 +293,28 @@ twistyjs.TwistyScene = function(options) {
     // render();
   }
 
-  var moveListeners = [];
+  // var moveListeners = [];
   this.addMoveListener = function(listener) {
-    moveListeners.push(listener);
+  //   moveListeners.push(listener);
   };
-  this.removeMoveListener = function(listener) {
-    var index = moveListeners.indexOf(listener);
-    assert(index >= 0);
-    delete moveListeners[index];
-  };
-  function fireMoveStarted(move) {
-    for(var i = 0; i < moveListeners.length; i++) {
-      moveListeners[i](move, true);
-    }
-  }
-  function fireMoveEnded(move) {
-    for(var i = 0; i < moveListeners.length; i++) {
-      moveListeners[i](move, false);
-    }
-  }
-
-  function startMove() {
-    model.moveProgress = 0;
-
-    model.currentMoveIdx += 1;
-    //log(moveToString(currentMove));
-    fireMoveStarted(currentMove());
-  }
-
-  //TODO 20110906: Handle illegal moves robustly.
-  function queueMoves(moves) {
-    model.moveList = model.moveList.concat(moves);
-    // if (model.moveList.length > 0) {
-    //   startAnimation();
-    // }
-  }
-  this.animateMoves = function(moves) {
-    animationStep = 0.1;
-    queueMoves(moves);
-  };
+  // this.removeMoveListener = function(listener) {
+  //   var index = moveListeners.indexOf(listener);
+  //   assert(index >= 0);
+  //   delete moveListeners[index];
+  // };
+  // function fireMoveStarted(move) {
+  //   for(var i = 0; i < moveListeners.length; i++) {
+  //     moveListeners[i](move, true);
+  //   }
+  // }
+  // function fireMoveEnded(move) {
+  //   for(var i = 0; i < moveListeners.length; i++) {
+  //     moveListeners[i](move, false);
+  //   }
+  // }
 
   this.addMoves = function(moves) {
-    queueMoves(moves);
+    model.moveList = model.moveList.concat(moves);
     triggerAnimation();
   };
 
@@ -373,18 +345,9 @@ twistyjs.TwistyScene = function(options) {
     renderOnce();
   }
 
-  this.debug.getIndex = function() {
-    return model.currentMoveIdx;
-  }
-
-  function startStats() {
-    that.debug.stats = new Stats();
-    that.debug.stats.domElement.style.position = 'absolute';
-    that.debug.stats.domElement.style.top = '0px';
-    that.debug.stats.domElement.style.left = '0px';
-    view.twistyContainer.appendChild( that.debug.stats.domElement );
-    $(that.debug.stats.domElement).click();
-  }
+  // this.debug.getIndex = function() {
+  //   return model.currentMoveIdx;
+  // }
 
   function totalLength() {
     // var total = 0;
@@ -413,22 +376,21 @@ twistyjs.TwistyScene = function(options) {
       model.time = Date.now();
       model.position = prevPosition + (model.time - prevTime) * view.speed / 1000;
 
-      if (model.position > totalLength()) {
-        model.position = totalLength();
-        view.animating = false;
-      }
-
-      // If we finished a move, snap to the beginning of the next.
       if (Math.floor(model.position) > Math.floor(prevPosition)) {
-        // TODO: Skip multpile moves.
+        // If we finished a move, snap to the beginning of the next. (Will never skip a move.)
+        model.position = Math.floor(prevPosition) + 1;
         var prevMove = model.moveList[Math.floor(prevPosition)];
         that.twisty["animateMoveCallback"](that.twisty, prevMove, 1);
         that.twisty["advanceMoveCallback"](that.twisty, prevMove);
       }
       else {
         var currentMove = model.moveList[Math.floor(model.position)];
-        // console.log("cur", currentMove);
         that.twisty["animateMoveCallback"](that.twisty, currentMove, model.position % 1);
+      }
+
+      if (model.position >= totalLength()) {
+        model.position = totalLength();
+        view.animating = false;
       }
     }
 
@@ -457,7 +419,7 @@ twistyjs.TwistyScene = function(options) {
     // TODO - discuss the class heirarchy with Lucas
     //  Does it make sense for a TwistyScene to have an addMoves method?
     //  Scene implies (potentially) multiple twisties.
-    //   Perhaps rename TwistyScene -> view.TwistyContainer?
+    //   Perhaps rename TwistyScene -> view.container?
     //  Alertatively, TwistyScene could become a that.twisty base class, 
     //  and that.twisty instances inherit useful stuff like addMoves.
     //
