@@ -1,7 +1,7 @@
 var aaa, bbb;
 
 /*
- * that.twisty.js
+ * model.twisty.js
  *
  * Started by Lucas Garron, July 22, 2011 at WSOH
  * Made classy by Jeremy Fleischman, October 7, 2011 during the flight to worlds
@@ -30,7 +30,7 @@ var twistyjs = {};
 
 /****************
  *
- * that.twisty Plugins
+ * twisty.js Plugins
  *
  * Plugins register themselves by calling twistyjs.registerTwisty.
  * This lets plugins be defined in different files.
@@ -110,8 +110,8 @@ twistyjs.TwistyScene = function(options) {
     model.preMoveList = [];
     model.moveList = [];
 
-    that.twisty = createTwisty(twistyType);
-    view.scene.add(that.twisty["3d"]);
+    model.twisty = createTwisty(twistyType);
+    view.scene.add(model.twisty["3d"]);
 
     that.resize();
   }
@@ -164,7 +164,7 @@ twistyjs.TwistyScene = function(options) {
 
   this.setCameraTheta = function(theta) {
     control.cameraTheta = theta;
-    var scale = that.twisty.cameraScale();
+    var scale = model.twisty.cameraScale();
     view.camera.position.x = 2.5*Math.sin(theta) * scale;
     view.camera.position.y = 2 * scale;
     view.camera.position.z = 2.5*Math.cos(theta) * scale;
@@ -241,7 +241,7 @@ twistyjs.TwistyScene = function(options) {
   this.keydown = function(e) {
 
     var keyCode = e.keyCode;
-    that.twisty.keydownCallback(that.twisty, e);
+    model.twisty.keydownCallback(model.twisty, e);
 
     switch (keyCode) {
 
@@ -308,8 +308,8 @@ twistyjs.TwistyScene = function(options) {
         // If we finished a move, snap to the beginning of the next. (Will never skip a move.)
         model.position = Math.floor(prevPosition) + 1;
         var prevMove = model.moveList[Math.floor(prevPosition)];
-        that.twisty["animateMoveCallback"](that.twisty, prevMove, 1);
-        that.twisty["advanceMoveCallback"](that.twisty, prevMove);
+        model.twisty["animateMoveCallback"](model.twisty, prevMove, 1);
+        model.twisty["advanceMoveCallback"](model.twisty, prevMove);
 
         if (control.stopAfterNextMove) {
           control.stopAfterNextMove = false;
@@ -318,7 +318,7 @@ twistyjs.TwistyScene = function(options) {
       }
       else {
         var currentMove = model.moveList[Math.floor(model.position)];
-        that.twisty["animateMoveCallback"](that.twisty, currentMove, model.position % 1);
+        model.twisty["animateMoveCallback"](model.twisty, currentMove, model.position % 1);
       }
 
       if (model.position >= totalLength()) {
@@ -335,86 +335,101 @@ twistyjs.TwistyScene = function(options) {
   }
 
   function totalLength() {
-    // var total = 0;
-    // for (var move in model.moveList) {
-    //   total += 1;
-    // }
     return model.moveList.length;
   }
 
 
   /******** Control: Playback ********/
 
-
-  function currentMove() {
-    return model.moveList[model.currentMoveIdx];
-  }
-
   var setupDefaults = {
     init: [],
     type: "generator"
   }
 
-  this.setupAnimation = function(algIn, opts) {
-    opts = getOptions(opts, setupDefaults);
+  this.setupAnimation = function(algIn, options) {
+    options = getOptions(options, setupDefaults);
 
     model.animating = false;
 
-    model.preMoveList = opts.init;
-    if (opts.type === "solve") {
+    model.preMoveList = options.init;
+    if (options.type === "solve") {
       var algInverse = alg.sign_w.invert(algIn);
       model.preMoveList = model.preMoveList.concat(algInverse);
     }
     that.applyMoves(model.preMoveList);
 
-    model.moveList = algIn;
-
+    that.queueMoves(algIn);
     renderOnce();
   }
-
-  function stopAnimation() {
-    // TODO: Graceful stopping.
-    control.animating = false
-  }
-  function startAnimation() {
-    triggerAnimation();
-  }
-
-  this.addMoves = function(moves) {
-    model.moveList = model.moveList.concat(moves);
-    triggerAnimation();
-  };
-
-  this.stopAnimation = stopAnimation;
-  this.startAnimation = startAnimation;
 
   this.applyMoves = function(moves) {
     for (i in moves) {
-      that.twisty["advanceMoveCallback"](that.twisty, moves[i]);
+      model.twisty["advanceMoveCallback"](model.twisty, moves[i]);
     }
   };
 
-  this.setIndex = function(idx) {
-    var moveListSaved = model.moveList;
-    that.initializeTwisty(model.twistyType); // Hack
-    model.moveList = moveListSaved;
-    if (model.mode === "playback") {
-      that.applyMoves(model.preMoveList);
-    }
-    while (model.currentMoveIdx < idx) {
-      startMove();
-      that.twisty["advanceMoveCallback"](that.twisty, currentMove());
-    }
-    renderOnce();
+  this.queueMoves = function(moves) {
+    model.moveList = model.moveList.concat(moves);
+  };
+
+  this.play = {}
+
+  this.play.reset = function() {
+    control.animating = false;
+    that.setIndex(0);
   }
 
-  this.stopPlayback = function() {
+  this.play.start = function() {
+    triggerAnimation();
+  }
+
+  this.play.pause = function() {
     control.stopAfterNextMove = true;
   }
 
-  // this.debug.getIndex = function() {
-  //   return model.currentMoveIdx;
-  // }
+  this.play.skip = function() {
+    that.setIndex(model.moveList.length);
+  }
+
+  this.play.forward = function() {
+    triggerAnimation();
+    control.stopAfterNextMove = true;
+  }
+
+  this.play.back = function() {
+    var index = that.getIndex();
+    if (index > 0) {
+      that.setIndex(index - 1);
+    }
+  }
+
+  this.setPosition = function(position) {
+    var moveListSaved = model.moveList;
+
+    // Hack
+    view.scene.remove(model.twisty["3d"]);
+    that.initializeTwisty(model.twisty.type);
+    model.moveList = moveListSaved;
+
+    that.applyMoves(model.preMoveList);
+    that.applyMoves(model.moveList.slice(0, position)); // Works with fractional positions
+
+    model.position = position;
+
+    renderOnce();
+  }
+
+  this.getPosition = function() {
+    return model.position;
+  }
+
+  this.getIndex = function() {
+    return Math.floor(model.position);
+  }
+
+  this.setIndex = function(idx) {
+    this.setPosition(Math.floor(idx));
+  }
 
 
   /******** Getters/setters ********/
@@ -441,7 +456,7 @@ twistyjs.TwistyScene = function(options) {
   function createTwisty(twistyType) {
     var twistyCreateFunction = twistyjs.twisties[twistyType.type];
     if(!twistyCreateFunction) {
-      err('that.twisty type "' + twistyType.type + '" is not recognized!');
+      err('model.twisty type "' + twistyType.type + '" is not recognized!');
       return null;
     }
 

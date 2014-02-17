@@ -147,14 +147,12 @@ $(document).ready(function() {
 
   $('input[name="renderer"]').click(reloadCube);
 
-  $("#play").click(twistyScene.startAnimation);
-  $("#pause").click(twistyScene.stopPlayback);
-  $("#rewind").click(function() {
-    twistyScene.setIndex(-1);
-  });
-  $("#fast_forward").click(function() {
-    twistyScene.setIndex(twistyScene.getMoveList().length-1);
-  });
+  $("#play").click(twistyScene.play.start);
+  $("#previous").click(twistyScene.play.back);
+  $("#pause").click(twistyScene.play.pause);
+  $("#rewind").click(twistyScene.play.reset);
+  $("#next").click(twistyScene.play.forward);
+  $("#fast_forward").click(twistyScene.play.skip);
   $("#speed").bind("change", function() {
     var speed = $('#speed')[0].valueAsNumber
     twistyScene.setSpeed(speed);

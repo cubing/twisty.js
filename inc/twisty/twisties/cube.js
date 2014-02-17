@@ -422,7 +422,8 @@ for (var i = 0; i < numSides; i++) {
     var keyCode = e.keyCode;
     if (keyCode in cubeKeyMapping) {
       var move = alg.sign_w.stringToAlg(cubeKeyMapping[keyCode]);
-      twistyScene.addMoves(move);
+      twistyScene.queueMoves(move);
+      twistyScene.play.start();
     }
   };
 
