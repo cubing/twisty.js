@@ -80,7 +80,8 @@ twistyjs.TwistyScene = function(options) {
   this.debug = {
     stats: null,
     model: model,
-    view: view
+    view: view,
+    control: control
   }
 
 
@@ -400,8 +401,6 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.play.start = function() {
-    // TODO: Smoothly start animating from fractional position.
-    that.setIndex(that.getIndex());
     triggerAnimation();
   }
 
