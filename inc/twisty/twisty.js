@@ -47,10 +47,9 @@ twistyjs.TwistyScene = function(options) {
   /******** Instance Variables ********/
 
   var model = {
-    moveList: [],
-    preMoveList: [],
     twisty: null,
-    mode: null,
+    preMoveList: [],
+    moveList: [],
 
     time: null,
     position: null,
@@ -58,55 +57,49 @@ twistyjs.TwistyScene = function(options) {
 
   var view = {
     camera: null,
-    scene: null,
-    renderer: null,
     container: null,
-    cameraTheta: null,
-    animating: false
+    scene: null,
+    renderer: null
   }
 
   var control = {
-    mouseXLast: null
+    cameraTheta: null,
+    mouseXLast: null,
+
+    speed: null,
+
+    animating: false,
+    stopAfterNextMove: false
   }
 
   this.debug = {
-    status: null,
+    stats: null,
     model: model,
     view: view
   }
 
-  /* http://tauday.com/ ;-) */
-  Math.TAU = Math.PI*2;
 
-  function currentMove() {
-    return model.moveList[model.currentMoveIdx];
+  /******** General Initialization ********/
+
+
+  var iniDefaults = {
+    speed: 3, // qtps
+    renderer: THREE.CanvasRenderer,
+    allowDragging: true,
+    stats: true
   }
 
-  this.getDomElement = function() {
-    return view.container;
-  };
+  function initialize(options) {
+    options = getOptions(options, iniDefaults);
 
-  var setupDefaults = {
-    init: [],
-    type: "generator"
+    view.initialize(options.renderer);
+
+    control.speed = options.speed;
+    if (options.allowDragging) { that.startAllowDragging(); }
+    if (options.stats) { startStats(); }
   }
 
-  this.setupAnimation = function(algIn, opts) {
-    opts = getOptions(opts, setupDefaults);
 
-    model.animating = false;
-
-    model.preMoveList = opts.init;
-    if (opts.type === "solve") {
-      var algInverse = alg.sign_w.invert(algIn);
-      model.preMoveList = model.preMoveList.concat(algInverse);
-    }
-    that.applyMoves(model.preMoveList);
-
-    model.moveList = algIn;
-
-    renderOnce();
-  }
 
   /******** Model: Initialization ********/
 
@@ -114,12 +107,12 @@ twistyjs.TwistyScene = function(options) {
   this.initializeTwisty = function(twistyType) {
 
     model.position = 0;
+    model.preMoveList = [];
     model.moveList = [];
 
     that.twisty = createTwisty(twistyType);
     view.scene.add(that.twisty["3d"]);
 
-    // resize creates the camera and calls render()
     that.resize();
   }
 
@@ -137,21 +130,11 @@ twistyjs.TwistyScene = function(options) {
 
   /******** View: Initialization ********/
 
-
-  var viewDefaults = {
-    speed: 3, // qtps
-    renderer: THREE.CanvasRenderer,
-    allowDragging: true,
-    stats: true
-  }
-
-  view.initialize = function(options) {
-    options = getOptions(options, viewDefaults);
-
+  view.initialize = function(Renderer) {
     view.scene = new THREE.Scene();
     view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
-    view.renderer = new options.renderer({antialias: true});
+    view.renderer = new Renderer({antialias: true});
 
     var canvas = view.renderer.domElement;
     $(canvas).css('position', 'absolute').css('top', 0).css('left', 0);
@@ -159,10 +142,6 @@ twistyjs.TwistyScene = function(options) {
     var container = $('<div/>').css('width', '100%').css('height', '100%');
     view.container = container[0];
     container.append(canvas);
-
-    view.speed = options.speed;
-    if (options.allowDragging) { that.startAllowDragging(); }
-    if (options.stats) { startStats(); }
   }
 
 
@@ -174,7 +153,7 @@ twistyjs.TwistyScene = function(options) {
   }
 
   function renderOnce() {
-    if (!view.animating) {
+    if (!control.animating) {
       requestAnimFrame(render);
     }
   }
@@ -184,7 +163,7 @@ twistyjs.TwistyScene = function(options) {
 
 
   this.setCameraTheta = function(theta) {
-    view.cameraTheta = theta;
+    control.cameraTheta = theta;
     var scale = that.twisty.cameraScale();
     view.camera.position.x = 2.5*Math.sin(theta) * scale;
     view.camera.position.y = 2 * scale;
@@ -193,7 +172,7 @@ twistyjs.TwistyScene = function(options) {
   }
 
   function moveCameraDelta(deltaTheta) {
-    that.setCameraTheta(view.cameraTheta + deltaTheta);
+    that.setCameraTheta(control.cameraTheta + deltaTheta);
   }
 
 
@@ -267,13 +246,13 @@ twistyjs.TwistyScene = function(options) {
     switch (keyCode) {
 
       case 37: // Left
-        moveCameraDelta(Math.TAU/48);
+        moveCameraDelta(Math.PI/24);
         e.preventDefault();
         renderOnce();
         break;
 
       case 39: // Right
-        moveCameraDelta(-Math.TAU/48);
+        moveCameraDelta(-Math.PI/24);
         e.preventDefault();
         renderOnce();
         break;
@@ -307,32 +286,23 @@ twistyjs.TwistyScene = function(options) {
 
   /******** Control: Animation ********/
 
-  function totalLength() {
-    // var total = 0;
-    // for (var move in model.moveList) {
-    //   total += 1;
-    // }
-    return model.moveList.length;
-  }
-
   function triggerAnimation() {
-    if (!view.animating) {
+    if (!control.animating) {
       model.time = Date.now();
-      view.animating = true;
+      control.animating = true;
       animFrame();
     }
   }
 
   function animFrame() {
 
-    //TODO: Handle non-animating rotation.
-    if (view.animating) {
+    if (control.animating) {
 
       var prevTime = model.time;
       var prevPosition = model.position;
 
       model.time = Date.now();
-      model.position = prevPosition + (model.time - prevTime) * view.speed / 1000;
+      model.position = prevPosition + (model.time - prevTime) * control.speed / 1000;
 
       if (Math.floor(model.position) > Math.floor(prevPosition)) {
         // If we finished a move, snap to the beginning of the next. (Will never skip a move.)
@@ -340,6 +310,11 @@ twistyjs.TwistyScene = function(options) {
         var prevMove = model.moveList[Math.floor(prevPosition)];
         that.twisty["animateMoveCallback"](that.twisty, prevMove, 1);
         that.twisty["advanceMoveCallback"](that.twisty, prevMove);
+
+        if (control.stopAfterNextMove) {
+          control.stopAfterNextMove = false;
+          control.animating = false;
+        }
       }
       else {
         var currentMove = model.moveList[Math.floor(model.position)];
@@ -348,20 +323,58 @@ twistyjs.TwistyScene = function(options) {
 
       if (model.position >= totalLength()) {
         model.position = totalLength();
-        view.animating = false;
+        control.animating = false;
       }
     }
 
     render();
 
-    if (view.animating) {
+    if (control.animating) {
       requestAnimFrame(animFrame);
     }
   }
 
+  function totalLength() {
+    // var total = 0;
+    // for (var move in model.moveList) {
+    //   total += 1;
+    // }
+    return model.moveList.length;
+  }
+
+
+  /******** Control: Playback ********/
+
+
+  function currentMove() {
+    return model.moveList[model.currentMoveIdx];
+  }
+
+  var setupDefaults = {
+    init: [],
+    type: "generator"
+  }
+
+  this.setupAnimation = function(algIn, opts) {
+    opts = getOptions(opts, setupDefaults);
+
+    model.animating = false;
+
+    model.preMoveList = opts.init;
+    if (opts.type === "solve") {
+      var algInverse = alg.sign_w.invert(algIn);
+      model.preMoveList = model.preMoveList.concat(algInverse);
+    }
+    that.applyMoves(model.preMoveList);
+
+    model.moveList = algIn;
+
+    renderOnce();
+  }
+
   function stopAnimation() {
     // TODO: Graceful stopping.
-    view.animating = false
+    control.animating = false
   }
   function startAnimation() {
     triggerAnimation();
@@ -381,10 +394,6 @@ twistyjs.TwistyScene = function(options) {
     }
   };
 
-  this.getMoveList = function() {
-    return model.moveList;
-  }
-
   this.setIndex = function(idx) {
     var moveListSaved = model.moveList;
     that.initializeTwisty(model.twistyType); // Hack
@@ -399,9 +408,32 @@ twistyjs.TwistyScene = function(options) {
     renderOnce();
   }
 
+  this.stopPlayback = function() {
+    control.stopAfterNextMove = true;
+  }
+
   // this.debug.getIndex = function() {
   //   return model.currentMoveIdx;
   // }
+
+
+  /******** Getters/setters ********/
+
+  this.getMoveList = function() {
+    return model.moveList;
+  }
+
+  this.getDomElement = function() {
+    return view.container;
+  }
+
+  this.setSpeed = function(speed) {
+    control.speed = speed;
+  }
+
+  this.getCanvas = function() {
+    return view.renderer.domElement;
+  }
 
 
   /******** Twisty ********/
@@ -442,7 +474,7 @@ twistyjs.TwistyScene = function(options) {
 
   /******** Go! ********/
 
-  view.initialize(options);
+  initialize(options);
 
 };
 

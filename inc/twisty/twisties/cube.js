@@ -164,7 +164,7 @@ var innerTemplate = new THREE.Mesh(innerGeometry);
 
 var hintGeometry = innerGeometry.clone();
 var hintTemplate = new THREE.Mesh(hintGeometry);
-hintTemplate.rotateY(Math.TAU/2);
+hintTemplate.rotateY(Math.PI);
 hintTemplate.translateZ(-3);
 
 var w = 1.95;
@@ -258,9 +258,9 @@ for (var i = 0; i < numSides; i++) {
     }
 
     var rott = new THREE.Matrix4();
-    //rott.makeRotationAxis(sidesRotAxis[canonical.base], (moveProgress - lastMoveProgress) * canonical.amount * Math.TAU/4);
+    //rott.makeRotationAxis(sidesRotAxis[canonical.base], (moveProgress - lastMoveProgress) * canonical.amount * Math.PI/2);
     lastMoveProgress = moveProgress;
-    rott.makeRotationAxis(sidesRotAxis[canonical.base], moveProgress * canonical.amount * Math.TAU/4);
+    rott.makeRotationAxis(sidesRotAxis[canonical.base], moveProgress * canonical.amount * Math.PI/2);
 
     var state = twisty["cubePieces"];
 
