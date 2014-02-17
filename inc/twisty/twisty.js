@@ -418,7 +418,7 @@ twistyjs.TwistyScene = function(options) {
   }
 
   this.play.back = function() {
-    var index = that.getIndex();
+    var index = Math.ceil(that.getPosition());
     if (index > 0) {
       that.setIndex(index - 1);
     }
