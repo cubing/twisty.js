@@ -204,7 +204,7 @@ $(document).ready(function() {
     }
   });
 
-  twistyScene.setCameraTheta(0);
+  twistyScene.setCameraPosition(0);
 
   $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "inc/offline/offline.html";
