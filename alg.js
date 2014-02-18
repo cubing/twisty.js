@@ -231,7 +231,7 @@ var alg = (function (){
     }
 
     function stringToAlg(algString) {
-      return sign_w_jison.parse(algString);
+      return alg_jison.parse(algString);
     }
 
     // Metric

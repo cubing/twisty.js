@@ -71,7 +71,7 @@
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var sign_w_jison = (function(){
+var alg_jison = (function(){
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"expressions":3,"ALG":4,"EOF":5,"OPTIONAL_WHITESPACE":6,"LAYER":7,"NUMBER":8,"REPETITION":9,"AMOUNT":10,"PRIME":11,"BASE_WIDE":12,"BASE_W":13,"BASE_LOWERCASE":14,"BASE":15,"BASE_UPPERCASE":16,"BASE_ROTATION":17,"BASE_SLICE":18,"PAUSE":19,"BLOCK":20,"DASH":21,"WHITESPACE":22,"REPEATABLE":23,"OPEN_BRACKET":24,"COMMA":25,"CLOSE_BRACKET":26,"COLON":27,"OPEN_PARENTHESIS":28,"CLOSE_PARENTHESIS":29,"REPEATED":30,"NEWLINE":31,"$accept":0,"$end":1},
@@ -646,9 +646,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = sign_w_jison;
-exports.Parser = sign_w_jison.Parser;
-exports.parse = function () { return sign_w_jison.parse.apply(sign_w_jison, arguments); };
+exports.parser = alg_jison;
+exports.Parser = alg_jison.Parser;
+exports.parse = function () { return alg_jison.parse.apply(alg_jison, arguments); };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
