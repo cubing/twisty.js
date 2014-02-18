@@ -48,8 +48,10 @@ twistyjs.TwistyScene = function(options) {
   /******** Constants ********/
 
   var CONSTANTS = {
-    CAMERA_STICKY_MIN: 2,
-    CAMERA_STICKY_MAX: 4,
+    CAMERA_HEIGHT_STICKY_MIN: 2,
+    CAMERA_HEIGHT_STICKY_MAX: 4,
+    DRAG_RESISTANCE_X: 256,
+    DRAG_RESISTANCE_Y: 60
   }
 
 
@@ -73,7 +75,7 @@ twistyjs.TwistyScene = function(options) {
 
   var control = {
     cameraTheta: null,
-    cameraHeight: CONSTANTS.CAMERA_STICKY_MAX,
+    cameraHeight: CONSTANTS.CAMERA_HEIGHT_STICKY_MAX,
 
     mouseXLast: null,
     mouseYLast: null,
@@ -186,18 +188,18 @@ twistyjs.TwistyScene = function(options) {
     control.cameraTheta = theta;
 
     if (typeof height !== "undefined") {
-      control.cameraHeight = Math.max(-CONSTANTS.CAMERA_STICKY_MAX, Math.min(CONSTANTS.CAMERA_STICKY_MAX, height));
+      control.cameraHeight = Math.max(-CONSTANTS.CAMERA_HEIGHT_STICKY_MAX, Math.min(CONSTANTS.CAMERA_HEIGHT_STICKY_MAX, height));
     }
 
     // We allow the height to enter a buffer from 2 to 3, but clip the display at 2.
-    var actualHeight = Math.max(-CONSTANTS.CAMERA_STICKY_MIN, Math.min(CONSTANTS.CAMERA_STICKY_MIN, control.cameraHeight));
+    var actualHeight = Math.max(-CONSTANTS.CAMERA_HEIGHT_STICKY_MIN, Math.min(CONSTANTS.CAMERA_HEIGHT_STICKY_MIN, control.cameraHeight));
 
-    var scale = model.twisty.cameraScale() + 1 - Math.pow(Math.abs(actualHeight)/CONSTANTS.CAMERA_STICKY_MIN, 2);
+    var scale = model.twisty.cameraScale() + 1 - Math.pow(Math.abs(actualHeight)/CONSTANTS.CAMERA_HEIGHT_STICKY_MIN, 2);
 
     view.camera.position.x = 2.5*Math.sin(theta) * scale;
     view.camera.position.y = actualHeight * scale;
     view.camera.position.z = 2.5*Math.cos(theta) * scale;
-    view.camera.lookAt(new THREE.Vector3(0, -0.075 * scale * (actualHeight)/CONSTANTS.CAMERA_STICKY_MIN, 0));
+    view.camera.lookAt(new THREE.Vector3(0, -0.075 * scale * (actualHeight)/CONSTANTS.CAMERA_HEIGHT_STICKY_MIN, 0));
   }
 
   function moveCameraDelta(deltaTheta, deltaHeight) {
@@ -258,8 +260,8 @@ twistyjs.TwistyScene = function(options) {
     var mouseX = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
     var mouseY = (kind == "mouse") ? event.clientY : event.touches[0].pageY;
 
-    var deltaX = (control.mouseXLast - mouseX)/256;
-    var deltaY = -(control.mouseYLast - mouseY)/60;
+    var deltaX = (control.mouseXLast - mouseX)/CONSTANTS.DRAG_RESISTANCE_X;
+    var deltaY = -(control.mouseYLast - mouseY)/CONSTANTS.DRAG_RESISTANCE_Y;
 
     moveCameraDelta(deltaX, deltaY);
 
@@ -274,11 +276,11 @@ twistyjs.TwistyScene = function(options) {
     var kind = eventKind(event);
 
     // Snap camera height to end of sticky region.
-    if (control.cameraHeight >= CONSTANTS.CAMERA_STICKY_MIN) {
-      control.cameraHeight = CONSTANTS.CAMERA_STICKY_MAX;
+    if (control.cameraHeight >= CONSTANTS.CAMERA_HEIGHT_STICKY_MIN) {
+      control.cameraHeight = CONSTANTS.CAMERA_HEIGHT_STICKY_MAX;
     }
-    else if (control.cameraHeight <= -CONSTANTS.CAMERA_STICKY_MIN) {
-      control.cameraHeight = -CONSTANTS.CAMERA_STICKY_MAX;
+    else if (control.cameraHeight <= -CONSTANTS.CAMERA_HEIGHT_STICKY_MIN) {
+      control.cameraHeight = -CONSTANTS.CAMERA_HEIGHT_STICKY_MAX;
     }
 
     for (listener in listeners[kind]) {
