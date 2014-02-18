@@ -269,7 +269,7 @@ for (var i = 0; i < numSides; i++) {
   var lastMoveProgress = 0;
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
-    var canonical = alg.sign_w.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
+    var canonical = alg.cube.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
 
     if (canonical.base == ".") {
       return; // Pause
@@ -345,7 +345,7 @@ for (var i = 0; i < numSides; i++) {
 
   var advanceMoveCallback = function(twisty, currentMove) {
 
-    var canonical = alg.sign_w.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
+    var canonical = alg.cube.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
 
     if (canonical.base === ".") {
       return; // Pause
@@ -439,7 +439,7 @@ for (var i = 0; i < numSides; i++) {
 
     var keyCode = e.keyCode;
     if (keyCode in cubeKeyMapping) {
-      var move = alg.sign_w.stringToAlg(cubeKeyMapping[keyCode]);
+      var move = alg.cube.stringToAlg(cubeKeyMapping[keyCode]);
       twistyScene.queueMoves(move);
       twistyScene.play.start();
     }

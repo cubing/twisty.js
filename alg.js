@@ -1,3 +1,4 @@
+
 var alg = (function (){
 
   var debug = false;
@@ -61,7 +62,7 @@ var alg = (function (){
     return Math.round(-Math.abs(x)) * antiSignish;
   }
 
-  var sign_w = (function(){
+  var cube = (function(){
 
     function algSimplify(alg) {
       var algOut = [];
@@ -296,6 +297,6 @@ var alg = (function (){
   })();
 
   return {
-    sign_w: sign_w
+    cube: cube
   }
 })();

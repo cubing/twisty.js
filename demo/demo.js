@@ -141,7 +141,7 @@ $(document).ready(function() {
   });
 
   $("#lucasparity").bind("click", function() {
-    var lucasparity = alg.sign_w.stringToAlg("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
+    var lucasparity = alg.cube.stringToAlg("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
     twistyScene.animateMoves(lucasparity);
   });
 
@@ -160,23 +160,23 @@ $(document).ready(function() {
 
   $("#alg_superflip").bind("click", function() {
     var once = "M' U' M' U' M' U' M' U' x y ";
-    var superflip = alg.sign_w.stringToAlg(once + once + once);
+    var superflip = alg.cube.stringToAlg(once + once + once);
     twistyScene.animateMoves(superflip);
   });
 
   $("#parsed_alg1").bind("click", function() {
-    var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
-    var moves = alg.sign_w.algToMoves(algo);
+    var algo = alg.cube.stringToAlg($("#parse_alg").val());
+    var moves = alg.cube.algToMoves(algo);
     twistyScene.animateMoves(moves);
   });
 
   $("#parsed_alg2").bind("click", function() {
-    var init = alg.sign_w.stringToAlg($("#init").val());
-    var algo = alg.sign_w.stringToAlg($("#parse_alg").val());
+    var init = alg.cube.stringToAlg($("#init").val());
+    var algo = alg.cube.stringToAlg($("#parse_alg").val());
     var type = $("#solve").is(':checked') ? "solve" : "gen";
 
-    init = alg.sign_w.algToMoves(init);
-    algo = alg.sign_w.algToMoves(algo);
+    init = alg.cube.algToMoves(init);
+    algo = alg.cube.algToMoves(algo);
 
     twistyScene.setupAnimation(
       algo,
@@ -199,7 +199,7 @@ $(document).ready(function() {
 
     f("Click:", -1);
     for (var i = 0; i < moveList.length; i += 1) {
-      var moveString = alg.sign_w.algToString([moveList[i]]);
+      var moveString = alg.cube.algToString([moveList[i]]);
       f(moveString, i);
     }
   });

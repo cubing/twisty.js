@@ -426,7 +426,7 @@ twistyjs.TwistyScene = function(options) {
 
     model.preMoveList = options.init;
     if (options.type === "solve") {
-      var algInverse = alg.sign_w.invert(algIn);
+      var algInverse = alg.cube.invert(algIn);
       model.preMoveList = model.preMoveList.concat(algInverse);
     }
     that.applyMoves(model.preMoveList);
