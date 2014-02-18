@@ -184,9 +184,10 @@ var hintTemplate = new THREE.Mesh(hintGeometry);
 hintTemplate.rotateY(Math.PI);
 hintTemplate.translateZ(-3);
 
-var w = 1.95;
+var w = 1.9;
 var cubieGeometry = new THREE.CubeGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
+cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
 var cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
 cubieTemplate.translateZ(-1);
 
