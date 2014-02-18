@@ -154,7 +154,14 @@ twistyjs.TwistyScene = function(options) {
     view.scene = new THREE.Scene();
     view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
-    view.renderer = new Renderer({antialias: true, alpha: true});
+    view.renderer = new Renderer({
+      antialias: true,
+      alpha: true,
+      // TODO: We're using this so we can save pictures of WebGL canvases.
+      // Investigate if there's a significant performance penalty.
+      // Better yet, allow rendering to a CanvasRenderer view separately.
+      preserveDrawingBuffer: true
+    });
 
     var canvas = view.renderer.domElement;
     $(canvas).css('position', 'absolute').css('top', 0).css('left', 0);
