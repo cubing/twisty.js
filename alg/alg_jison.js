@@ -587,47 +587,47 @@ performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:return 22
+case 0:return "WHITESPACE"
 break;
-case 1:return 8
+case 1:return "NUMBER"
 break;
-case 2:return 21
+case 2:return "DASH"
 break;
-case 3:return 13
+case 3:return "BASE_W"
 break;
-case 4:return 16
+case 4:return "BASE_UPPERCASE"
 break;
-case 5:return 14
+case 5:return "BASE_LOWERCASE"
 break;
-case 6:return 17
+case 6:return "BASE_ROTATION"
 break;
-case 7:return 18
+case 7:return "BASE_SLICE"
 break;
-case 8:return 11
+case 8:return "PRIME"
 break;
-case 9:return 19
+case 9:return "PAUSE"
 break;
 case 10:/* ignore comment */
 break;
 case 11:/* ignore comment */
 break;
-case 12:return 31
+case 12:return "NEWLINE"
 break;
-case 13:return 24
+case 13:return "OPEN_BRACKET"
 break;
-case 14:return 26
+case 14:return "CLOSE_BRACKET"
 break;
-case 15:return 28
+case 15:return "OPEN_PARENTHESIS"
 break;
-case 16:return 29
+case 16:return "CLOSE_PARENTHESIS"
 break;
-case 17:return 25
+case 17:return "COMMA"
 break;
-case 18:return 27
+case 18:return "COLON"
 break;
-case 19:return 5
+case 19:return "EOF"
 break;
-case 20:return 'INVALID'
+case 20:return "INVALID"
 break;
 }
 },

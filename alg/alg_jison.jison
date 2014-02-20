@@ -3,27 +3,27 @@
 %lex
 %%
 
-[^\S\r\n]+             return 'WHITESPACE'
-[0-9]+                 return 'NUMBER'
-"-"                    return 'DASH'
-(Rw|Fw|Uw|Bw|Lw|Dw)    return 'BASE_W'
-(R|F|U|B|L|D)          return 'BASE_UPPERCASE'
-(r|f|u|b|l|d)          return 'BASE_LOWERCASE'
-(x|y|z)                return 'BASE_ROTATION'
-(M|E|S)                return 'BASE_SLICE'
-"'"                    return 'PRIME'
-"."                    return 'PAUSE'
+[^\S\r\n]+             return "WHITESPACE"
+[0-9]+                 return "NUMBER"
+"-"                    return "DASH"
+(Rw|Fw|Uw|Bw|Lw|Dw)    return "BASE_W"
+(R|F|U|B|L|D)          return "BASE_UPPERCASE"
+(r|f|u|b|l|d)          return "BASE_LOWERCASE"
+(x|y|z)                return "BASE_ROTATION"
+(M|E|S)                return "BASE_SLICE"
+"'"                    return "PRIME"
+"."                    return "PAUSE"
 "//"[^\n\r]*           /* ignore comment */
 "/*"[^]*?"*/"          /* ignore comment */
-[\n\r]                 return 'NEWLINE'
-"["                    return 'OPEN_BRACKET'
-"]"                    return 'CLOSE_BRACKET'
-"("                    return 'OPEN_PARENTHESIS'
-")"                    return 'CLOSE_PARENTHESIS'
-","                    return 'COMMA'
-":"                    return 'COLON'
-<<EOF>>                return 'EOF'
-.                      return 'INVALID'
+[\n\r]                 return "NEWLINE"
+"["                    return "OPEN_BRACKET"
+"]"                    return "CLOSE_BRACKET"
+"("                    return "OPEN_PARENTHESIS"
+")"                    return "CLOSE_PARENTHESIS"
+","                    return "COMMA"
+":"                    return "COLON"
+<<EOF>>                return "EOF"
+.                      return "INVALID"
 
 /lex
 
