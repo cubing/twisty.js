@@ -1,40 +1,44 @@
 
 /* lexical grammar */
 %lex
+%s timestamp
 %%
+
+
+"@"                               { this.begin("timestamp"); return 'AT' }
+<timestamp>[0-9]+("."[0-9]+)?     return 'FLOAT'
+<timestamp>"s"                    { this.popState(); return 'SECONDS' }
 
 [^\S\r\n]+             return "WHITESPACE"
 [0-9]+                 return "NUMBER"
 "-"                    return "DASH"
+
 (Rw|Fw|Uw|Bw|Lw|Dw)    return "BASE_W"
 (R|F|U|B|L|D)          return "BASE_UPPERCASE"
 (r|f|u|b|l|d)          return "BASE_LOWERCASE"
 (x|y|z)                return "BASE_ROTATION"
 (M|E|S)                return "BASE_SLICE"
+
 "'"                    return "PRIME"
 "."                    return "PAUSE"
+
 "//"[^\n\r]*           /* ignore comment */
 "/*"[^]*?"*/"          /* ignore comment */
 [\n\r]                 return "NEWLINE"
+
 "["                    return "OPEN_BRACKET"
 "]"                    return "CLOSE_BRACKET"
 "("                    return "OPEN_PARENTHESIS"
 ")"                    return "CLOSE_PARENTHESIS"
 ","                    return "COMMA"
 ":"                    return "COLON"
+
 <<EOF>>                return "EOF"
 .                      return "INVALID"
 
 /lex
 
 %% /* language grammar */
-
-expressions
-    : ALG EOF
-        { return $1; }
-    | OPTIONAL_WHITESPACE EOF
-        { return []; }
-    ;
 
 LAYER
     : NUMBER
@@ -78,6 +82,11 @@ BLOCK
         {$$ = {type: "move", base: $4, startLayer: $1, endLayer: $3};}
     ;
 
+TIMESTAMP
+    : AT FLOAT SECONDS
+        {$$ = {type: "timestamp", time: parseFloat($2)};}
+    ;
+
 OPTIONAL_WHITESPACE
     : WHITESPACE
     | /* nothing */
@@ -103,9 +112,24 @@ REPEATED
         {$$ = {type: "move", base: ".", amount: 1};}
     ;
 
-ALG
+NESTED_ALG
     : OPTIONAL_WHITESPACE REPEATED OPTIONAL_WHITESPACE
         {$$ = [$2]; $REPEATED.location = @REPEATED;}
-    | ALG ALG
+    | NESTED_ALG NESTED_ALG
         {$$ = $1.concat($2);}
+    ;
+
+TOP_LEVEL_ALG
+    : NESTED_ALG
+    | TIMESTAMP
+        {$$ = [$TIMESTAMP];}
+    | TOP_LEVEL_ALG TOP_LEVEL_ALG
+        {$$ = $1.concat($2);}
+    ;
+
+expressions
+    : TOP_LEVEL_ALG EOF
+        { return $1; }
+    | OPTIONAL_WHITESPACE EOF
+        { return []; }
     ;
