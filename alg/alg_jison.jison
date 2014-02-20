@@ -3,9 +3,6 @@
 %lex
 %%
 
-/* The parser puts a boundary after the last of a
-   set of alternatives, so we get around this by repeating */
-
 [^\S\r\n]+             return 'WHITESPACE'
 [0-9]+                 return 'NUMBER'
 "-"                    return 'DASH'
