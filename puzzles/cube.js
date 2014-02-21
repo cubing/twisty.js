@@ -106,6 +106,14 @@ function createCubeTwisty(twistyScene, twistyParameters) {
     [0,0,0,12,12,12,12,12,12],
     [13,13,0,13,13,13,13,13,13]
   ];
+  stageStickers["L6E"] = [
+    [8,1,8,1,1,1,8,1,8],
+    [9,2,9,9,9,9,9,9,9],
+    [10,3,10,10,3,10,10,3,10],
+    [11,4,11,11,11,11,11,11,11],
+    [12,5,12,12,5,12,12,5,12],
+    [13,6,13,13,6,13,13,6,13]
+  ];
 
   var stickers = stageStickers["full"];
   if (cubeOptions["stage"] in stageStickers) {
