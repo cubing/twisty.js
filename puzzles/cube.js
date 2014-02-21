@@ -17,7 +17,7 @@ function createCubeTwisty(twistyScene, twistyParameters) {
     "stickerBorder": true,
     "borderWidth": 8,
     "cubies": false,
-    "stickerWidth": 1.8,
+    "stickerWidth": 1.7,
     "doubleSided": true,
     "algUpdateCallback": null,
     "hintStickers": false,
@@ -192,12 +192,25 @@ var hintTemplate = new THREE.Mesh(hintGeometry);
 hintTemplate.rotateY(Math.PI);
 hintTemplate.translateZ(-3);
 
+var cubieTemplate = new THREE.Object3D();
+
+var w = 1.8;
+var cubieGeometry = new THREE.CubeGeometry(w, w, w);
+var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
+cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
+var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
+cubieTemplate1.translateZ(-1);
+
+cubieTemplate.add(cubieTemplate1);
+
 var w = 1.9;
 var cubieGeometry = new THREE.CubeGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
 cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
-var cubieTemplate = new THREE.Mesh(cubieGeometry, cubieMaterial);
-cubieTemplate.translateZ(-1);
+var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
+cubieTemplate1.translateZ(-1);
+
+cubieTemplate.add(cubieTemplate1);
 
 var side = cubeOptions["doubleSided"] ? "doubleSided" : "singleSided";
 
