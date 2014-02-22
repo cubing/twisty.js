@@ -51,7 +51,9 @@ twistyjs.TwistyScene = function(options) {
     CAMERA_HEIGHT_STICKY_MIN: 2,
     CAMERA_HEIGHT_STICKY_MAX: 4,
     DRAG_RESISTANCE_X: 256,
-    DRAG_RESISTANCE_Y: 60
+    DRAG_RESISTANCE_Y: 60,
+    SCROLL_RESISTANCE_X: 1024,
+    SCROLL_RESISTANCE_Y: 180
   }
 
 
@@ -220,6 +222,7 @@ twistyjs.TwistyScene = function(options) {
     $(view.container).css("cursor", "move");
     view.container.addEventListener("mousedown", onStart, false );
     view.container.addEventListener("touchstart", onStart, false );
+    view.container.addEventListener("wheel", onWheel, false );
   }
 
   var listeners = {
@@ -274,6 +277,16 @@ twistyjs.TwistyScene = function(options) {
 
     control.mouseXLast = mouseX;
     control.mouseYLast = mouseY;
+
+    renderOnce();
+    event.preventDefault();
+  }
+
+  function onWheel(event) {
+    var deltaX = -event.wheelDeltaX/CONSTANTS.SCROLL_RESISTANCE_X;
+    var deltaY = event.wheelDeltaY/CONSTANTS.SCROLL_RESISTANCE_Y;
+
+    moveCameraDelta(deltaX, deltaY);
 
     renderOnce();
     event.preventDefault();
