@@ -137,12 +137,14 @@ $(document).ready(function() {
   $('input[name="stage"]').bind("change", reloadCube);
 
   $("#alg_ccc").bind("click", function() {
-    twistyScene.animateMoves(makeCCC(parseInt($("#cubeDimension").val())));
+    twistyScene.queueMoves(makeCCC(parseInt($("#cubeDimension").val())));
+    twistyScene.play.start();
   });
 
   $("#lucasparity").bind("click", function() {
     var lucasparity = alg.cube.stringToAlg("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
-    twistyScene.animateMoves(lucasparity);
+    twistyScene.queueMoves(lucasparity);
+    twistyScene.play.start();
   });
 
   $('input[name="renderer"]').click(reloadCube);
@@ -161,13 +163,15 @@ $(document).ready(function() {
   $("#alg_superflip").bind("click", function() {
     var once = "M' U' M' U' M' U' M' U' x y ";
     var superflip = alg.cube.stringToAlg(once + once + once);
-    twistyScene.animateMoves(superflip);
+    twistyScene.queueMoves(superflip);
+    twistyScene.play.start();
   });
 
   $("#parsed_alg1").bind("click", function() {
     var algo = alg.cube.stringToAlg($("#parse_alg").val());
     var moves = alg.cube.algToMoves(algo);
-    twistyScene.animateMoves(moves);
+    twistyScene.queueMoves(moves);
+    twistyScene.play.start();
   });
 
   $("#parsed_alg2").bind("click", function() {
