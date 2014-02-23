@@ -24,7 +24,7 @@ if(typeof(assert) == "undefined") {
   };
 }
 
-var twistyjs = {};
+var twisty = {};
 
 (function() {
 
@@ -32,14 +32,14 @@ var twistyjs = {};
  *
  * twisty.js Plugins
  *
- * Plugins register themselves by calling twistyjs.registerTwisty.
+ * Plugins register themselves by calling twisty.registerTwisty.
  * This lets plugins be defined in different files.
  *
  */
 
-twistyjs.twisties = {};
+twisty.puzzles = {};
 
-twistyjs.TwistyScene = function(options) {
+twisty.scene = function(options) {
 
   // that=this is a Crockford convention for accessing "this" inside of methods.
   var that = this;
@@ -126,7 +126,7 @@ twistyjs.TwistyScene = function(options) {
   /******** Model: Initialization ********/
 
 
-  this.initializeTwisty = function(twistyType) {
+  this.initializePuzzle = function(twistyType) {
 
     model.position = 0;
     model.preMoveList = [];
@@ -500,7 +500,7 @@ twistyjs.TwistyScene = function(options) {
 
       // Hack
       view.scene.remove(model.twisty["3d"]);
-      that.initializeTwisty(model.twisty.type);
+      that.initializePuzzle(model.twisty.type);
       model.preMoveList = preMoveListSaved;
       model.moveList = moveListSaved;
 
@@ -554,7 +554,7 @@ twistyjs.TwistyScene = function(options) {
   /******** Twisty ********/
 
   function createTwisty(twistyType) {
-    var twistyCreateFunction = twistyjs.twisties[twistyType.type];
+    var twistyCreateFunction = twisty.puzzles[twistyType.type];
     if(!twistyCreateFunction) {
       err('model.twisty type "' + twistyType.type + '" is not recognized!');
       return null;

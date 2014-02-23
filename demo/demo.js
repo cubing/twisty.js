@@ -242,7 +242,7 @@ $(document).ready(function() {
     var stage = $('input[name="stage"]:checked').val();
     var speed = $('#speed')[0].valueAsNumber;
 
-    twistyScene = new twistyjs.TwistyScene({
+    twistyScene = new twisty.scene({
       renderer: renderer,
       allowDragging: $("#allow_dragging").is(':checked'),
       "speed": speed,
@@ -251,7 +251,7 @@ $(document).ready(function() {
     $("#twistyContainer").empty();
     $("#twistyContainer").append($(twistyScene.getDomElement()));
 
-    twistyScene.initializeTwisty({
+    twistyScene.initializePuzzle({
       "type": "cube",
       "dimension": currentCubeSize,
       "stage": stage,

@@ -4,7 +4,7 @@
 
 "use strict";
 
-function createCubeTwisty(twistyScene, twistyParameters) {
+twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
 
   // log("Creating cube twisty.");
 
@@ -580,5 +580,3 @@ for (var i = 0; i < numSides; i++) {
   };
 
 }
-
-twistyjs.twisties["cube"] = createCubeTwisty;
