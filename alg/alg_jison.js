@@ -120,7 +120,7 @@ case 30:this.$ = [$$[$0-1]]; $$[$0-1].location = _$[$0-1];
 break;
 case 31:this.$ = $$[$0-1].concat($$[$0]);
 break;
-case 33:this.$ = [$$[$0-1]];
+case 33:this.$ = [$$[$0-1]]; $$[$0-1].location = _$[$0-1];
 break;
 case 34:this.$ = $$[$0-1].concat($$[$0]);
 break;

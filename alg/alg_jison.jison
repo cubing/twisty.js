@@ -129,7 +129,7 @@ NESTED_ALG
 TOP_LEVEL_ALG
     : NESTED_ALG
     | OPTIONAL_WHITESPACE TIMESTAMP OPTIONAL_WHITESPACE
-        {$$ = [$TIMESTAMP];}
+        {$$ = [$TIMESTAMP]; $TIMESTAMP.location = @TIMESTAMP;}
     | TOP_LEVEL_ALG TOP_LEVEL_ALG
         {$$ = $1.concat($2);}
     ;
