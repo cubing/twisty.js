@@ -75,7 +75,6 @@ BASE
     | BASE_UPPERCASE
     | BASE_ROTATION
     | BASE_SLICE
-    | PAUSE
     ;
 
 BLOCK
@@ -115,6 +114,8 @@ REPEATED
         {$REPEATABLE.amount = 1; $$ = $REPEATABLE;}
     | REPEATABLE AMOUNT
         {$REPEATABLE.amount = $AMOUNT; $$ = $REPEATABLE;}
+    | PAUSE
+        {$$ = {type: "move", base: ".", amount: 1};}
     | NEWLINE
         {$$ = {type: "move", base: ".", amount: 1};}
     ;
