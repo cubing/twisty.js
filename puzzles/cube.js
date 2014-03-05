@@ -12,6 +12,19 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
   var cubeObject = new THREE.Object3D();
   var cubePieces = [];
 
+  var easing = {};
+  easing.linear = function(x) { return x; };
+  easing.smooth = function(x) {
+    x = x * x; // Ease in.
+    return x * (2 - x); // Ease out.
+  };
+  easing.boingy_sproingy = function(x) {
+    // TODO: make this less jarring.
+    var y = x * x; // Ease in.
+    return 3 * (y * (2 - y) - (x / 1.5)); // Ease out.
+    return x;
+  };
+
   //Defaults
   var cubeOptions = {
     "stickerBorder": true,
@@ -23,6 +36,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     "hintStickers": false,
     "opacity": 1,
     "dimension": 3,
+    "easing": easing.smooth,
     "colors": [0x444444, 0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00,
     // TODO: Handle extra colors procedurally
                0x222222, 0x888888, 0x884400, 0x008800, 0x660000, 0x000088, 0x888800],
@@ -289,6 +303,9 @@ for (var i = 0; i < numSides; i++) {
 
   var lastMoveProgress = 0;
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
+
+    // Easing
+    moveProgress = twisty["options"]["easing"](moveProgress);
 
     var canonical = alg.cube.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
 
