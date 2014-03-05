@@ -223,6 +223,10 @@ var alg = (function (){
       return repeatMoves(once, group);
     }
 
+    repeatableToMoves["timestamp"] = function(group) {
+      return [];
+    }
+
     function algToMoves(algIn) {
       var moves = [];
       for (i in algIn) {
