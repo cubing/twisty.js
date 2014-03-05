@@ -12,11 +12,13 @@
 <script type="text/javascript" src="lib/RequestAnimationFrame.js"></script>
 <script type="text/javascript" src="lib/Stats.js"></script>
 
-<script src="alg/alg_jison.js" type="text/javascript"></script>
+<!-- <script src="alg/alg_jison.js" type="text/javascript"></script>
 <script src="alg.js" type="text/javascript"></script>
 <script src="twisty.js" type="text/javascript"></script>
-<script src="puzzles/cube.js" type="text/javascript"></script>
-<script src="demo/demo.js" type="text/javascript"></script>
+<script src="puzzles/cube.js" type="text/javascript"></script> -->
+<script src="puzzles/ksolve/ksolve_jison.js" type="text/javascript"></script>
+<script src="puzzles/ksolve/ksolve-twisty.js" type="text/javascript"></script>
+<!-- <script src="demo/demo.js" type="text/javascript"></script> -->
 
 </head>
 <body>
@@ -135,6 +137,50 @@
 
     </div>
     <div class="right checkered" id="twistyContainer">
+<svg id="puzzle" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="410" height="310">
+  <defs>
+  </defs>
+  <title>2x2x2</title>
+  <defs>
+    <g id="sticker">
+        <rect x="0" y="0" width="1" height="1" stroke="black" stroke-width="0.04px" />
+    </g>
+  </defs>
+  <g id="puzzle" transform="translate(5, 5) scale(50)">
+    <use id="CORNERS-l0-o0" xlink:href="#sticker" transform="translate(2, 0)" style="fill: white"/>
+    <use id="CORNERS-l0-o1" xlink:href="#sticker" transform="translate(7, 2)" style="fill: blue"/>
+    <use id="CORNERS-l0-o2" xlink:href="#sticker" transform="translate(0, 2)" style="fill: orange"/>
+
+    <use id="CORNERS-l1-o0" xlink:href="#sticker" transform="translate(3, 0)" style="fill: white"/>
+    <use id="CORNERS-l1-o1" xlink:href="#sticker" transform="translate(5, 2)" style="fill: red"/>
+    <use id="CORNERS-l1-o2" xlink:href="#sticker" transform="translate(6, 2)" style="fill: blue"/>
+
+    <use id="CORNERS-l2-o0" xlink:href="#sticker" transform="translate(3, 1)" style="fill: white"/>
+    <use id="CORNERS-l2-o1" xlink:href="#sticker" transform="translate(3, 2)" style="fill: green"/>
+    <use id="CORNERS-l2-o2" xlink:href="#sticker" transform="translate(4, 2)" style="fill: red"/>
+
+    <use id="CORNERS-l3-o0" xlink:href="#sticker" transform="translate(2, 1)" style="fill: white"/>
+    <use id="CORNERS-l3-o1" xlink:href="#sticker" transform="translate(1, 2)" style="fill: orange"/>
+    <use id="CORNERS-l3-o2" xlink:href="#sticker" transform="translate(2, 2)" style="fill: green"/>
+
+    <use id="CORNERS-l4-o0" xlink:href="#sticker" transform="translate(3, 5)" style="fill: yellow"/>
+    <use id="CORNERS-l4-o1" xlink:href="#sticker" transform="translate(6, 3)" style="fill: blue"/>
+    <use id="CORNERS-l4-o2" xlink:href="#sticker" transform="translate(5, 3)" style="fill: red"/>
+
+    <use id="CORNERS-l5-o0" xlink:href="#sticker" transform="translate(3, 4)" style="fill: yellow"/>
+    <use id="CORNERS-l5-o1" xlink:href="#sticker" transform="translate(4, 3)" style="fill: red"/>
+    <use id="CORNERS-l5-o2" xlink:href="#sticker" transform="translate(3, 3)" style="fill: green"/>
+
+    <use id="CORNERS-l6-o0" xlink:href="#sticker" transform="translate(2, 4)" style="fill: yellow"/>
+    <use id="CORNERS-l6-o1" xlink:href="#sticker" transform="translate(2, 3)" style="fill: green"/>
+    <use id="CORNERS-l6-o2" xlink:href="#sticker" transform="translate(1, 3)" style="fill: orange"/>
+
+    <use                    xlink:href="#sticker" transform="translate(2, 5)" style="fill: yellow"/>
+    <use                    xlink:href="#sticker" transform="translate(0, 3)" style="fill: orange"/>
+    <use                    xlink:href="#sticker" transform="translate(7, 3)" style="fill: blue"/>
+  </g>
+
+</svg>
     </div>
 
   </div>
