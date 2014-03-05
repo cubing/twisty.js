@@ -40,20 +40,27 @@
 
 %% /* language grammar */
 
+expressions
+    : TOP_LEVEL_ALG EOF
+        { return $TOP_LEVEL_ALG; }
+    | OPTIONAL_WHITESPACE EOF
+        { return []; }
+    ;
+
 LAYER
     : NUMBER
-        {$$ = parseInt($1);}
+        {$$ = parseInt($NUMBER);}
     ;
 
 REPETITION
     : NUMBER
-        {$$ = parseInt($1);}
+        {$$ = parseInt($NUMBER);}
     ;
 
 AMOUNT
     : REPETITION
     | REPETITION PRIME
-        {$$ = -$1;}
+        {$$ = -$REPETITION;}
     | PRIME
         {$$ = -1;}
     ;
@@ -73,13 +80,13 @@ BASE
 
 BLOCK
     : BASE
-        {$$ = {type: "move", base: $1};}
+        {$$ = {type: "move", base: $BASE};}
     | LAYER BASE_UPPERCASE
-        {$$ = {type: "move", base: $2, layer: $1};}
+        {$$ = {type: "move", base: $BASE_UPPERCASE, layer: $LAYER};}
     | LAYER BASE_WIDE
-        {$$ = {type: "move", base: $2, endLayer: $1};}
+        {$$ = {type: "move", base: $BASE_WIDE, endLayer: $LAYER};}
     | LAYER DASH LAYER BASE_WIDE
-        {$$ = {type: "move", base: $4, startLayer: $1, endLayer: $3};}
+        {$$ = {type: "move", base: $BASE_WIDE, startLayer: $1, endLayer: $3};}
     ;
 
 TIMESTAMP
@@ -95,26 +102,26 @@ OPTIONAL_WHITESPACE
 
 REPEATABLE
     : BLOCK
-    | OPEN_BRACKET ALG COMMA ALG CLOSE_BRACKET
+    | OPEN_BRACKET NESTED_ALG COMMA NESTED_ALG CLOSE_BRACKET
         {$$ = {"type": "commutator", "A": $2, "B": $4};}
-    | OPEN_BRACKET ALG COLON ALG CLOSE_BRACKET
+    | OPEN_BRACKET NESTED_ALG COLON NESTED_ALG CLOSE_BRACKET
         {$$ = {"type": "conjugate", "A": $2, "B": $4};}
-    | OPEN_PARENTHESIS ALG CLOSE_PARENTHESIS
-        {$$ = {"type": "group", "A": $2};}
+    | OPEN_PARENTHESIS NESTED_ALG CLOSE_PARENTHESIS
+        {$$ = {"type": "group", "A": $NESTED_ALG};}
     ;
 
 REPEATED
     : REPEATABLE
-        {$1.amount = 1; $$ = $1;}
+        {$REPEATABLE.amount = 1; $$ = $REPEATABLE;}
     | REPEATABLE AMOUNT
-        {$1.amount = $2; $$ = $1;}
+        {$REPEATABLE.amount = $AMOUNT; $$ = $REPEATABLE;}
     | NEWLINE
         {$$ = {type: "move", base: ".", amount: 1};}
     ;
 
 NESTED_ALG
     : OPTIONAL_WHITESPACE REPEATED OPTIONAL_WHITESPACE
-        {$$ = [$2]; $REPEATED.location = @REPEATED;}
+        {$$ = [$REPEATED]; $REPEATED.location = @REPEATED;}
     | NESTED_ALG NESTED_ALG
         {$$ = $1.concat($2);}
     ;
@@ -125,11 +132,4 @@ TOP_LEVEL_ALG
         {$$ = [$TIMESTAMP];}
     | TOP_LEVEL_ALG TOP_LEVEL_ALG
         {$$ = $1.concat($2);}
-    ;
-
-expressions
-    : TOP_LEVEL_ALG EOF
-        { return $1; }
-    | OPTIONAL_WHITESPACE EOF
-        { return []; }
     ;
