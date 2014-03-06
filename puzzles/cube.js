@@ -4,7 +4,7 @@
 
 "use strict";
 
-twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
+twisty.puzzles.cube = function(twistyScene, twistyParameters) {
 
   // log("Creating cube twisty.");
 
@@ -27,21 +27,21 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
 
   //Defaults
   var cubeOptions = {
-    "stickerBorder": true,
-    "borderWidth": 8,
-    "cubies": false,
-    "stickerWidth": 1.7,
-    "doubleSided": true,
-    "algUpdateCallback": null,
-    "hintStickers": false,
-    "opacity": 1,
-    "dimension": 3,
-    "easing": easing.smooth,
-    "colors": [0x444444, 0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00,
+    stickerBorder: true,
+    borderWidth: 8,
+    cubies: false,
+    stickerWidth: 1.7,
+    doubleSided: true,
+    algUpdateCallback: null,
+    hintStickers: false,
+    opacity: 1,
+    dimension: 3,
+    easing: easing.smooth,
+    colors: [0x444444, 0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00,
     // TODO: Handle extra colors procedurally
                0x222222, 0x888888, 0x884400, 0x008800, 0x660000, 0x000088, 0x888800],
-    "stage": "full",
-    "scale": 1,
+    stage: "full",
+    scale: 1,
   };
 
 
@@ -58,21 +58,21 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
 
   // Cube Materials
   var materials = {"singleSided": [], "doubleSided": []};
-  for (var i = 0; i < cubeOptions["colors"].length; i++) {
+  for (var i = 0; i < cubeOptions.colors.length; i++) {
     for (var j = 0; j < 2; j++) {
       var side = ["singleSided", "doubleSided"][j];
-      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["colors"][i], overdraw: 0.5 });
+      var material = new THREE.MeshBasicMaterial( { color: cubeOptions.colors[i], overdraw: 0.5 });
       if (side === "doubleSided") {
         material.side = THREE.DoubleSide;
       }
-      material.opacity = cubeOptions["opacity"];
+      material.opacity = cubeOptions.opacity;
       materials[side].push(material);
     }
   }
 
   // Stickering for stages.
   var stageStickers = {};
-  stageStickers["full"] = [
+  stageStickers.full = [
     [1,1,1,1,1,1,1,1,1],
     [2,2,2,2,2,2,2,2,2],
     [3,3,3,3,3,3,3,3,3],
@@ -80,7 +80,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [5,5,5,5,5,5,5,5,5],
     [6,6,6,6,6,6,6,6,6]
   ];
-  stageStickers["PLL"] = [
+  stageStickers.PLL = [
     [1,1,1,1,1,1,1,1,1],
     [2,2,2,9,9,9,9,9,9],
     [3,3,3,10,10,10,10,10,10],
@@ -88,7 +88,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [5,5,5,12,12,12,12,12,12],
     [13,13,13,13,13,13,13,13,13]
   ];
-  stageStickers["OLL"] = [
+  stageStickers.OLL = [
     [1,1,1,1,1,1,1,1,1],
     [0,0,0,9,9,9,9,9,9],
     [0,0,0,10,10,10,10,10,10],
@@ -96,7 +96,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [0,0,0,12,12,12,12,12,12],
     [13,13,13,13,13,13,13,13,13]
   ];
-  stageStickers["F2L"] = [
+  stageStickers.F2L = [
     [0,0,0,0,1,0,0,0,0],
     [0,0,0,2,2,2,2,2,2],
     [0,0,0,3,3,3,3,3,3],
@@ -104,7 +104,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [0,0,0,5,5,5,5,5,5],
     [6,6,6,6,6,6,6,6,6]
   ];
-  stageStickers["CLS"] = [
+  stageStickers.CLS = [
     [1,8,1,8,8,8,1,8,1],
     [0,0,0,9,9,9,9,9,9],
     [0,0,0,10,10,10,10,10,3],
@@ -112,7 +112,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [0,0,0,12,12,12,12,12,12],
     [13,13,6,13,13,13,13,13,13]
   ];
-  stageStickers["ELS"] = [
+  stageStickers.ELS = [
     [0,1,0,1,1,1,0,1,0],
     [0,0,0,9,9,9,9,9,9],
     [0,0,0,10,10,3,10,10,0],
@@ -120,7 +120,7 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [0,0,0,12,12,12,12,12,12],
     [13,13,0,13,13,13,13,13,13]
   ];
-  stageStickers["L6E"] = [
+  stageStickers.L6E = [
     [8,1,8,1,1,1,8,1,8],
     [9,2,9,9,9,9,9,9,9],
     [10,3,10,10,3,10,10,3,10],
@@ -129,9 +129,9 @@ twisty.puzzles["cube"] = function(twistyScene, twistyParameters) {
     [13,6,13,13,6,13,13,6,13]
   ];
 
-  var stickers = stageStickers["full"];
-  if (cubeOptions["stage"] in stageStickers) {
-    stickers = stageStickers[cubeOptions["stage"]];
+  var stickers = stageStickers.full;
+  if (cubeOptions.stage in stageStickers) {
+    stickers = stageStickers[cubeOptions.stage];
   }
 
   // Cube Helper Linear Algebra
@@ -189,16 +189,16 @@ var sidesUV = [
                ];
 
 var borderGeometry = new THREE.Geometry();
-var c = cubeOptions["stickerWidth"]*0.51;
+var c = cubeOptions.stickerWidth*0.51;
 borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(+c, -c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(+c, +c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(-c, +c, 0) );
 borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
-var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: cubeOptions["borderWidth"], opacity: cubeOptions.opacity});
+var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: cubeOptions.borderWidth, opacity: cubeOptions.opacity});
 var borderTemplate = new THREE.Line(borderGeometry, borderMaterial);
 
-var innerGeometry = new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]);
+var innerGeometry = new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth);
 var innerTemplate = new THREE.Mesh(innerGeometry);
 
 var hintGeometry = innerGeometry.clone();
@@ -226,7 +226,7 @@ cubieTemplate1.translateZ(-1);
 
 cubieTemplate.add(cubieTemplate1);
 
-var side = cubeOptions["doubleSided"] ? "doubleSided" : "singleSided";
+var side = cubeOptions.doubleSided ? "doubleSided" : "singleSided";
 
 //Cube Object Generation
 for (var i = 0; i < numSides; i++) {
@@ -238,43 +238,43 @@ for (var i = 0; i < numSides; i++) {
   var innerSticker = innerTemplate.clone();
   stickerTemplate.add(innerSticker);
 
-  if (cubeOptions["hintStickers"]) {
+  if (cubeOptions.hintStickers) {
     stickerTemplate.add(hintTemplate);
   }
 
-  if (cubeOptions["stickerBorder"]) {
+  if (cubeOptions.stickerBorder) {
     stickerTemplate.add(borderTemplate);
   }
 
-  if (cubeOptions["cubies"]) {
+  if (cubeOptions.cubies) {
     // Easiest to make this one per sticker for now. Can be optimized later.
     stickerTemplate.add(cubieTemplate);
   }
 
-  for (var su = 0; su < cubeOptions["dimension"]; su++) {
-    for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
+  for (var su = 0; su < cubeOptions.dimension; su++) {
+    for (var sv = 0; sv < cubeOptions.dimension; sv++) {
 
       var sticker = stickerTemplate.clone();
 
       var material = materials[side][i+1];
-      var material2 = materials["singleSided"][i+1];
+      var material2 = materials.singleSided[i+1];
 
-      if (cubeOptions["dimension"] == 3) {
+      if (cubeOptions.dimension == 3) {
         var material = materials[side][stickers[i][su + 3*sv]];
-        var material2 = materials["singleSided"][stickers[i][su + 3*sv]];
+        var material2 = materials.singleSided[stickers[i][su + 3*sv]];
       }
 
       sticker.children[0].material = material;
 
-      if (cubeOptions["hintStickers"]) {
+      if (cubeOptions.hintStickers) {
         sticker.children[1].material = material2;
       }
 
       var positionMatrix = new THREE.Matrix4();
       positionMatrix.makeTranslation(
-          su*2 - cubeOptions["dimension"] + 1,
-          -(sv*2 - cubeOptions["dimension"] + 1),
-          cubeOptions["dimension"]
+          su*2 - cubeOptions.dimension + 1,
+          -(sv*2 - cubeOptions.dimension + 1),
+          cubeOptions.dimension
       );
 
       var x = sidesUV[i].clone();
@@ -293,8 +293,8 @@ for (var i = 0; i < numSides; i++) {
     return m.elements[12]*v.x + m.elements[13]*v.y + m.elements[14]*v.z;
   }
 
-  var actualScale = 2 * cubeOptions["dimension"] / cubeOptions["scale"];
-  if (cubeOptions["hintStickers"]) {
+  var actualScale = 2 * cubeOptions.dimension / cubeOptions.scale;
+  if (cubeOptions.hintStickers) {
     actualScale *= 1.2;
   }
   function cameraScale() {
@@ -305,9 +305,9 @@ for (var i = 0; i < numSides; i++) {
   var animateMoveCallback = function(twisty, currentMove, moveProgress) {
 
     // Easing
-    moveProgress = twisty["options"]["easing"](moveProgress);
+    moveProgress = twisty.options.easing(moveProgress);
 
-    var canonical = alg.cube.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
+    var canonical = alg.cube.canonicalizeMove(currentMove, twisty.options.dimension);
 
     if (canonical.base == ".") {
       return; // Pause
@@ -318,7 +318,7 @@ for (var i = 0; i < numSides; i++) {
     lastMoveProgress = moveProgress;
     rott.makeRotationAxis(sidesRotAxis[canonical.base], moveProgress * canonical.amount * Math.PI/2);
 
-    var state = twisty["cubePieces"];
+    var state = twisty.cubePieces;
 
 
     for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
@@ -332,14 +332,14 @@ for (var i = 0; i < numSides; i++) {
         var layerStart = canonical.startLayer;
         var layerEnd = canonical.endLayer;
         if (layerEnd < 0) {
-          layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+          layerEnd = twisty.options.dimension + 1 + layerEnd;
         }
 
         var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[canonical.base]);
         if (
-            layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
+            layer < twisty.options.dimension - 2*layerStart + 2.5
             &&
-            layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
+            layer > twisty.options.dimension - 2*layerEnd - 0.5
            ) {
              var roty = rott.clone();
              roty.multiply(sticker[0]);
@@ -383,7 +383,7 @@ for (var i = 0; i < numSides; i++) {
 
   var advanceMoveCallback = function(twisty, currentMove) {
 
-    var canonical = alg.cube.canonicalizeMove(currentMove, twisty["options"]["dimension"]);
+    var canonical = alg.cube.canonicalizeMove(currentMove, twisty.options.dimension);
 
     if (canonical.base === ".") {
       return; // Pause
@@ -391,7 +391,7 @@ for (var i = 0; i < numSides; i++) {
 
     var rott = matrix4Power(sidesRot[canonical.base], canonical.amount);
 
-    var state = twisty["cubePieces"];
+    var state = twisty.cubePieces;
 
     for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
       var faceStickers = state[faceIndex];
@@ -402,14 +402,14 @@ for (var i = 0; i < numSides; i++) {
         var layerStart = canonical.startLayer;
         var layerEnd = canonical.endLayer;
         if (layerEnd < 0) {
-          layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+          layerEnd = twisty.options.dimension + 1 + layerEnd;
         }
 
         var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[canonical.base]);
         if (
-            layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
+            layer < twisty.options.dimension - 2*layerStart + 2.5
             &&
-            layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
+            layer > twisty.options.dimension - 2*layerEnd - 0.5
            ) {
              var roty = rott.clone();
              roty.multiply(sticker[0]);
@@ -423,13 +423,13 @@ for (var i = 0; i < numSides; i++) {
     }
 
     cumulativeAlgorithm.push(canonical);
-    if (twisty["options"]["algUpdateCallback"]) {
-      twisty["options"]["algUpdateCallback"](cumulativeAlgorithm);
+    if (twisty.options.algUpdateCallback) {
+      twisty.options.algUpdateCallback(cumulativeAlgorithm);
     }
   };
 
   function generateScramble(twisty) {
-    var dim = twisty["options"]["dimension"];
+    var dim = twisty.options.dimension;
     var n = 32;
     var newMoves = [];
 
@@ -451,7 +451,7 @@ for (var i = 0; i < numSides; i++) {
 
   var iS = 1;
   var oS = 1;
-  var iSi = cubeOptions["dimension"];
+  var iSi = cubeOptions.dimension;
   var cubeKeyMapping = {
     73: "R", 75: "R'",
     87: "B", 79: "B'",
@@ -504,7 +504,7 @@ for (var i = 0; i < numSides; i++) {
   }
   var isSolved = function(twisty) {
     var state = twisty.cubePieces;
-    var dimension = twisty["options"]["dimension"];
+    var dimension = twisty.options.dimension;
 
 
     // This implementation of isSolved simply checks that
@@ -576,7 +576,7 @@ for (var i = 0; i < numSides; i++) {
   };
 
   var isInspectionLegalMove = function(twisty, move) {
-    if(move.startLayer == 1 && move.endLayer == twisty["options"]["dimension"]) {
+    if(move.startLayer == 1 && move.endLayer == twisty.options.dimension) {
       return true;
     }
     return false;
