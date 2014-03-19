@@ -17,7 +17,7 @@
 (R|F|U|B|L|D)          return "BASE_UPPERCASE"
 (r|f|u|b|l|d)          return "BASE_LOWERCASE"
 (x|y|z)                return "BASE_ROTATION"
-(M|E|S)                return "BASE_SLICE"
+(M|N|E|S)              return "BASE_SLICE"
 
 "'"                    return "PRIME"
 "."                    return "PAUSE"

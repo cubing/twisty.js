@@ -6,7 +6,7 @@ var alg = (function (){
   var patterns = {
     single: /^[UFRBLD]$/,
     wide: /^([ufrbld])|([UFRBLD]w)$/,
-    slice: /^[MES]$/,
+    slice: /^[MNES]$/,
     rotation: /^[xyz]$/,
     pause: /^\.$/
   };
@@ -23,7 +23,7 @@ var alg = (function (){
   var directionMap = {
     "U": "U", "Uw": "U", "u": "U",           "y": "U",
     "F": "F", "Fw": "F", "f": "F", "S": "F", "z": "F",
-    "R": "R", "Rw": "R", "r": "R",           "x": "R",
+    "R": "R", "Rw": "R", "r": "R", "N": "R", "x": "R",
     "B": "B", "Bw": "B", "b": "B",
     "L": "L", "Lw": "L", "l": "L", "M": "L",
     "D": "D", "Dw": "D", "d": "D", "E": "D",
