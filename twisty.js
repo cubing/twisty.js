@@ -215,6 +215,9 @@ twisty.scene = function(options) {
     that.setCameraPosition(control.cameraTheta + deltaTheta, control.cameraHeight + deltaHeight);
   }
 
+  // Detect modern versions of IE.
+  // I try to write browser-agnostic code, but even IE11 manages to break the wheel event.
+  var isIE = navigator.userAgent.indexOf('Trident') > -1;
 
   /******** Control: Mouse/Touch Dragging ********/
 
@@ -222,7 +225,9 @@ twisty.scene = function(options) {
     $(view.container).css("cursor", "move");
     view.container.addEventListener("mousedown", onStart, false );
     view.container.addEventListener("touchstart", onStart, false );
-    view.container.addEventListener("wheel", onWheel, false );
+    if (!isIE) {
+      view.container.addEventListener("wheel", onWheel, false );
+    }
   }
 
   var listeners = {
