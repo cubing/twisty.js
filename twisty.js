@@ -84,7 +84,9 @@ twisty.scene = function(options) {
 
     listeners: {
       animating: [],
-      position: []
+      position: [],
+      moveStart: [],
+      moveAdvance: []
     },
 
     speed: null,
@@ -188,6 +190,8 @@ twisty.scene = function(options) {
       requestAnimFrame(render);
     }
   }
+
+  this.redraw = renderOnce;
 
 
   /******** View: Camera ********/
@@ -319,7 +323,10 @@ twisty.scene = function(options) {
   this.keydown = function(e) {
 
     var keyCode = e.keyCode;
-    model.twisty.keydownCallback(model.twisty, e);
+    var move = model.twisty.keydownCallback(model.twisty, e);
+    if (move != null) {
+      fireListener("moveStart", move);
+    }
 
     switch (keyCode) {
 
@@ -400,6 +407,7 @@ twisty.scene = function(options) {
         var prevMove = model.moveList[Math.floor(prevPosition)];
         model.twisty["animateMoveCallback"](model.twisty, prevMove, 1);
         model.twisty["advanceMoveCallback"](model.twisty, prevMove);
+        fireListener("moveAdvance");
 
         if (control.stopAfterNextMove) {
           control.stopAfterNextMove = false;

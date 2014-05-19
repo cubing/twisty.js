@@ -435,12 +435,18 @@ for (var i = 0; i < numSides; i++) {
 
     for (var i=0; i<n; i++) {
 
-      var random1 = 1+ Math.floor(Math.random()*dim/2);
-      var random2 = random1 + Math.floor(Math.random()*dim/2);
-      var random3 = Math.floor(Math.random()*6);
-      var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
+      var startLayer = 1+ Math.floor(Math.random()*dim/2);
+      var endLayer = startLayer + Math.floor(Math.random()*dim/2);
+      var side = Math.floor(Math.random()*6);
+      var amount = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
 
-      var newMove = [random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4];
+      var newMove = {
+        type: "move",
+        base: ["u", "l", "f", "r", "b", "d"][side],
+        amount: amount,
+        startLayer: startLayer,
+        endLayer: endLayer
+      };
 
       newMoves.push(newMove);
 
@@ -472,7 +478,7 @@ for (var i = 0; i < numSides; i++) {
   }
   var keydownCallback = function(twisty, e) {
     if(e.altKey || e.ctrlKey) {
-      return;
+      return null;
     }
 
     var keyCode = e.keyCode;
@@ -480,7 +486,11 @@ for (var i = 0; i < numSides; i++) {
       var move = alg.cube.stringToAlg(cubeKeyMapping[keyCode]);
       twistyScene.queueMoves(move);
       twistyScene.play.start();
+
+      return move;
     }
+
+    return null;
   };
 
   var ogCubePiecesCopy = [];

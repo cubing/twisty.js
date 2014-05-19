@@ -268,6 +268,25 @@ $(document).ready(function() {
     twistyScene.resize();
     cubeState = CubeState.solved;
     resetTimer();
+
+    twistyScene.addListener("moveStart", function(move) {
+      if(cubeState == CubeState.scrambling) {
+        // We don't want to start the timer if we're scrambling the cube.
+      } else if(cubeState == CubeState.scrambled) {
+        // var twisty = twistyScene  ;
+        console.log(move);
+        startTimer();
+        cubeState = CubeState.solving;
+      }
+    });
+
+    twistyScene.addListener("moveAdvance", function(move) {
+      // var twisty = twistyScene.getTwisty();
+      // if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
+      //   cubeState = CubeState.solved;
+      //   stopTimer();
+      // }
+    });
   }
 
   $(window).resize(twistyScene.resize);
@@ -295,13 +314,14 @@ $(document).ready(function() {
 
       case 32:
         if (!isTiming()) {
-          var twisty = twistyScene.getTwisty();
+          var twisty = twistyScene.debug.model.twisty;
           var scramble = twisty.generateScramble(twisty);
           // We're going to get notified of the scrambling, and we don't
           // want to start the timer when that's happening, so we keep track
           // of the fact that we're scrambling.
           cubeState = CubeState.scrambling;
           twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
+          twistyScene.redraw(); // Force redraw.
           cubeState = CubeState.scrambled;
           resetTimer();
         }
@@ -311,27 +331,6 @@ $(document).ready(function() {
 
     twistyScene.keydown(e);
   });
-
-  // twistyScene.addMoveListener(function(move, started) {
-  //   if(started) {
-  //     if(cubeState == CubeState.scrambling) {
-  //       // We don't want to start the timer if we're scrambling the cube.
-  //     } else if(cubeState == CubeState.scrambled) {
-  //       var twisty = twistyScene.getTwisty();
-  //       if(twisty.isInspectionLegalMove(twisty, move)) {
-  //         return;
-  //       }
-  //       startTimer();
-  //       cubeState = CubeState.solving;
-  //     }
-  //   } else {
-  //     var twisty = twistyScene.getTwisty();
-  //     if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
-  //       cubeState = CubeState.solved;
-  //       stopTimer();
-  //     }
-  //   }
-  // });
 
 });
 
