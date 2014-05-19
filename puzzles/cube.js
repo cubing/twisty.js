@@ -428,30 +428,80 @@ for (var i = 0; i < numSides; i++) {
     }
   };
 
-  var PLLs = {
-    Aa: [4, "R' F R' B2 R F' R' B2 R2"],
-    Ab: [4, "R B' R F2 R' B R F2 R2"],
-    E: [2, "y x' R U' R' D R U R' D' R U R' D R U' R' D' x"],
-    F: [4, "R' U R U' R2 F' U' F U R F R' F' R2"],
-    Ga: [4, "R2' u R' U R' U' R u' R2 y' R' U R"],
-    Gb: [4, "R' U' R y R2 u R' U R U' R u' R2"],
-    Gc: [4, "R2' u' R U' R U R' u R2 y R U' R'"],
-    Gd: [4, "R U R' y' R2 u' R U' R' U R' u R2"],
-    H: [1, "M2' U M2' U2 M2' U M2'"],
-    J: [4, "B U' F U2 B' U B U2 F' B'"],
-    L: [4, "B' U F' U2 B U' B' U2 F B"],
-    Na: [1, "L U' R U2 L' U R' L U' R U2 L' U R'"],
-    Nb: [1, "R' U L' U2 R U' L R' U L' U2 R U' L"],
-    Ra: [4, "R U2 R' U2 R B' R' U' R U R B R2"],
-    Rb: [4, "R' U2 R U2 R' F R U R' U' R' F' R2'"],
-    S: [1, ""],
-    T: [4, "R U R' U' R' F R2 U' R' U' R U R' F'"],
-    Ua: [4, "R2 U' R' U' R U R U R U' R"],
-    Ub: [4, "R' U R' U' R' U' R' U R U R2"],
-    V: [4, "R' U R' U' B' R' B2 U' B' U B' R B R"],
-    Y: [4, "F R U' R' U' R U R' F' R U R' U' R' F R F'"],
-    Z: [2, "M2' U M2' U M' U2 M2' U2 M'"]
-  }
+  var PLLs = [
+    ["H", "M2' U M2' U2 M2' U M2'"],
+    ["Na", "L U' R U2 L' U R' L U' R U2 L' U R'"],
+    ["Nb", "R' U L' U2 R U' L R' U L' U2 R U' L"],
+    ["S", ""],
+    ["E", "y x' R U' R' D R U R' D' R U R' D R U' R' D' x"],
+    ["E", "U y x' R U' R' D R U R' D' R U R' D R U' R' D' x"],
+    ["Z", "M2' U M2' U M' U2 M2' U2 M'"],
+    ["Z", "U M2' U M2' U M' U2 M2' U2 M'"],
+    ["Aa", "R' F R' B2 R F' R' B2 R2"],
+    ["Aa", "U R' F R' B2 R F' R' B2 R2"],
+    ["Aa", "U2 R' F R' B2 R F' R' B2 R2"],
+    ["Aa", "U' R' F R' B2 R F' R' B2 R2"],
+    ["Ab", "R B' R F2 R' B R F2 R2"],
+    ["Ab", "U R B' R F2 R' B R F2 R2"],
+    ["Ab", "U2 R B' R F2 R' B R F2 R2"],
+    ["Ab", "U' R B' R F2 R' B R F2 R2"],
+    ["F", "R' U R U' R2 F' U' F U R F R' F' R2"],
+    ["F", "U R' U R U' R2 F' U' F U R F R' F' R2"],
+    ["F", "U2 R' U R U' R2 F' U' F U R F R' F' R2"],
+    ["F", "U' R' U R U' R2 F' U' F U R F R' F' R2"],
+    ["Ga", "R2' u R' U R' U' R u' R2 y' R' U R"],
+    ["Ga", "U R2' u R' U R' U' R u' R2 y' R' U R"],
+    ["Ga", "U2 R2' u R' U R' U' R u' R2 y' R' U R"],
+    ["Ga", "U' R2' u R' U R' U' R u' R2 y' R' U R"],
+    ["Gb", "R' U' R y R2 u R' U R U' R u' R2"],
+    ["Gb", "U R' U' R y R2 u R' U R U' R u' R2"],
+    ["Gb", "U2 R' U' R y R2 u R' U R U' R u' R2"],
+    ["Gb", "U' R' U' R y R2 u R' U R U' R u' R2"],
+    ["Gc", "R2' u' R U' R U R' u R2 y R U' R'"],
+    ["Gc", "U R2' u' R U' R U R' u R2 y R U' R'"],
+    ["Gc", "U2 R2' u' R U' R U R' u R2 y R U' R'"],
+    ["Gc", "U' R2' u' R U' R U R' u R2 y R U' R'"],
+    ["Gd", "R U R' y' R2 u' R U' R' U R' u R2"],
+    ["Gd", "U R U R' y' R2 u' R U' R' U R' u R2"],
+    ["Gd", "U2 R U R' y' R2 u' R U' R' U R' u R2"],
+    ["Gd", "U' R U R' y' R2 u' R U' R' U R' u R2"],
+    ["J", "B U' F U2 B' U B U2 F' B'"],
+    ["J", "U B U' F U2 B' U B U2 F' B'"],
+    ["J", "U2 B U' F U2 B' U B U2 F' B'"],
+    ["J", "U' B U' F U2 B' U B U2 F' B'"],
+    ["L", "B' U F' U2 B U' B' U2 F B"],
+    ["L", "U B' U F' U2 B U' B' U2 F B"],
+    ["L", "U2 B' U F' U2 B U' B' U2 F B"],
+    ["L", "U' B' U F' U2 B U' B' U2 F B"],
+    ["Ra", "R U2 R' U2 R B' R' U' R U R B R2"],
+    ["Ra", "U R U2 R' U2 R B' R' U' R U R B R2"],
+    ["Ra", "U2 R U2 R' U2 R B' R' U' R U R B R2"],
+    ["Ra", "U' R U2 R' U2 R B' R' U' R U R B R2"],
+    ["Rb", "R' U2 R U2 R' F R U R' U' R' F' R2'"],
+    ["Rb", "U R' U2 R U2 R' F R U R' U' R' F' R2'"],
+    ["Rb", "U2 R' U2 R U2 R' F R U R' U' R' F' R2'"],
+    ["Rb", "U' R' U2 R U2 R' F R U R' U' R' F' R2'"],
+    ["T", "R U R' U' R' F R2 U' R' U' R U R' F'"],
+    ["T", "U R U R' U' R' F R2 U' R' U' R U R' F'"],
+    ["T", "U2 R U R' U' R' F R2 U' R' U' R U R' F'"],
+    ["T", "U' R U R' U' R' F R2 U' R' U' R U R' F'"],
+    ["Ua", "R2 U' R' U' R U R U R U' R"],
+    ["Ua", "U R2 U' R' U' R U R U R U' R"],
+    ["Ua", "U2 R2 U' R' U' R U R U R U' R"],
+    ["Ua", "U' R2 U' R' U' R U R U R U' R"],
+    ["Ub", "R' U R' U' R' U' R' U R U R2"],
+    ["Ub", "U R' U R' U' R' U' R' U R U R2"],
+    ["Ub", "U2 R' U R' U' R' U' R' U R U R2"],
+    ["Ub", "U' R' U R' U' R' U' R' U R U R2"],
+    ["V", "R' U R' U' B' R' B2 U' B' U B' R B R"],
+    ["V", "U R' U R' U' B' R' B2 U' B' U B' R B R"],
+    ["V", "U2 R' U R' U' B' R' B2 U' B' U B' R B R"],
+    ["V", "U' R' U R' U' B' R' B2 U' B' U B' R B R"],
+    ["Y", "U F R U' R' U' R U R' F' R U R' U' R' F R F'"],
+    ["Y", "U2 F R U' R' U' R U R' F' R U R' U' R' F R F'"],
+    ["Y", "F' R U' R' U' R U R' F' R U R' U' R' F R F'"],
+    ["Y", "U F R U' R' U' R U R' F' R U R' U' R' F R F'"]
+  ];
 
   var AUFs = ["", "U", "U2", "U'"]
 
@@ -471,18 +521,16 @@ for (var i = 0; i < numSides; i++) {
   };
 
   function randomPLL() {
-    var pllCase = randomKey(PLLs);
-    var pll = PLLs[pllCase];
+    var pll = randomElement(PLLs);
 
-    var solutionString = AUFs[rand(pll[0])];
-    solutionString += " " + pll[1];
+    var solutionString = pll[1];
     solutionString += " " + randomElement(AUFs);
     solutionString += " " + randomElement(rot1);
     solutionString += " " + randomElement(rot2);
 
     console.log(solutionString);
     var solution = alg.cube.stringToAlg(solutionString);
-    return [pllCase, alg.cube.invert(solution)];
+    return [pll[0], alg.cube.invert(solution)];
   }
 
   function generateScramble(twisty) {
