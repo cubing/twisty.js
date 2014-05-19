@@ -115,10 +115,23 @@ var twistyScene;
 
 $(document).ready(function() {
 
+  function getThing(date, thing) {
+    var t = date["get" + thing]();
+    return "" + (t < 10 ? "0" : "") + t;
+  }
+
+  var results = localStorage.getItem("pll-times");
+  if (results === null) {
+    results = "";
+  }
+  var latestScrambleCase = "";
+  var latestScramble = "";
+
+  document.getElementById("results").innerHTML = results;
+
   /*
    * Caching Stuff.
    */
-
 
   cache.addEventListener('updateready', updateReadyCache, false);
 
@@ -284,7 +297,30 @@ $(document).ready(function() {
     twistyScene.addListener("moveAdvance", function(move) {
       if(cubeState == CubeState.solving && twistyScene.debug.model.twisty.isSolved()) {
         cubeState = CubeState.solved;
+
         stopTimer();
+
+        var d = new Date();
+        var dateString = "" + d.getFullYear() + "-" +
+          getThing(d, "Month") + "-" +
+          getThing(d, "Date") + "@" +
+          getThing(d, "Hours") + ":" +
+          getThing(d, "Minutes") + ":" +
+          getThing(d, "Seconds");
+
+        var solution = alg.cube.algToString(twistyScene.debug.model.moveList);
+
+        results = "[" + dateString + "] " +
+          prettyTime(stopTime) +
+          "[" + latestScrambleCase + "] " +
+          " (" + latestScramble + ") " +
+          solution + "\n" +
+          results;
+        localStorage.setItem("pll-times", results);
+        document.getElementById("results").innerHTML = results;
+        $("#instantReplay").fadeOut(0)
+        document.getElementById("instantReplay").href = "http://alg.cubing.net/?setup=" + latestScramble + "&alg=" + solution + "&title=" + latestScrambleCase + " PLL in " + prettyTime(stopTime);
+        $("#instantReplay").fadeIn(400);
       }
     });
   }
@@ -316,12 +352,14 @@ $(document).ready(function() {
         if (!isTiming()) {
           var twisty = twistyScene.debug.model.twisty;
           var scramble = twisty.generateScramble(twisty);
+          latestScrambleCase = scramble[0];
+          latestScramble = alg.cube.algToString(scramble[1]);
           // We're going to get notified of the scrambling, and we don't
           // want to start the timer when that's happening, so we keep track
           // of the fact that we're scrambling.
           cubeState = CubeState.scrambling;
           twistyScene.debug.resetMoves();
-          twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
+          twistyScene.applyMoves(scramble[1]); //TODO: Use appropriate function.
           twistyScene.redraw(); // Force redraw.
           cubeState = CubeState.scrambled;
           resetTimer();

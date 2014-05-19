@@ -467,11 +467,12 @@ for (var i = 0; i < numSides; i++) {
   }
 
   function randomKey(obj) {
-    return obj[randomElement(Object.keys(obj))];
+    return randomElement(Object.keys(obj));
   };
 
   function randomPLL() {
-    var pll = randomKey(PLLs);
+    var pllCase = randomKey(PLLs);
+    var pll = PLLs[pllCase];
 
     var solutionString = AUFs[rand(pll[0])];
     solutionString += " " + pll[1];
@@ -481,7 +482,7 @@ for (var i = 0; i < numSides; i++) {
 
     console.log(solutionString);
     var solution = alg.cube.stringToAlg(solutionString);
-    return alg.cube.invert(solution);
+    return [pllCase, alg.cube.invert(solution)];
   }
 
   function generateScramble(twisty) {
