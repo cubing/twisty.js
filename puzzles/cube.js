@@ -153,7 +153,7 @@ twisty.puzzles.cube = function(twistyScene, twistyParameters) {
   var yyi = new THREE.Vector3(0, -1, 0);
   var zzi = new THREE.Vector3(0, 0, -1);
 
-  // var index_side = [ "U", "L", "F", "R", "B", "D" ];
+  var index_side = [ "U", "L", "F", "R", "B", "D" ];
 
   var sidesRot = {
     "U": axify(zz, yy, xxi),
@@ -278,7 +278,7 @@ for (var i = 0; i < numSides; i++) {
       );
 
       var x = sidesUV[i].clone();
-      x.multiply(positionMatrix);
+      x.multiplyMatrices(x, positionMatrix);
 
       sticker.applyMatrix(x);
 
@@ -483,7 +483,7 @@ for (var i = 0; i < numSides; i++) {
 
     var keyCode = e.keyCode;
     if (keyCode in cubeKeyMapping) {
-      var move = alg.cube.stringToAlg(cubeKeyMapping[keyCode]);
+      var move = alg.cube.stringToAlg(cubeKeyMapping[keyCode])[0];
       twistyScene.queueMoves(move);
       twistyScene.play.start();
 
@@ -503,8 +503,8 @@ for (var i = 0; i < numSides; i++) {
     }
   }
   function areMatricesEqual(m1, m2) {
-    var flatM1 = m1.flatten();
-    var flatM2 = m2.flatten();
+    var flatM1 = m1.flattenToArray(new Array(16));
+    var flatM2 = m2.flattenToArray(new Array(16));
     for (var i = 0; i < flatM1.length; i++) {
       if(flatM1[i] != flatM2[i]) {
         return false;
@@ -512,9 +512,9 @@ for (var i = 0; i < numSides; i++) {
     }
     return true;
   }
-  var isSolved = function(twisty) {
-    var state = twisty.cubePieces;
-    var dimension = twisty.options.dimension;
+  var isSolved = function() {
+    var state = cubePieces;
+    var dimension = cubeOptions.dimension;
 
 
     // This implementation of isSolved simply checks that
@@ -538,7 +538,7 @@ for (var i = 0; i < numSides; i++) {
     var stickerState = state[faceIndex][stickerIndex][0];
     var netCubeRotations = new THREE.Matrix4();
     netCubeRotations.getInverse(ogCubePiecesCopy[faceIndex][stickerIndex]);
-    netCubeRotations = netCubeRotations.multiply(stickerState, netCubeRotations);
+    netCubeRotations.multiplyMatrices(stickerState, netCubeRotations);
 
     for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
       var faceStickers = state[faceIndex];
@@ -561,13 +561,13 @@ for (var i = 0; i < numSides; i++) {
           var centerMatches = false;
           for(var i = 0; i < 4; i++) {
             var transformedRotatedOgState = new THREE.Matrix4();
-            transformedRotatedOgState = ogState.multiply(netCubeRotations, rotatedOgState);
+            transformedRotatedOgState.multiplyMatrices(netCubeRotations, rotatedOgState);
             if(areMatricesEqual(currState, transformedRotatedOgState)) {
               centerMatches = true;
               break;
             }
 
-            rotatedOgState.multiply(rott, rotatedOgState);
+            rotatedOgState.multiplyMatrices(rott, rotatedOgState);
           }
           if(!centerMatches) {
             return false;
@@ -575,7 +575,7 @@ for (var i = 0; i < numSides; i++) {
         } else {
           // Every non-center sticker should return to exactly where it was
           var ogState = new THREE.Matrix4();
-          ogState = ogState.multiply(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
+          ogState.multiplyMatrices(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
           if(!areMatricesEqual(currState, ogState)) {
             return false;
           }
@@ -585,8 +585,8 @@ for (var i = 0; i < numSides; i++) {
     return true;
   };
 
-  var isInspectionLegalMove = function(twisty, move) {
-    if(move.startLayer == 1 && move.endLayer == twisty.options.dimension) {
+  var isInspectionLegalMove = function(move) {
+    if(["x", "y", "z"].indexOf(move.base) !== -1) {
       return true;
     }
     return false;

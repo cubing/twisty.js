@@ -273,19 +273,19 @@ $(document).ready(function() {
       if(cubeState == CubeState.scrambling) {
         // We don't want to start the timer if we're scrambling the cube.
       } else if(cubeState == CubeState.scrambled) {
-        // var twisty = twistyScene  ;
-        console.log(move);
+        if(twistyScene.debug.model.twisty.isInspectionLegalMove(move)) {
+          return;
+        }
         startTimer();
         cubeState = CubeState.solving;
       }
     });
 
     twistyScene.addListener("moveAdvance", function(move) {
-      // var twisty = twistyScene.getTwisty();
-      // if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
-      //   cubeState = CubeState.solved;
-      //   stopTimer();
-      // }
+      if(cubeState == CubeState.solving && twistyScene.debug.model.twisty.isSolved()) {
+        cubeState = CubeState.solved;
+        stopTimer();
+      }
     });
   }
 
