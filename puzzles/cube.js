@@ -497,10 +497,10 @@ for (var i = 0; i < numSides; i++) {
     ["V", "U R' U R' U' B' R' B2 U' B' U B' R B R"],
     ["V", "U2 R' U R' U' B' R' B2 U' B' U B' R B R"],
     ["V", "U' R' U R' U' B' R' B2 U' B' U B' R B R"],
+    ["Y", "F R U' R' U' R U R' F' R U R' U' R' F R F'"],
     ["Y", "U F R U' R' U' R U R' F' R U R' U' R' F R F'"],
     ["Y", "U2 F R U' R' U' R U R' F' R U R' U' R' F R F'"],
-    ["Y", "F' R U' R' U' R U R' F' R U R' U' R' F R F'"],
-    ["Y", "U F R U' R' U' R U R' F' R U R' U' R' F R F'"]
+    ["Y", "U' F R U' R' U' R U R' F' R U R' U' R' F R F'"]
   ];
 
   var AUFs = ["", "U", "U2", "U'"]
