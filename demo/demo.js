@@ -208,7 +208,7 @@ $(document).ready(function() {
     }
   });
 
-  twistyScene.setCameraPosition(0);
+  twistyScene.setCameraPosition(0.45, 1.5);
 
   $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "inc/offline/offline.html";
@@ -320,10 +320,12 @@ $(document).ready(function() {
           // want to start the timer when that's happening, so we keep track
           // of the fact that we're scrambling.
           cubeState = CubeState.scrambling;
+          twistyScene.debug.resetMoves();
           twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
           twistyScene.redraw(); // Force redraw.
           cubeState = CubeState.scrambled;
           resetTimer();
+          startTimer();
         }
         e.preventDefault();
         break;

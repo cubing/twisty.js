@@ -588,6 +588,13 @@ twisty.scene = function(options) {
     $(that.debug.stats.domElement).click();
   }
 
+  this.debug.resetMoves = function() {
+    that.play.reset();
+    model.preMoveList = [];
+    model.moveList = [];
+    that.setPosition(1);
+    that.setPosition(0);
+  }
 
   /******** Convenience Functions ********/
 

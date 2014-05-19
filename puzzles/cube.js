@@ -428,31 +428,90 @@ for (var i = 0; i < numSides; i++) {
     }
   };
 
+  var PLLs = {
+    Aa: [4, "R' F R' B2 R F' R' B2 R2"],
+    Ab: [4, "R B' R F2 R' B R F2 R2"],
+    E: [2, "y x' R U' R' D R U R' D' R U R' D R U' R' D' x"],
+    F: [4, "R' U R U' R2 F' U' F U R F R' F' R2"],
+    Ga: [4, "R2' u R' U R' U' R u' R2 y' R' U R"],
+    Gb: [4, "R' U' R y R2 u R' U R U' R u' R2"],
+    Gc: [4, "R2' u' R U' R U R' u R2 y R U' R'"],
+    Gd: [4, "R U R' y' R2 u' R U' R' U R' u R2"],
+    H: [1, "M2' U M2' U2 M2' U M2'"],
+    J: [4, "B U' F U2 B' U B U2 F' B'"],
+    L: [4, "B' U F' U2 B U' B' U2 F B"],
+    Na: [1, "L U' R U2 L' U R' L U' R U2 L' U R'"],
+    Nb: [1, "R' U L' U2 R U' L R' U L' U2 R U' L"],
+    Ra: [4, "R U2 R' U2 R B' R' U' R U R B R2"],
+    Rb: [4, "R' U2 R U2 R' F R U R' U' R' F' R2'"],
+    S: [1, ""],
+    T: [4, "R U R' U' R' F R2 U' R' U' R U R' F'"],
+    Ua: [4, "R2 U' R' U' R U R U R U' R"],
+    Ub: [4, "R' U R' U' R' U' R' U R U R2"],
+    V: [4, "R' U R' U' B' R' B2 U' B' U B' R B R"],
+    Y: [4, "F R U' R' U' R U R' F' R U R' U' R' F R F'"],
+    Z: [2, "M2' U M2' U M' U2 M2' U2 M'"]
+  }
+
+  var AUFs = ["", "U", "U2", "U'"]
+
+  var rot1 = ["", "x", "x2", "x'", "z", "z'"];
+  var rot2 = ["", "y", "y2", "y'"];
+
+  function rand(i) {
+    return i * Math.random() << 0;
+  }
+
+  function randomElement(l) {
+    return l[rand(l.length)];
+  }
+
+  function randomKey(obj) {
+    return obj[randomElement(Object.keys(obj))];
+  };
+
+  function randomPLL() {
+    var pll = randomKey(PLLs);
+
+    var solutionString = AUFs[rand(pll[0])];
+    solutionString += " " + pll[1];
+    solutionString += " " + randomElement(AUFs);
+    solutionString += " " + randomElement(rot1);
+    solutionString += " " + randomElement(rot2);
+
+    console.log(solutionString);
+    var solution = alg.cube.stringToAlg(solutionString);
+    return alg.cube.invert(solution);
+  }
+
   function generateScramble(twisty) {
-    var dim = twisty.options.dimension;
-    var n = 32;
-    var newMoves = [];
 
-    for (var i=0; i<n; i++) {
+    return(randomPLL());
 
-      var startLayer = 1+ Math.floor(Math.random()*dim/2);
-      var endLayer = startLayer + Math.floor(Math.random()*dim/2);
-      var side = Math.floor(Math.random()*6);
-      var amount = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
+    // var dim = twisty.options.dimension;
+    // var n = 32;
+    // var newMoves = [];
 
-      var newMove = {
-        type: "move",
-        base: ["u", "l", "f", "r", "b", "d"][side],
-        amount: amount,
-        startLayer: startLayer,
-        endLayer: endLayer
-      };
+    // for (var i=0; i<n; i++) {
 
-      newMoves.push(newMove);
+    //   var startLayer = 1+ Math.floor(Math.random()*dim/2);
+    //   var endLayer = startLayer + Math.floor(Math.random()*dim/2);
+    //   var side = Math.floor(Math.random()*6);
+    //   var amount = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
 
-    }
+    //   var newMove = {
+    //     type: "move",
+    //     base: ["u", "l", "f", "r", "b", "d"][side],
+    //     amount: amount,
+    //     startLayer: startLayer,
+    //     endLayer: endLayer
+    //   };
 
-    return newMoves;
+    //   newMoves.push(newMove);
+
+    // }
+
+    // return newMoves;
   }
 
   var iS = 1;
@@ -586,9 +645,9 @@ for (var i = 0; i < numSides; i++) {
   };
 
   var isInspectionLegalMove = function(move) {
-    if(["x", "y", "z"].indexOf(move.base) !== -1) {
-      return true;
-    }
+    // if(["x", "y", "z"].indexOf(move.base) !== -1) {
+    //   return true;
+    // }
     return false;
   };
 
