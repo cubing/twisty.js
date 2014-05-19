@@ -121,13 +121,11 @@ $(document).ready(function() {
   }
 
   var results = localStorage.getItem("pll-times");
-  if (results === null) {
-    results = "";
+  if (results !== null) {
+    document.getElementById("results").innerHTML = results;
   }
   var latestScrambleCase = "";
   var latestScramble = "";
-
-  document.getElementById("results").innerHTML = results;
 
   /*
    * Caching Stuff.
@@ -297,6 +295,14 @@ $(document).ready(function() {
     twistyScene.addListener("moveAdvance", function(move) {
       if(cubeState == CubeState.solving && twistyScene.debug.model.twisty.isSolved()) {
         cubeState = CubeState.solved;
+
+
+
+        var results = localStorage.getItem("pll-times");
+        if (results === null) {
+          results = "";
+        }
+
 
         stopTimer();
 
