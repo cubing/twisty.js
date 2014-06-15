@@ -128,6 +128,9 @@ $(document).ready(function() {
   reloadCube();
 
   $("#reset").bind("click", reloadCube);
+  $("#undo").bind("click", function() {
+    
+  });
 
 
 

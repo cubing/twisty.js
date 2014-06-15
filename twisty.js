@@ -344,10 +344,13 @@ twisty.scene = function(options) {
 
     dims.centerSize = Math.min(dims.height, dims.width) / 3;
 
-    dims.y1 = dims.vCenter - dims.centerSize / 2;
-    dims.y2 = dims.vCenter + dims.centerSize / 2;
-    dims.x1 = dims.hCenter - dims.centerSize / 2;
-    dims.x2 = dims.hCenter + dims.centerSize / 2;
+    dims.centerX = (dims.centerSize + (dims.width  / 3)) / 2;
+    dims.centerY = (dims.centerSize + (dims.height / 3)) / 2;
+
+    dims.y1 = dims.vCenter - dims.centerY / 2;
+    dims.y2 = dims.vCenter + dims.centerY / 2;
+    dims.x1 = dims.hCenter - dims.centerX / 2;
+    dims.x2 = dims.hCenter + dims.centerX / 2;
 
     return dims;
   }
@@ -472,8 +475,7 @@ twisty.scene = function(options) {
     addMoveMap("L" , [["UL", "EL", "DL"]]);
     addMoveMap("D" , [["DL", "DM", "DR"]]);
 
-    addMoveMap("F" , [["UL", "EM", "DR"]]);
-    addMoveMap("F" , [["DL", "EM", "UR"]]);
+    addMoveMap("F" , [["UL", "EM", "DR"], ["DL", "EM", "UR"]]);
 
     addMoveMap("F" , [["EL", "UM"], ["UM", "ER"]/*", "["ER, DM"], ["DM", "EL"]*/]);
     addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
@@ -484,6 +486,9 @@ twisty.scene = function(options) {
 
     addMoveMap("M" , [["UM", "EM"], ["EM", "DM"]]);
     addMoveMap("u" , [["ER", "EM"], ["EM", "EL"]]);
+
+    addMoveMap("r" , [["DM", "UR"]]);
+    addMoveMap("l" , [["UL", "DM"]]);
   })();
 
   function onEnd(event) {
