@@ -72,7 +72,8 @@ twisty.scene = function(options) {
     camera: null,
     container: null,
     scene: null,
-    renderer: null
+    renderer: null,
+    canvas2: null
   }
 
   var control = {
@@ -88,6 +89,8 @@ twisty.scene = function(options) {
       moveStart: [],
       moveAdvance: []
     },
+
+    startSector: null,
 
     speed: null,
 
@@ -110,6 +113,7 @@ twisty.scene = function(options) {
     speed: 1, // qtps is 3*speed
     renderer: THREE.CanvasRenderer,
     allowDragging: true,
+    touchMoveInput: false,
     stats: false
   }
 
@@ -119,7 +123,7 @@ twisty.scene = function(options) {
     view.initialize(options.renderer);
 
     control.speed = options.speed;
-    if (options.allowDragging) { that.startAllowDragging(); }
+    that.initializeTouchOrDragEvents();
     if (options.stats) { startStats(); }
   }
 
@@ -149,6 +153,8 @@ twisty.scene = function(options) {
     moveCameraDelta(0, 0);
     view.renderer.setSize(width, height);
     renderOnce();
+
+    drawSectors();
   };
 
 
@@ -225,12 +231,15 @@ twisty.scene = function(options) {
 
   /******** Control: Mouse/Touch Dragging ********/
 
-  this.startAllowDragging = function() {
-    $(view.container).css("cursor", "move");
-    view.container.addEventListener("mousedown", onStart, false );
-    view.container.addEventListener("touchstart", onStart, false );
-    if (!isIE) {
-      view.container.addEventListener("wheel", onWheel, false );
+  this.initializeTouchOrDragEvents = function() {
+
+    if (options.allowDragging || options.touchMoveInput) {
+      $(view.container).css("cursor", "move");
+      view.container.addEventListener("mousedown", onStart, false );
+      view.container.addEventListener("touchstart", onStart, false );
+      if (!isIE) {
+        view.container.addEventListener("wheel", onWheel, false );
+      }
     }
   }
 
@@ -255,6 +264,115 @@ twisty.scene = function(options) {
     throw "Unknown event kind.";
   }
 
+  function touchMark(x, y, color) {
+    var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
+    var d = $("<div>").appendTo("#twistyContainer");
+    d.addClass("touchMark");
+    d.css({
+      display: "flex",
+      position: "fixed",
+      width: radius * 2,
+      height: radius * 2,
+      background: color,
+      "border-radius": radius + 1,
+      border: "#000 2px solid",
+      "text-align": "center",
+      "align-items": "center",
+      "font-size": radius * 1.5,
+      opacity: "0.85",
+      "pointer-events": "none",
+      "font-family": "Tahoma, Verdana"
+    });
+    d.offset({left: control.mouseXLast - radius - 1, top: control.mouseYLast - radius - 1});
+    return d;
+  }
+
+  function sectorDimensions() {
+    var dims = {};
+
+    var p = $(view.container).position();
+    dims.top = p.top;
+    dims.left = p.left;
+    dims.height = $(view.container).height();
+    dims.width = $(view.container).width();
+
+    dims.vCenter = dims.top + dims.height / 2;
+    dims.hCenter = dims.left + dims.width / 2;
+
+    dims.centerDist = Math.min(dims.height, dims.width) / 6;
+
+    dims.y1 = dims.vCenter - dims.centerDist;
+    dims.y2 = dims.vCenter + dims.centerDist;
+    dims.x1 = dims.hCenter - dims.centerDist;
+    dims.x2 = dims.hCenter + dims.centerDist;
+
+    return dims;
+  }
+
+  function drawSectors() {
+
+    console.log("foo")
+
+    $(".sectorMark").remove();
+
+    var dims = sectorDimensions();
+
+    // var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
+    // var d = $("<div>").appendTo(view.container);
+    // d.addClass("touchMark");
+    // d.css({
+    //   display: "flex",
+    //   position: "fixed",
+    //   width: radius * 2,
+    //   height: radius * 2,
+    //   background: "white",
+    //   "border-radius": radius + 1,
+    //   border: "#000 2px solid",
+    //   "text-align": "center",
+    //   "align-items": "center",
+    //   "font-size": radius * 1.5,
+    //   opacity: "0.85",
+    //   "pointer-events": "none",
+    //   "font-family": "Tahoma, Verdana"
+    // });
+    // d.offset({left: dims.left, top: dims.top});
+
+    function d() {
+      var d = $("<div>").appendTo(view.container);
+      d.addClass("sectorMark");
+      d.css({
+        position: "fixed",
+        border: "#000 1px solid",
+        "pointer-events": "none",
+        opacity: 0.5
+      });
+      return d;
+    }
+    d().width(0).height(dims.height).offset({left: dims.x1,   top: dims.top});
+    d().width(0).height(dims.height).offset({left: dims.x2,   top: dims.top});
+    d().width(dims.width).height(0).offset( {left: dims.left, top: dims.y1 });
+    d().width(dims.width).height(0).offset( {left: dims.left, top: dims.y2 });
+
+    console.log(d);
+
+  }
+
+  function sector(x, y) {
+
+    var sector = "";
+    var dims = sectorDimensions();
+
+         if (y < dims.y1) { sector += "U"; }
+    else if (y > dims.y2) { sector += "D"; }
+    else                                         { sector += "E"; }
+
+         if (x < dims.x1) { sector += "L"; }
+    else if (x > dims.x2) { sector += "R"; }
+    else                                         { sector += "M"; }
+
+    return sector;
+  }
+
   function onStart(event) {
     var kind = eventKind(event);
 
@@ -263,6 +381,11 @@ twisty.scene = function(options) {
 
       control.mouseXLast = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
       control.mouseYLast = (kind == "mouse") ? event.clientY : event.touches[0].pageY;
+
+      if (options.touchMoveInput) {
+        touchMark(control.mouseXLast, control.mouseYLast, "gray");
+        control.startSector = sector(control.mouseXLast, control.mouseYLast);
+      }
 
       renderOnce();
       event.preventDefault();
@@ -279,16 +402,18 @@ twisty.scene = function(options) {
     var mouseX = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
     var mouseY = (kind == "mouse") ? event.clientY : event.touches[0].pageY;
 
-    var deltaX = (control.mouseXLast - mouseX)/CONSTANTS.DRAG_RESISTANCE_X;
-    var deltaY = -(control.mouseYLast - mouseY)/CONSTANTS.DRAG_RESISTANCE_Y;
+    if (options.allowDragging) {
+      var deltaX = (control.mouseXLast - mouseX)/CONSTANTS.DRAG_RESISTANCE_X;
+      var deltaY = -(control.mouseYLast - mouseY)/CONSTANTS.DRAG_RESISTANCE_Y;
 
-    moveCameraDelta(deltaX, deltaY);
+      moveCameraDelta(deltaX, deltaY);
+
+      renderOnce();
+      event.preventDefault();
+    }
 
     control.mouseXLast = mouseX;
     control.mouseYLast = mouseY;
-
-    renderOnce();
-    event.preventDefault();
   }
 
   function onWheel(event) {
@@ -300,6 +425,33 @@ twisty.scene = function(options) {
     renderOnce();
     event.preventDefault();
   }
+
+  var sectorMoveMap = {};
+
+  (function() {
+    function addMoveMap(moveString, l) {
+        sectorMoveMap[l[0] + " -> " + l[1]] = moveString;
+        sectorMoveMap[l[1] + " -> " + l[0]] = moveString + "'";
+        if (l.length == 3) {
+          sectorMoveMap[l[1] + " -> " + l[2]] = moveString;
+          sectorMoveMap[l[2] + " -> " + l[1]] = moveString + "'";
+
+          sectorMoveMap[l[0] + " -> " + l[2]] = moveString;
+          sectorMoveMap[l[2] + " -> " + l[0]] = moveString + "'";
+        }
+    }
+
+    addMoveMap("R" , ["DR", "ER", "UR"]);
+    addMoveMap("U" , ["UR", "UM", "UL"]);
+    addMoveMap("L" , ["UL", "EM", "DL"]);
+    addMoveMap("D" , ["DL", "EM", "DR"]);
+    addMoveMap("F" , ["UL", "EM", "DR"]);
+    addMoveMap("F" , ["DL", "EM", "UR"]);
+    addMoveMap("F" , ["UM", "ER"]);
+    addMoveMap("F" , ["EL", "UM"]);
+    addMoveMap("y" , ["ER", "EM", "EL"]);
+    addMoveMap("x" , ["DM", "EM", "UM"]);
+  })();
 
   function onEnd(event) {
     var kind = eventKind(event);
@@ -314,6 +466,27 @@ twisty.scene = function(options) {
 
     for (listener in listeners[kind]) {
       window.removeEventListener(listener, listeners[kind][listener], false);
+    }
+
+
+    if (options.touchMoveInput) {
+      var endSector = sector(control.mouseXLast, control.mouseYLast);
+
+      var sectorMove = control.startSector + " -> " + endSector;
+      var moveString = sectorMoveMap[sectorMove];
+
+      console.log(sectorMove);
+
+      var d = touchMark(control.mouseXLast, control.mouseYLast, "white");
+      d.append($("<span>").html(moveString).css({
+        "text-align": "center",
+        width: "100%"
+      }));
+      $(".touchMark").fadeOut(1000); // Also fades out the starting touch mark
+
+      var move = alg.cube.stringToAlg(moveString);
+      that.queueMoves(move);
+      that.play.start();
     }
   }
 

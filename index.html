@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <title>twisty.js</title>
 
@@ -32,15 +33,22 @@
 
     <div class="left">
 
+      <center>
+        <button style="font-size: 2em; text-align: center; margin: 0.5em" id="reset">Reset</a></button>
+        <button style="font-size: 2em; text-align: center; margin: 0.5em" id="visitLink">View at alg.cubing.net</a></button>
+      </center>
+
+      <br>
+
       <h2>Controls</h2>
       <div class="padded center">
           <p class="spacey">
             <input id="cubeDimension" placeholder="Cube Dimension"
               type="number" min="1" max="12" step="1" value="3" /> <br>
             
-            <input type="checkbox" id="allow_dragging" checked="true"/>
+            <input type="checkbox" id="allow_dragging"/>
             <label for="allow_dragging">Allow Dragging</label>
-            <input type="checkbox" id="sticker_border" checked="true" />
+            <input type="checkbox" id="sticker_border"/>
             <label for="sticker_border">Sticker Border</label>
             <input type="checkbox" id="double_sided" checked="true" />
             <label for="double_sided">Double-sided</label>
@@ -96,7 +104,7 @@
         <span title="Next"><button id="next" style="font-size: 100%">&rarr;</button></span>
         <span title="Fast Forward"><button id="fast_forward" style="font-size: 100%">&#9654;&#9654;</button></span>
         <br>
-        <input id="speed" type="range" min="1" max="4" step="0.1" value="4"/>
+        <input id="speed" type="range" min="1" max="4" step="0.1" value="1.75"/>
       </center>
       <div class="padded center">
       <div id="playback_alg">[Algorithm]</div>

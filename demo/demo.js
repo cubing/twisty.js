@@ -127,6 +127,26 @@ $(document).ready(function() {
   var currentCubeSize = parseInt($("#cubeDimension").val());
   reloadCube();
 
+  $("#reset").bind("click", reloadCube);
+
+
+
+  function escape_alg(alg) {
+    if (!alg) {return alg;}
+    var escaped = alg;
+    escaped = escaped.replace(/_/g, "&#95;").replace(/ /g, "_");
+    escaped = escaped.replace(/\+/g, "&#2b;");
+    escaped = escaped.replace(/-/g, "&#45;").replace(/'/g, "-");
+    return escaped;
+  }
+
+  $("#visitLink").bind("click", function() {
+    var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
+    var algString = alg.cube.algToString(simplifiedAlg);
+    var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
+    window.location = url;
+  });
+
   $("#cubeDimension").bind("input", reDimensionCube);
   $("#allow_dragging").bind("change", reloadCube);
   $("#double_sided").bind("change", reloadCube);
@@ -249,8 +269,9 @@ $(document).ready(function() {
     twistyScene = new twisty.scene({
       renderer: renderer,
       allowDragging: $("#allow_dragging").is(':checked'),
+      touchMoveInput: true,
       "speed": speed,
-      stats: true
+      stats: false
     });
     $("#twistyContainer").empty();
     $("#twistyContainer").append($(twistyScene.getDomElement()));
