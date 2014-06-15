@@ -744,6 +744,8 @@ twisty.scene = function(options) {
 
       that.applyMoves(model.preMoveList);
       that.applyMoves(model.moveList.slice(0, position)); // Works with fractional positions
+
+      drawSectors(); // TODO: this is a workaround for an occasional iOS bug.
     }
 
     model.position = position;
