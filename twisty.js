@@ -471,25 +471,31 @@ twisty.scene = function(options) {
       }
     }
 
-    addMoveMap("R" , [["DR", "ER", "UR"]]);
+    addMoveMap("R" , [["ER", "UR"]]);
     addMoveMap("U" , [["UR", "UM", "UL"]]);
-    addMoveMap("L" , [["UL", "EL", "DL"]]);
+    addMoveMap("L" , [["UL", "EL"]]);
     addMoveMap("D" , [["DL", "DM", "DR"]]);
 
-    addMoveMap("F" , [["UL", "EM", "DR"], ["DL", "EM", "UR"]]);
+    addMoveMap("R2" , [["DR", "UR"]]);
+    addMoveMap("L2" , [["UL", "DL"]]);
 
-    addMoveMap("F" , [["EL", "UM"], ["UM", "ER"]/*", "["ER, DM"], ["DM", "EL"]*/]);
-    addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
+    addMoveMap("F" , [["ER", "DR"], ["DL", "EL"]]);
+    // addMoveMap("F" , [["UL", "EM", "DR"], ["DL", "EM", "UR"]]);
+
+    addMoveMap("B" , [["UM", "EL"], ["ER", "UM"]/*, ["DM", "ER"], ["EL", "DM"]*/]);
+    // addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
     // addMoveMap("B" , [["DR", "UM", "DL"]]);
 
     addMoveMap("x" , [["DM", "EM", "UM"]]);
     addMoveMap("y" , [["ER", "EM", "EL"]]);
 
-    addMoveMap("M" , [["UM", "DM"]]);
-    addMoveMap("u",  [["ER", "EL"]]);
+    addMoveMap("d" , [["DL", "EM"], ["EM", "DR"]]);
+    addMoveMap("u",  [["UR", "EM"], ["EM", "UL"]]);
+    addMoveMap("M",  [["EL", "DM"], ["ER", "DM"]]);
+    addMoveMap("M2", [["UR", "DM"], ["UL", "DM"]]);
 
-    addMoveMap("r" , [["DM", "UR"]]);
-    addMoveMap("l" , [["UL", "DM"]]);
+    addMoveMap("r" , [["DR", "UM"]]);
+    addMoveMap("l" , [["UM", "DL"]]);
   })();
 
   function onEnd(event) {
