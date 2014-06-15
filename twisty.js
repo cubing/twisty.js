@@ -72,8 +72,7 @@ twisty.scene = function(options) {
     camera: null,
     container: null,
     scene: null,
-    renderer: null,
-    canvas2: null
+    renderer: null
   }
 
   var control = {
@@ -91,6 +90,7 @@ twisty.scene = function(options) {
     },
 
     startSector: null,
+    lastSector: null,
 
     speed: null,
 
@@ -265,17 +265,31 @@ twisty.scene = function(options) {
   }
 
   function touchMark(x, y, color) {
+
+    var dims = sectorDimensions();
+
+    var divDims = {};
+
+         if (y < dims.y1) { divDims.top = dims.top; divDims.bottom = dims.y1; }
+    else if (y > dims.y2) { divDims.top = dims.y2;  divDims.bottom = dims.top + dims.height; }
+    else                  { divDims.top = dims.y1;  divDims.bottom = dims.y2; }
+
+         if (x < dims.x1) { divDims.left = dims.left; divDims.right = dims.x1; }
+    else if (x > dims.x2) { divDims.left = dims.x2;   divDims.right = dims.left + dims.width; }
+    else                  { divDims.left = dims.x1;   divDims.right = dims.x2; }
+
+
     var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
     var d = $("<div>").appendTo("#twistyContainer");
     d.addClass("touchMark");
+    d.addClass("move");
     d.css({
       display: "flex",
       position: "fixed",
-      width: radius * 2,
-      height: radius * 2,
+      width: divDims.right - divDims.left,
+      height: divDims.bottom - divDims.top,
       background: color,
-      "border-radius": radius + 1,
-      border: "#000 2px solid",
+      color: "white",
       "text-align": "center",
       "align-items": "center",
       "font-size": radius * 1.5,
@@ -283,8 +297,37 @@ twisty.scene = function(options) {
       "pointer-events": "none",
       "font-family": "Tahoma, Verdana"
     });
-    d.offset({left: control.mouseXLast - radius - 1, top: control.mouseYLast - radius - 1});
+    d.offset({left: divDims.left, top: divDims.top});
     return d;
+  }
+
+  function highlightCurrentSector(x, y) {
+
+    var sector = getSector(control.mouseXLast, control.mouseYLast);
+
+    if (sector !== control.lastSector) {
+      $(".sectorHighlights").remove();
+
+      var sectorMove = control.startSector + " -> " + sector;
+
+      var d = touchMark(control.mouseXLast, control.mouseYLast, "#444");
+      d.addClass("sectorHighlights");
+
+      if (sectorMove in sectorMoveMap) {
+        var moveString = sectorMoveMap[sectorMove];
+        d.append($("<span>").html(moveString).css({
+          "text-align": "center",
+          width: "100%"
+        }));
+      }
+      else {
+        d.css("background", "#FAA");
+      }
+
+      control.lastSector = sector;
+    }
+
+    return sector;
   }
 
   function sectorDimensions() {
@@ -299,43 +342,21 @@ twisty.scene = function(options) {
     dims.vCenter = dims.top + dims.height / 2;
     dims.hCenter = dims.left + dims.width / 2;
 
-    dims.centerDist = Math.min(dims.height, dims.width) / 6;
+    dims.centerSize = Math.min(dims.height, dims.width) / 3;
 
-    dims.y1 = dims.vCenter - dims.centerDist;
-    dims.y2 = dims.vCenter + dims.centerDist;
-    dims.x1 = dims.hCenter - dims.centerDist;
-    dims.x2 = dims.hCenter + dims.centerDist;
+    dims.y1 = dims.vCenter - dims.centerSize / 2;
+    dims.y2 = dims.vCenter + dims.centerSize / 2;
+    dims.x1 = dims.hCenter - dims.centerSize / 2;
+    dims.x2 = dims.hCenter + dims.centerSize / 2;
 
     return dims;
   }
 
   function drawSectors() {
 
-    console.log("foo")
-
     $(".sectorMark").remove();
 
     var dims = sectorDimensions();
-
-    // var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
-    // var d = $("<div>").appendTo(view.container);
-    // d.addClass("touchMark");
-    // d.css({
-    //   display: "flex",
-    //   position: "fixed",
-    //   width: radius * 2,
-    //   height: radius * 2,
-    //   background: "white",
-    //   "border-radius": radius + 1,
-    //   border: "#000 2px solid",
-    //   "text-align": "center",
-    //   "align-items": "center",
-    //   "font-size": radius * 1.5,
-    //   opacity: "0.85",
-    //   "pointer-events": "none",
-    //   "font-family": "Tahoma, Verdana"
-    // });
-    // d.offset({left: dims.left, top: dims.top});
 
     function d() {
       var d = $("<div>").appendTo(view.container);
@@ -344,7 +365,8 @@ twisty.scene = function(options) {
         position: "fixed",
         border: "#000 1px solid",
         "pointer-events": "none",
-        opacity: 0.5
+        opacity: 0.2,
+        "z-index": 100
       });
       return d;
     }
@@ -353,22 +375,20 @@ twisty.scene = function(options) {
     d().width(dims.width).height(0).offset( {left: dims.left, top: dims.y1 });
     d().width(dims.width).height(0).offset( {left: dims.left, top: dims.y2 });
 
-    console.log(d);
-
   }
 
-  function sector(x, y) {
+  function getSector(x, y) {
 
     var sector = "";
     var dims = sectorDimensions();
 
          if (y < dims.y1) { sector += "U"; }
     else if (y > dims.y2) { sector += "D"; }
-    else                                         { sector += "E"; }
+    else                  { sector += "E"; }
 
          if (x < dims.x1) { sector += "L"; }
     else if (x > dims.x2) { sector += "R"; }
-    else                                         { sector += "M"; }
+    else                  { sector += "M"; }
 
     return sector;
   }
@@ -384,7 +404,8 @@ twisty.scene = function(options) {
 
       if (options.touchMoveInput) {
         touchMark(control.mouseXLast, control.mouseYLast, "gray");
-        control.startSector = sector(control.mouseXLast, control.mouseYLast);
+        control.startSector = getSector(control.mouseXLast, control.mouseYLast);
+        control.lastSector = control.startSector;
       }
 
       renderOnce();
@@ -414,6 +435,8 @@ twisty.scene = function(options) {
 
     control.mouseXLast = mouseX;
     control.mouseYLast = mouseY;
+
+    highlightCurrentSector();
   }
 
   function onWheel(event) {
@@ -443,12 +466,14 @@ twisty.scene = function(options) {
 
     addMoveMap("R" , ["DR", "ER", "UR"]);
     addMoveMap("U" , ["UR", "UM", "UL"]);
-    addMoveMap("L" , ["UL", "EM", "DL"]);
-    addMoveMap("D" , ["DL", "EM", "DR"]);
+    addMoveMap("L" , ["UL", "EL", "DL"]);
+    addMoveMap("D" , ["DL", "DM", "DR"]);
     addMoveMap("F" , ["UL", "EM", "DR"]);
     addMoveMap("F" , ["DL", "EM", "UR"]);
-    addMoveMap("F" , ["UM", "ER"]);
-    addMoveMap("F" , ["EL", "UM"]);
+    addMoveMap("F" , ["EL", "UM", "ER"/*, "DM", "EL"*/]);
+    addMoveMap("u" , ["ER", "UL"]);
+    addMoveMap("u" , ["UR", "EL"]);
+    addMoveMap("B" , ["DR", "UM", "DL"]);
     addMoveMap("y" , ["ER", "EM", "EL"]);
     addMoveMap("x" , ["DM", "EM", "UM"]);
   })();
@@ -470,23 +495,22 @@ twisty.scene = function(options) {
 
 
     if (options.touchMoveInput) {
-      var endSector = sector(control.mouseXLast, control.mouseYLast);
+      var endSector = highlightCurrentSector(control.mouseXLast, control.mouseYLast);
+      $(".touchMark").fadeOut(1000, function(){$(this).remove();}); // Also fades out the starting touch mark
+
 
       var sectorMove = control.startSector + " -> " + endSector;
-      var moveString = sectorMoveMap[sectorMove];
+      if (sectorMove in sectorMoveMap) {
+        var moveString = sectorMoveMap[sectorMove];
+        console.log("[" + sectorMove + "] " + moveString);
 
-      console.log(sectorMove);
-
-      var d = touchMark(control.mouseXLast, control.mouseYLast, "white");
-      d.append($("<span>").html(moveString).css({
-        "text-align": "center",
-        width: "100%"
-      }));
-      $(".touchMark").fadeOut(1000); // Also fades out the starting touch mark
-
-      var move = alg.cube.stringToAlg(moveString);
-      that.queueMoves(move);
-      that.play.start();
+        var move = alg.cube.stringToAlg(moveString);
+        that.queueMoves(move);
+        that.play.start();
+      }
+      else {
+        console.log("[" + sectorMove + "] not a move");
+      }
     }
   }
 
