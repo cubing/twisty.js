@@ -456,6 +456,7 @@ twisty.scene = function(options) {
 
   (function() {
     function addMoveMap(moveString, lists) {
+
       for (i in lists) {
         var l = lists[i];
         sectorMoveMap[l[0] + " -> " + l[1]] = moveString;
@@ -481,11 +482,11 @@ twisty.scene = function(options) {
     addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
     // addMoveMap("B" , [["DR", "UM", "DL"]]);
 
-    addMoveMap("x" , [["DM", "UM"]]);
-    addMoveMap("y" , [["ER", "EL"]]);
+    addMoveMap("x" , [["DM", "EM", "UM"]]);
+    addMoveMap("y" , [["ER", "EM", "EL"]]);
 
-    addMoveMap("M" , [["UM", "EM"], ["EM", "DM"]]);
-    addMoveMap("u" , [["ER", "EM"], ["EM", "EL"]]);
+    addMoveMap("M" , [["UM", "DM"]]);
+    addMoveMap("u",  [["ER", "EL"]]);
 
     addMoveMap("r" , [["DM", "UR"]]);
     addMoveMap("l" , [["UL", "DM"]]);
