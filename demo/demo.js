@@ -129,9 +129,7 @@ $(document).ready(function() {
 
   $("#reset").bind("click", reloadCube);
   $("#timer").bind("click", scramble);
-  $("#undo").bind("click", function() {
-
-  });
+  $("#undo").bind("click", twistyScene.play.undo);
 
 
 

@@ -715,6 +715,19 @@ twisty.scene = function(options) {
     }
   }
 
+  // TODO: A more general framework that mutates the alg.
+  // TODO: Animate.
+  this.play.undo = function() {
+    if (model.moveList.length === 0) {
+      throw "Tried to undo the last move of an empty alg.";
+    }
+    if (that.getIndex() !== model.moveList.length) {
+      throw "Tried to undo while index is " + that.getIndex() + "(needs to be at the end: " + model.moveList.length + ")";
+    }
+    that.setIndex(model.moveList.length - 1);
+    model.moveList = model.moveList.slice(0, model.moveList.length - 1)
+  }
+
   this.setPosition = function(position) {
 
     // If we're somewhere on the same move, don't recalculate position.
