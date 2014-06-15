@@ -455,18 +455,24 @@ twisty.scene = function(options) {
   var sectorMoveMap = {};
 
   (function() {
-    function addMoveMap(moveString, lists) {
+    function addMoveMap(moveString, lists, inverses) {
+
+      if (typeof inverses === "undefined") {
+        inverses = true;
+      }
 
       for (i in lists) {
         var l = lists[i];
-        sectorMoveMap[l[0] + " -> " + l[1]] = moveString;
-        sectorMoveMap[l[1] + " -> " + l[0]] = moveString + "'";
-        if (l.length == 3) {
-          sectorMoveMap[l[1] + " -> " + l[2]] = moveString;
-          sectorMoveMap[l[2] + " -> " + l[1]] = moveString + "'";
 
-          sectorMoveMap[l[0] + " -> " + l[2]] = moveString + "2";
-          sectorMoveMap[l[2] + " -> " + l[0]] = moveString + "2'";
+                       sectorMoveMap[l[0] + " -> " + l[1]] = moveString;
+        if (inverses) {sectorMoveMap[l[1] + " -> " + l[0]] = moveString + "'";}
+
+        if (l.length == 3) {
+                         sectorMoveMap[l[1] + " -> " + l[2]] = moveString;
+          if (inverses) {sectorMoveMap[l[2] + " -> " + l[1]] = moveString + "'";}
+
+                         sectorMoveMap[l[0] + " -> " + l[2]] = moveString + "2";
+          if (inverses) {sectorMoveMap[l[2] + " -> " + l[0]] = moveString + "2'";}
         }
       }
     }
@@ -480,22 +486,26 @@ twisty.scene = function(options) {
     addMoveMap("L2" , [["UL", "DL"]]);
 
     addMoveMap("F" , [["ER", "DR"], ["DL", "EL"]]);
+    addMoveMap("F2", [["DL", "ER"], ["ER", "DL"]], false);
+    addMoveMap("F2'", [["EL", "DR"], ["DR", "EL"]], false);
     // addMoveMap("F" , [["UL", "EM", "DR"], ["DL", "EM", "UR"]]);
 
     addMoveMap("B" , [["UM", "EL"], ["ER", "UM"]/*, ["DM", "ER"], ["EL", "DM"]*/]);
+    addMoveMap("B2" , [["UM", "DL"], ["DR", "UM"]/*, ["DM", "ER"], ["EL", "DM"]*/]);
     // addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
     // addMoveMap("B" , [["DR", "UM", "DL"]]);
 
     addMoveMap("x" , [["DM", "EM", "UM"]]);
     addMoveMap("y" , [["ER", "EM", "EL"]]);
 
-    addMoveMap("d" , [["DL", "EM"], ["EM", "DR"]]);
+    // addMoveMap("d" , [["DL", "EM"], ["EM", "DR"]]);
     addMoveMap("u",  [["UR", "EM"], ["EM", "UL"]]);
+    addMoveMap("u2", [["UR", "EL"], ["ER", "UL"]]);
     addMoveMap("M",  [["EL", "DM"], ["ER", "DM"]]);
     addMoveMap("M2", [["UR", "DM"], ["UL", "DM"]]);
 
-    addMoveMap("r" , [["DR", "UM"]]);
-    addMoveMap("l" , [["UM", "DL"]]);
+    addMoveMap("r" , [["DR", "EM"]]);
+    addMoveMap("l" , [["EM", "DL"]]);
   })();
 
   function onEnd(event) {
