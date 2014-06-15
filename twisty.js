@@ -452,30 +452,38 @@ twisty.scene = function(options) {
   var sectorMoveMap = {};
 
   (function() {
-    function addMoveMap(moveString, l) {
+    function addMoveMap(moveString, lists) {
+      for (i in lists) {
+        var l = lists[i];
         sectorMoveMap[l[0] + " -> " + l[1]] = moveString;
         sectorMoveMap[l[1] + " -> " + l[0]] = moveString + "'";
         if (l.length == 3) {
           sectorMoveMap[l[1] + " -> " + l[2]] = moveString;
           sectorMoveMap[l[2] + " -> " + l[1]] = moveString + "'";
 
-          sectorMoveMap[l[0] + " -> " + l[2]] = moveString;
-          sectorMoveMap[l[2] + " -> " + l[0]] = moveString + "'";
+          sectorMoveMap[l[0] + " -> " + l[2]] = moveString + "2";
+          sectorMoveMap[l[2] + " -> " + l[0]] = moveString + "2'";
         }
+      }
     }
 
-    addMoveMap("R" , ["DR", "ER", "UR"]);
-    addMoveMap("U" , ["UR", "UM", "UL"]);
-    addMoveMap("L" , ["UL", "EL", "DL"]);
-    addMoveMap("D" , ["DL", "DM", "DR"]);
-    addMoveMap("F" , ["UL", "EM", "DR"]);
-    addMoveMap("F" , ["DL", "EM", "UR"]);
-    addMoveMap("F" , ["EL", "UM", "ER"/*, "DM", "EL"*/]);
-    addMoveMap("u" , ["ER", "UL"]);
-    addMoveMap("u" , ["UR", "EL"]);
-    addMoveMap("B" , ["DR", "UM", "DL"]);
-    addMoveMap("y" , ["ER", "EM", "EL"]);
-    addMoveMap("x" , ["DM", "EM", "UM"]);
+    addMoveMap("R" , [["DR", "ER", "UR"]]);
+    addMoveMap("U" , [["UR", "UM", "UL"]]);
+    addMoveMap("L" , [["UL", "EL", "DL"]]);
+    addMoveMap("D" , [["DL", "DM", "DR"]]);
+
+    addMoveMap("F" , [["UL", "EM", "DR"]]);
+    addMoveMap("F" , [["DL", "EM", "UR"]]);
+
+    addMoveMap("F" , [["EL", "UM"], ["UM", "ER"]/*", "["ER, DM"], ["DM", "EL"]*/]);
+    addMoveMap("B" , [["ER", "UL"], ["UR", "EL"]]);
+    // addMoveMap("B" , [["DR", "UM", "DL"]]);
+
+    addMoveMap("x" , [["DM", "UM"]]);
+    addMoveMap("y" , [["ER", "EL"]]);
+
+    addMoveMap("M" , [["UM", "EM"], ["EM", "DM"]]);
+    addMoveMap("u" , [["ER", "EM"], ["EM", "EL"]]);
   })();
 
   function onEnd(event) {
