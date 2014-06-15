@@ -112,6 +112,7 @@ var CubeState = {
 var cubeState = null;
 
 var twistyScene;
+var scrambleMoves = [];
 
 $(document).ready(function() {
 
@@ -142,12 +143,21 @@ $(document).ready(function() {
     return escaped;
   }
 
-  twistyScene.addListener("moveStart", function() {
-    var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
-    var algString = alg.cube.algToString(simplifiedAlg);
-    var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
-    console.log(url);
-    $("#link").attr("href", url);
+  twistyScene.addListener("moveAdvance", function() {
+    if(cubeState != CubeState.scrambling) {
+      var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
+      var algString = alg.cube.algToString(simplifiedAlg);
+      var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
+      if (scrambleMoves.length > 0) {
+        console.log(alg.cube.algToString(alg.cube.algSimplify(scrambleMoves)));
+        url += "&setup=" + encodeURIComponent(escape_alg(alg.cube.algToString(scrambleMoves)));
+        if (stopTime !== null) {
+          url += "&title=Solve:%20" + prettyTime(stopTime) + "%20seconds";
+        }
+      }
+      console.log(url);
+      $("#link").attr("href", url);
+    }
   });
   // $("#visitLink").bind("click", function() {
   //   var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
@@ -266,19 +276,19 @@ $(document).ready(function() {
   }
 
   function scramble() {
-
-        if (!isTiming()) {
-          var twisty = twistyScene.debug.model.twisty;
-          var scramble = twisty.generateScramble(twisty);
-          // We're going to get notified of the scrambling, and we don't
-          // want to start the timer when that's happening, so we keep track
-          // of the fact that we're scrambling.
-          cubeState = CubeState.scrambling;
-          twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
-          twistyScene.redraw(); // Force redraw.
-          cubeState = CubeState.scrambled;
-          resetTimer();
+    if (!isTiming()) {
+      var twisty = twistyScene.debug.model.twisty;
+      scrambleMoves = twisty.generateScramble(twisty);
+      cubeState = CubeState.scrambling;
+      twistyScene.setupAnimation(
+        [],
+        {
+          init: scrambleMoves
         }
+      );
+      cubeState = CubeState.scrambled;
+      resetTimer();
+    }
   }
 
   // From alg.garron.us
@@ -286,6 +296,8 @@ $(document).ready(function() {
 
   function reloadCube() {
     log("Current cube size: " + currentCubeSize);
+
+    scrambleMoves = [];
 
     var renderer = THREE[$('input[name="renderer"]:checked').val() + "Renderer"]; //TODO: Unsafe
     var stage = $('input[name="stage"]:checked').val();
