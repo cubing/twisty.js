@@ -129,10 +129,10 @@ div.right {
 
 #timer {
   background: #ACE;
-  padding: 4px;
-  font-family: monospace;
-  font-size: 48px;
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+  /*padding: 4px;*/
+  /*font-family: monospace;*/
+  /*font-size: 48px;*/
+  /*box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);*/
 }
 
 #timer.reset { 

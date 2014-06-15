@@ -128,8 +128,9 @@ $(document).ready(function() {
   reloadCube();
 
   $("#reset").bind("click", reloadCube);
+  $("#timer").bind("click", scramble);
   $("#undo").bind("click", function() {
-    
+
   });
 
 
@@ -259,6 +260,22 @@ $(document).ready(function() {
     resetTimer();
   }
 
+  function scramble() {
+
+        if (!isTiming()) {
+          var twisty = twistyScene.debug.model.twisty;
+          var scramble = twisty.generateScramble(twisty);
+          // We're going to get notified of the scrambling, and we don't
+          // want to start the timer when that's happening, so we keep track
+          // of the fact that we're scrambling.
+          cubeState = CubeState.scrambling;
+          twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
+          twistyScene.redraw(); // Force redraw.
+          cubeState = CubeState.scrambled;
+          resetTimer();
+        }
+  }
+
   // From alg.garron.us
   function escapeAlg(algstr){return algstr.replace(/\n/g, '%0A').replace(/-/g, '%2D').replace(/\'/g, '-').replace(/ /g, '_');}
 
@@ -297,6 +314,8 @@ $(document).ready(function() {
       if(cubeState == CubeState.scrambling) {
         // We don't want to start the timer if we're scrambling the cube.
       } else if(cubeState == CubeState.scrambled) {
+        console.log("f", move);
+        console.log("g", twistyScene.debug.model.twisty.isInspectionLegalMove(move));
         if(twistyScene.debug.model.twisty.isInspectionLegalMove(move)) {
           return;
         }
@@ -337,18 +356,7 @@ $(document).ready(function() {
         break;
 
       case 32:
-        if (!isTiming()) {
-          var twisty = twistyScene.debug.model.twisty;
-          var scramble = twisty.generateScramble(twisty);
-          // We're going to get notified of the scrambling, and we don't
-          // want to start the timer when that's happening, so we keep track
-          // of the fact that we're scrambling.
-          cubeState = CubeState.scrambling;
-          twistyScene.applyMoves(scramble); //TODO: Use appropriate function.
-          twistyScene.redraw(); // Force redraw.
-          cubeState = CubeState.scrambled;
-          resetTimer();
-        }
+        scramble();
         e.preventDefault();
         break;
     }
