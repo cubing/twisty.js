@@ -142,12 +142,19 @@ $(document).ready(function() {
     return escaped;
   }
 
-  $("#visitLink").bind("click", function() {
+  twistyScene.addListener("moveStart", function() {
     var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
     var algString = alg.cube.algToString(simplifiedAlg);
     var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
-    window.location = url;
+    console.log(url);
+    $("#link").attr("href", url);
   });
+  // $("#visitLink").bind("click", function() {
+  //   var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
+  //   var algString = alg.cube.algToString(simplifiedAlg);
+  //   var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
+  //   window.location = url;
+  // });
 
   $("#cubeDimension").bind("input", reDimensionCube);
   $("#allow_dragging").bind("change", reloadCube);

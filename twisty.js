@@ -519,9 +519,9 @@ twisty.scene = function(options) {
         console.log("[" + sectorMove + "] " + moveString);
 
         var move = alg.cube.stringToAlg(moveString);
-        fireListener("moveStart", move[0]); // TODO: DRY this.
         that.queueMoves(move);
         that.play.start();
+        fireListener("moveStart", move[0]); // TODO: DRY this.
       }
       else {
         console.log("[" + sectorMove + "] not a move");
