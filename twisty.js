@@ -89,8 +89,7 @@ twisty.scene = function(options) {
       moveAdvance: []
     },
 
-    startSector: null,
-    lastSector: null,
+    touchData: {},
 
     speed: null,
 
@@ -264,73 +263,8 @@ twisty.scene = function(options) {
     throw "Unknown event kind.";
   }
 
-  function touchMark(x, y, color) {
-
-    var dims = sectorDimensions();
-
-    var divDims = {};
-
-         if (y < dims.y1) { divDims.top = dims.top; divDims.bottom = dims.y1; }
-    else if (y > dims.y2) { divDims.top = dims.y2;  divDims.bottom = dims.top + dims.height; }
-    else                  { divDims.top = dims.y1;  divDims.bottom = dims.y2; }
-
-         if (x < dims.x1) { divDims.left = dims.left; divDims.right = dims.x1; }
-    else if (x > dims.x2) { divDims.left = dims.x2;   divDims.right = dims.left + dims.width; }
-    else                  { divDims.left = dims.x1;   divDims.right = dims.x2; }
-
-
-    var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
-    var d = $("<div>").appendTo("#twistyContainer");
-    d.addClass("touchMark");
-    d.addClass("move");
-    d.css({
-      display: "flex",
-      position: "fixed",
-      width: divDims.right - divDims.left,
-      height: divDims.bottom - divDims.top,
-      background: color,
-      color: "white",
-      "text-align": "center",
-      "align-items": "center",
-      "font-size": radius * 1.5,
-      opacity: "0.85",
-      "pointer-events": "none",
-      "font-family": "Tahoma, Verdana"
-    });
-    d.offset({left: divDims.left, top: divDims.top});
-    return d;
-  }
-
-  function highlightCurrentSector(x, y) {
-
-    var sector = getSector(control.mouseXLast, control.mouseYLast);
-
-    if (sector !== control.lastSector) {
-      $(".sectorHighlights").remove();
-
-      var sectorMove = control.startSector + " -> " + sector;
-
-      var d = touchMark(control.mouseXLast, control.mouseYLast, "#444");
-      d.addClass("sectorHighlights");
-
-      if (sectorMove in sectorMoveMap) {
-        var moveString = sectorMoveMap[sectorMove];
-        d.append($("<span>").html(moveString).css({
-          "text-align": "center",
-          width: "100%"
-        }));
-      }
-      else {
-        d.css("background", "#FAA");
-      }
-
-      control.lastSector = sector;
-    }
-
-    return sector;
-  }
-
   function sectorDimensions() {
+    // Memoize?
     var dims = {};
 
     var p = $(view.container).position();
@@ -396,60 +330,130 @@ twisty.scene = function(options) {
     return sector;
   }
 
+  function newSectorDiv(color) {
+    var radius = Math.min($(view.container).width(), $(view.container).height()) / 8;
+    var d = $("<div>").appendTo("#twistyContainer");
+    d.addClass("sectorDiv");
+    d.css({
+      display: "flex",
+      position: "fixed",
+      width: 0,
+      height: 0,
+      color: "white",
+      "text-align": "center",
+      "align-items": "center",
+      "font-size": radius * 1.5,
+      opacity: "0.85",
+      "pointer-events": "none",
+      "font-family": "Tahoma, Verdana"
+    });
+    d.offset({left: 0, top: 0});
+    d.append($("<span>").css({
+      "text-align": "center",
+      width: "100%"
+    }));
+    return d;
+  }
+
+  function updateSectorDiv(div, x, y, color, text) {
+
+    var dims = sectorDimensions();
+
+    var divDims = {};
+
+         if (y < dims.y1) { divDims.top = dims.top; divDims.bottom = dims.y1; }
+    else if (y > dims.y2) { divDims.top = dims.y2;  divDims.bottom = dims.top + dims.height; }
+    else                  { divDims.top = dims.y1;  divDims.bottom = dims.y2; }
+
+         if (x < dims.x1) { divDims.left = dims.left; divDims.right = dims.x1; }
+    else if (x > dims.x2) { divDims.left = dims.x2;   divDims.right = dims.left + dims.width; }
+    else                  { divDims.left = dims.x1;   divDims.right = dims.x2; }
+
+    div.css({
+      width: divDims.right - divDims.left,
+      height: divDims.bottom - divDims.top,
+      background: color
+    })
+    div.offset({left: divDims.left, top: divDims.top});
+    console.log(divDims)
+
+    if (typeof text !== "undefined") {
+      div.find("span").html(text);
+    }
+  }
+
   function onStart(event) {
     var kind = eventKind(event);
+    // var isTouch = (kind == "touch"  );
 
-    // Ignore multi-finger touches (e.g. pinch to zoom).
-    if (kind !== "touch" || event.touches.length === 1) {
+    console.log(event);
+    // console.log("[start] ", event.which, event.touches.length, event.changedTouches[0].identifier);
 
-      control.mouseXLast = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
-      control.mouseYLast = (kind == "mouse") ? event.clientY : event.touches[0].pageY;
+    for (i = 0; i < event.changedTouches.length; i++) {
+      var touch = event.changedTouches[i];
+      var touchData = {};
+      control.touchData[touch.identifier] = touchData; // I wanna put this on the previous line, but I don't have faith in portable Javascript semantics. :-(
 
-      if (options.touchMoveInput) {
-        touchMark(control.mouseXLast, control.mouseYLast, "gray");
-        control.startSector = getSector(control.mouseXLast, control.mouseYLast);
-        control.lastSector = control.startSector;
-      }
+      var x = touch.pageX;
+      var y = touch.pageY;
 
-      renderOnce();
-      event.preventDefault();
+      touchData.startSectorDiv = newSectorDiv();
+      touchData.endSectorDiv = newSectorDiv();
 
+      updateSectorDiv(touchData.startSectorDiv, x, y, "gray");
+
+      touchData.startSector = getSector(x, y);
+      touchData.lastSector = touchData.startSector;
+    }
+
+    renderOnce();
+    event.preventDefault();
+
+    if ($.isEmptyObject(control.touchData) <= 1) { // Don't add a move listener more than once.
       for (listener in listeners[kind]) {
         window.addEventListener(listener, listeners[kind][listener], false);
       }
     }
   }
 
+  function updateTouch(touch) {
+      var touchData = control.touchData[touch.identifier];
+
+      var x = touch.pageX;
+      var y = touch.pageY;
+      var sector = getSector(x, y);
+
+      if (sector != touchData.lastSector) {
+        var color = "#444";
+        var text = "";
+        if (sector === touchData.startSector) {
+          color = "#FAA";
+        }
+        else {
+          var sectorChange = touchData.startSector + " -> " + sector;
+          text = sectorMoveMap[sectorChange];
+        }
+        updateSectorDiv(touchData.endSectorDiv, x, y, color, text);
+
+        touchData.lastSector = sector;
+      }
+  }
+
   function onMove(event) {
     var kind = eventKind(event);
-
-    var mouseX = (kind == "mouse") ? event.clientX : event.touches[0].pageX;
-    var mouseY = (kind == "mouse") ? event.clientY : event.touches[0].pageY;
-
-    if (options.allowDragging) {
-      var deltaX = (control.mouseXLast - mouseX)/CONSTANTS.DRAG_RESISTANCE_X;
-      var deltaY = -(control.mouseYLast - mouseY)/CONSTANTS.DRAG_RESISTANCE_Y;
-
-      moveCameraDelta(deltaX, deltaY);
-
-      renderOnce();
-      event.preventDefault();
+    for (i = 0; i < event.touches.length; i++) {
+      updateTouch(event.touches[i]);
     }
-
-    control.mouseXLast = mouseX;
-    control.mouseYLast = mouseY;
-
-    highlightCurrentSector();
   }
 
   function onWheel(event) {
-    var deltaX = -event.wheelDeltaX/CONSTANTS.SCROLL_RESISTANCE_X;
-    var deltaY = event.wheelDeltaY/CONSTANTS.SCROLL_RESISTANCE_Y;
+    // var deltaX = -event.wheelDeltaX/CONSTANTS.SCROLL_RESISTANCE_X;
+    // var deltaY = event.wheelDeltaY/CONSTANTS.SCROLL_RESISTANCE_Y;
 
-    moveCameraDelta(deltaX, deltaY);
+    // moveCameraDelta(deltaX, deltaY);
 
-    renderOnce();
-    event.preventDefault();
+    // renderOnce();
+    // event.preventDefault();
   }
 
   var sectorMoveMap = {};
@@ -497,6 +501,8 @@ twisty.scene = function(options) {
 
     addMoveMap("x" , [["DM", "EM", "UM"]]);
     addMoveMap("y" , [["ER", "EM", "EL"]]);
+    addMoveMap("z" , [["UL", "DR"]]);
+    addMoveMap("z" , [["DL", "UR"]]);
 
     // addMoveMap("d" , [["DL", "EM"], ["EM", "DR"]]);
     addMoveMap("u",  [["UR", "EM"], ["EM", "UL"]]);
@@ -511,28 +517,15 @@ twisty.scene = function(options) {
   function onEnd(event) {
     var kind = eventKind(event);
 
-    // Snap camera height to end of sticky region.
-    if (control.cameraHeight >= CONSTANTS.CAMERA_HEIGHT_STICKY_MIN) {
-      control.cameraHeight = CONSTANTS.CAMERA_HEIGHT_STICKY_MAX;
-    }
-    else if (control.cameraHeight <= -CONSTANTS.CAMERA_HEIGHT_STICKY_MIN) {
-      control.cameraHeight = -CONSTANTS.CAMERA_HEIGHT_STICKY_MAX;
-    }
 
-    for (listener in listeners[kind]) {
-      window.removeEventListener(listener, listeners[kind][listener], false);
-    }
+    for (i = 0; i < event.changedTouches.length; i++) {
+      var touch = event.changedTouches[i];
+      var touchData = control.touchData[touch.identifier];
+      var sectorChange = touchData.startSector + " -> " + touchData.lastSector;
 
-
-    if (options.touchMoveInput) {
-      var endSector = highlightCurrentSector(control.mouseXLast, control.mouseYLast);
-      $(".touchMark").fadeOut(1000, function(){$(this).remove();}); // Also fades out the starting touch mark
-
-
-      var sectorMove = control.startSector + " -> " + endSector;
-      if (sectorMove in sectorMoveMap) {
-        var moveString = sectorMoveMap[sectorMove];
-        console.log("[" + sectorMove + "] " + moveString);
+      if (sectorChange in sectorMoveMap) {
+        var moveString = sectorMoveMap[sectorChange];
+        console.log("[" + sectorChange + "] " + moveString);
 
         var move = alg.cube.stringToAlg(moveString);
         that.queueMoves(move);
@@ -540,8 +533,13 @@ twisty.scene = function(options) {
         fireListener("moveStart", move[0]); // TODO: DRY this.
       }
       else {
-        console.log("[" + sectorMove + "] not a move");
+        console.log("[" + sectorChange + "] not a move");
       }
+
+
+      touchData.startSectorDiv.remove();
+      touchData.endSectorDiv.remove()
+      delete control.touchData[touch.identifier];
     }
   }
 
