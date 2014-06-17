@@ -233,6 +233,55 @@ var alg = (function (){
       return movesOut;
     }
 
+    function makeStructuralRecursion() {
+
+      var fn = function() {
+        return fn["sequence"].apply(this, arguments);
+      }
+
+      fn["sequence"] = function(algIn) {
+        var moves = [];
+        for (i in algIn) {
+          console.log(this);
+          console.log(algIn[i].type);
+          moves = moves.concat(fn[algIn[i].type](algIn[i]));
+        }
+        return moves;
+      };
+
+      fn["move"] = function(move) {
+        return move;
+      }
+
+      fn["commutator"] = function(commutator) {
+        return {
+          "type": "commutator",
+          "A": fn(commutator.A),
+          "B": fn(commutator.B)
+        };
+      }
+
+      fn["conjugate"] = function(conjugate) {
+        return {
+          "type": "conjugate",
+          "A": fn(conjugate.A),
+          "B": fn(conjugate.B)
+        };
+      }
+
+      fn["group"] = function(group) {
+        return {
+          "type": "group",
+          "A": fn(group.A),
+        };
+      }
+
+      fn["timestamp"] = function(group) {
+        return group;
+      }
+      return fn;
+    }
+
     var mirrorSlicesAcrossM = {
       "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
       "F": "F", "Fw": "Fw", "f": "f", "S": "S", "z": "z",
@@ -243,15 +292,8 @@ var alg = (function (){
       ".": "."
     };
 
-    // TODO: Factor out a structural recursion skeleton.
     // TODO: Arbitrary mirrors and transformations.
-    var mirrorAlg = function(algIn) {
-      var moves = [];
-      for (i in algIn) {
-        moves = moves.concat(mirrorAlg[algIn[i].type](algIn[i]));
-      }
-      return moves;
-    };
+    var mirrorAlg = makeStructuralRecursion();
 
     mirrorAlg["move"] = function(move) {
       var mirroredMove = cloneMove(move);
@@ -261,37 +303,6 @@ var alg = (function (){
       }
       return mirroredMove;
     }
-
-    mirrorAlg["commutator"] = function(commutator) {
-      return {
-        "type": "commutator",
-        "A": mirrorAlg(commutator.A),
-        "B": mirrorAlg(commutator.B),
-        "amount": commutator.amount
-      };
-    }
-
-    mirrorAlg["conjugate"] = function(conjugate) {
-      return {
-        "type": "conjugate",
-        "A": mirrorAlg(conjugate.A),
-        "B": mirrorAlg(conjugate.B),
-        "amount": conjugate.amount
-      };
-    }
-
-    mirrorAlg["group"] = function(group) {
-      return {
-        "type": "group",
-        "A": mirrorAlg(group.A),
-        "amount": group.amount
-      };
-    }
-
-    mirrorAlg["timestamp"] = function(group) {
-      return group;
-    }
-
 
     function algToMoves(algIn) {
       var moves = [];
