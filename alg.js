@@ -193,6 +193,64 @@ var alg = (function (){
       return movesOut;
     }
 
+    var mirrorSlicesAcrossM = {
+      "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
+      "F": "F", "Fw": "Fw", "f": "f", "S": "S", "z": "z",
+      "R": "L", "Rw": "Lw", "r": "l", "N": "N", "x": "x",
+      "B": "B", "Bw": "Bw", "b": "b",
+      "L": "R", "Lw": "Rw", "l": "r", "M": "M",
+      "D": "D", "Dw": "Dw", "d": "d", "E": "E",
+      ".": "."
+    };
+
+    // TODO: Factor out a structural recursion skeleton.
+    // TODO: Arbitrary mirrors and transformations.
+    var mirrorAlg = function(algIn) {
+      var moves = [];
+      for (i in algIn) {
+        moves = moves.concat(mirrorAlg[algIn[i].type](algIn[i]));
+      }
+      return moves;
+    };
+
+    mirrorAlg["move"] = function(move) {
+      var mirroredMove = cloneMove(move);
+      if (["x", "M", "N", "."].indexOf(mirroredMove.base) === -1) {
+        mirroredMove.base = mirrorSlicesAcrossM[mirroredMove.base];
+        mirroredMove.amount = -mirroredMove.amount;
+      }
+      return mirroredMove;
+    }
+
+    mirrorAlg["commutator"] = function(commutator) {
+      return {
+        "type": "commutator",
+        "A": mirrorAlg(commutator.A),
+        "B": mirrorAlg(commutator.B)
+      };
+    }
+
+    mirrorAlg["conjugate"] = function(conjugate) {
+      return {
+        "type": "conjugate",
+        "A": mirrorAlg(conjugate.A),
+        "B": mirrorAlg(conjugate.B)
+      };
+    }
+
+    mirrorAlg["group"] = function(group) {
+      return {
+        "type": "group",
+        "A": mirrorAlg(group.A),
+      };
+    }
+
+    mirrorAlg["timestamp"] = function(group) {
+      return group;
+    }
+
+
+
     var repeatableToMoves = {};
 
     repeatableToMoves["move"] = function(move) {
@@ -294,6 +352,7 @@ var alg = (function (){
       algSimplify: algSimplify,
       stringToAlg: stringToAlg,
       invert: invert,
+      mirrorAcrossM: mirrorAlg,
       canonicalizeMove: canonicalizeMove,
       algToMoves: algToMoves,
       countMoves: countMoves
