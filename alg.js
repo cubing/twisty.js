@@ -250,14 +250,19 @@ var alg = (function (){
     }
 
 
+    function algToMoves(algIn) {
+      var moves = [];
+      for (i in algIn) {
+        moves = moves.concat(algToMoves[algIn[i].type](algIn[i]));
+      }
+      return moves;
+    }
 
-    var repeatableToMoves = {};
-
-    repeatableToMoves["move"] = function(move) {
+    algToMoves["move"] = function(move) {
       return [move];
     }
 
-    repeatableToMoves["commutator"] = function(commutator) {
+    algToMoves["commutator"] = function(commutator) {
       var once = [].concat(
         algToMoves(commutator.A),
         algToMoves(commutator.B),
@@ -267,7 +272,7 @@ var alg = (function (){
       return repeatMoves(once, commutator);
     }
 
-    repeatableToMoves["conjugate"] = function(conjugate) {
+    algToMoves["conjugate"] = function(conjugate) {
       var once = [].concat(
         algToMoves(conjugate.A),
         algToMoves(conjugate.B),
@@ -276,21 +281,13 @@ var alg = (function (){
       return repeatMoves(once, conjugate);
     }
 
-    repeatableToMoves["group"] = function(group) {
+    algToMoves["group"] = function(group) {
       var once = algToMoves(group.A);
       return repeatMoves(once, group);
     }
 
-    repeatableToMoves["timestamp"] = function(group) {
+    algToMoves["timestamp"] = function(group) {
       return [];
-    }
-
-    function algToMoves(algIn) {
-      var moves = [];
-      for (i in algIn) {
-        moves = moves.concat(repeatableToMoves[algIn[i].type](algIn[i]));
-      }
-      return moves;
     }
 
     function stringToAlg(algString) {
