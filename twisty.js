@@ -527,6 +527,8 @@ twisty.scene = function(options) {
         var moveString = sectorMoveMap[sectorChange];
         console.log("[" + sectorChange + "] " + moveString);
 
+        // that.play.skip();
+
         var move = alg.cube.stringToAlg(moveString);
         that.queueMoves(move);
         that.play.start();
