@@ -266,7 +266,8 @@ var alg = (function (){
       return {
         "type": "commutator",
         "A": mirrorAlg(commutator.A),
-        "B": mirrorAlg(commutator.B)
+        "B": mirrorAlg(commutator.B),
+        "amount": commutator.amount
       };
     }
 
@@ -274,7 +275,8 @@ var alg = (function (){
       return {
         "type": "conjugate",
         "A": mirrorAlg(conjugate.A),
-        "B": mirrorAlg(conjugate.B)
+        "B": mirrorAlg(conjugate.B),
+        "amount": conjugate.amount
       };
     }
 
@@ -282,6 +284,7 @@ var alg = (function (){
       return {
         "type": "group",
         "A": mirrorAlg(group.A),
+        "amount": group.amount
       };
     }
 
