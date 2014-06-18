@@ -85,7 +85,7 @@ var alg = (function (){
 
 
 
-    function stringToAlg(algString) {
+    function fromString(algString) {
       return alg_jison.parse(algString);
     }
 
@@ -130,12 +130,12 @@ var alg = (function (){
     /****************************************************************/
 
 
-    function algToString(alg, dimension) {
+    function toString(alg, dimension) {
 
       var moveStrings = [];
       for (var i = 0; i < alg.length; i++) {
         var type = alg[i].type;
-        var moveString = algToString[type](alg[i]);
+        var moveString = toString[type](alg[i]);
         if (types[type].repeatable) {
           moveString += suffix(alg[i]);
         }
@@ -144,7 +144,7 @@ var alg = (function (){
       return moveStrings.join(" ");
     }
 
-    algToString.move = function(move) {
+    toString.move = function(move) {
         var tL = move.layer;
         var sL = move.startLayer;
         var oL = move.endLayer;
@@ -168,35 +168,35 @@ var alg = (function (){
         return prefix + move.base;
     }
 
-    algToString.commutator = function(commutator) {
-      return "[" + algToString(commutator.A) + ", " + algToString(commutator.B) + "]";
+    toString.commutator = function(commutator) {
+      return "[" + toString(commutator.A) + ", " + toString(commutator.B) + "]";
     }
 
-    algToString.conjugate = function(conjugate) {
-      return "[" + algToString(conjugate.A) + ": " + algToString(conjugate.B) + "]";
+    toString.conjugate = function(conjugate) {
+      return "[" + toString(conjugate.A) + ": " + toString(conjugate.B) + "]";
     }
 
-    algToString.group = function(group) {
-      return "(" + algToString(group.A) + ")";
+    toString.group = function(group) {
+      return "(" + toString(group.A) + ")";
     }
 
-    algToString.timestamp = function(timestamp) {
+    toString.timestamp = function(timestamp) {
       return "@" + timestamp.time + "s";
     }
 
-    algToString.comment_short = function(comment_short) {
+    toString.comment_short = function(comment_short) {
       return comment_short.comment;
     }
 
-    algToString.comment_long = function(comment_long) {
+    toString.comment_long = function(comment_long) {
       return comment_long.comment;
     }
 
-    algToString.pause = function(pause) {
+    toString.pause = function(pause) {
       return ".";
     }
 
-    algToString.spacing = function(spacing) {
+    toString.spacing = function(spacing) {
       return spacing.string;
     }
 
@@ -211,9 +211,9 @@ var alg = (function (){
       var fn = function(alg) {
         var stringInput = (typeof alg === "string");
 
-        if (stringInput) {alg = stringToAlg(alg);}
+        if (stringInput) {alg = fromString(alg);}
         var output = fn.sequence(alg);
-        if (stringInput) {output = algToString(output);}
+        if (stringInput) {output = toString(output);}
 
         return output;
       }
@@ -279,9 +279,9 @@ var alg = (function (){
 
 
 
-    var algSimplify = makeAlgTransform();
+    var simplify = makeAlgTransform();
 
-    algSimplify.sequence = function(sequence) {
+    simplify.sequence = function(sequence) {
       var algOut = [];
       for (var i = 0; i < sequence.length; i++) {
         var move = sequence[i];
@@ -334,50 +334,54 @@ var alg = (function (){
     }
 
 
+
     /****************************************************************/
 
 
-    function algToMoves(algIn) {
-      var moves = [];
-      for (i in algIn) {
-        moves = moves.concat(algToMoves[algIn[i].type](algIn[i]));
-      }
-      return moves;
-    }
 
-    algToMoves.move = function(move) {
-      return [move];
-    }
 
-    algToMoves.commutator = function(commutator) {
+    var expand = makeAlgTransform();
+
+    expand.commutator = function(commutator) {
       var once = [].concat(
-        algToMoves(commutator.A),
-        algToMoves(commutator.B),
-        invert(algToMoves(commutator.A)),
-        invert(algToMoves(commutator.B))
+        expand(commutator.A),
+        expand(commutator.B),
+        invert(expand(commutator.A)),
+        invert(expand(commutator.B))
       );
       return repeatMoves(once, commutator);
     }
 
-    algToMoves.conjugate = function(conjugate) {
+    expand.conjugate = function(conjugate) {
       var once = [].concat(
-        algToMoves(conjugate.A),
-        algToMoves(conjugate.B),
-        invert(algToMoves(conjugate.A))
+        expand(conjugate.A),
+        expand(conjugate.B),
+        invert(expand(conjugate.A))
       );
       return repeatMoves(once, conjugate);
     }
 
-    algToMoves.group = function(group) {
-      var once = algToMoves(group.A);
+    expand.group = function(group) {
+      var once = toMoves(group.A);
       return repeatMoves(once, group);
     }
 
-    algToMoves.pause = function(timestamp) {return [];}
-    algToMoves.spacing = function(timestamp) {return [];}
-    algToMoves.comment_short = function(timestamp) {return [];}
-    algToMoves.comment_long = function(timestamp) {return [];}
-    algToMoves.timestamp = function(timestamp) {return [];}
+
+    /****************************************************************/
+
+
+
+    var toMoves = makeAlgTransform();
+
+    toMoves.commutator = expand.commutator;
+    toMoves.conjugate = expand.conjugate;
+    toMoves.group = expand.group;
+
+    toMoves.pause = function(timestamp) {return [];}
+    toMoves.spacing = function(timestamp) {return [];}
+    toMoves.comment_short = function(timestamp) {return [];}
+    toMoves.comment_long = function(timestamp) {return [];}
+    toMoves.timestamp = function(timestamp) {return [];}
 
 
 
@@ -429,7 +433,7 @@ var alg = (function (){
     }
 
     // TODO: Reversing timestamps properly takes more work.
-    algToMoves.timestamp = function(timestamp) {
+    toMoves.timestamp = function(timestamp) {
       return [];
     }
 
@@ -471,7 +475,7 @@ var alg = (function (){
     // Metrics
 
     function countMoves(algo, metric, dimension) {
-      var moves = algToMoves(algo); // TODO: multiple dispatch to avoid expanding algs
+      var moves = toMoves(algo); // TODO: multiple dispatch to avoid expanding algs
       var moveCount = 0;
       for (move in moves) {
         moveCount += countMove(moves[move], metric, dimension);
@@ -523,14 +527,15 @@ var alg = (function (){
     // Exports
 
     return {
-      algToString: algToString,
-      algSimplify: algSimplify,
-      stringToAlg: stringToAlg,
+      toString: toString,
+      simplify: simplify,
+      fromString: fromString,
       makeAlgTransform: makeAlgTransform,
       invert: invert,
       mirrorAcrossM: mirrorAlg,
       canonicalizeMove: canonicalizeMove,
-      algToMoves: algToMoves,
+      toMoves: toMoves,
+      expand: expand,
       countMoves: countMoves
     }
   })();
