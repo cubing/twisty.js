@@ -53,15 +53,6 @@ var alg = (function (){
     return move;
   }
 
-  function round(x) {
-    // We want to round:
-    //    2.6 to  3
-    //    2.5 to  2
-    //   -2.5 to -2
-    var antiSignish = x < 0 ? 1 : -1; // When can we haz ES6?
-    return Math.round(-Math.abs(x)) * antiSignish;
-  }
-
   var cube = (function(){
 
 
@@ -220,7 +211,7 @@ var alg = (function (){
 
       fn.sequence = function(algIn) {
         var moves = [];
-        for (i in algIn) {
+        for (var i = 0; i < algIn.length; i++) {
           moves = moves.concat(fn[algIn[i].type](algIn[i]));
         }
         return moves;
@@ -278,6 +269,18 @@ var alg = (function (){
     /************************************************************************************************/
 
 
+    function round(x) {
+      // We want to round:
+      //    2.6 to  3
+      //    2.5 to  2
+      //   -2.5 to -2
+      var antiSignish = x < 0 ? 1 : -1; // When can we haz ES6?
+      return Math.round(-Math.abs(x)) * antiSignish;
+    }
+
+
+    /****************************************************************/
+
 
     var simplify = makeAlgTransform();
 
@@ -285,7 +288,10 @@ var alg = (function (){
       var algOut = [];
       for (var i = 0; i < sequence.length; i++) {
         var move = sequence[i];
-        if (algOut.length > 0 &&
+        if (move.type !== "move") {
+          algOut.push(simplify[move.type](move));
+        }
+        else if (algOut.length > 0 &&
             algOut[algOut.length-1].startLayer == move.startLayer &&
             algOut[algOut.length-1].endLayer == move.endLayer &&
             algOut[algOut.length-1].base == move.base) {
@@ -305,6 +311,7 @@ var alg = (function (){
         }
         //console.log(JSON.stringify(algOut));
       }
+      console.log(algOut);
       return algOut;
     }
 
@@ -334,10 +341,7 @@ var alg = (function (){
     }
 
 
-
     /****************************************************************/
-
-
 
 
     var expand = makeAlgTransform();
@@ -377,11 +381,13 @@ var alg = (function (){
     toMoves.conjugate = expand.conjugate;
     toMoves.group = expand.group;
 
-    toMoves.pause = function(timestamp) {return [];}
-    toMoves.spacing = function(timestamp) {return [];}
-    toMoves.comment_short = function(timestamp) {return [];}
-    toMoves.comment_long = function(timestamp) {return [];}
-    toMoves.timestamp = function(timestamp) {return [];}
+    var emptySequence = function(timestamp) {return [];}
+
+    toMoves.pause = emptySequence;
+    toMoves.spacing = emptySequence;
+    toMoves.comment_short = emptySequence;
+    toMoves.comment_long = emptySequence;
+    toMoves.timestamp = emptySequence;
 
 
 
