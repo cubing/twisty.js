@@ -281,10 +281,10 @@ twisty.scene = function(options) {
     dims.centerX = (dims.centerSize + (dims.width  / 3)) / 2;
     dims.centerY = (dims.centerSize + (dims.height / 3)) / 2;
 
-    dims.y1 = dims.vCenter - dims.centerY / 2;
-    dims.y2 = dims.vCenter + dims.centerY / 2;
-    dims.x1 = dims.hCenter - dims.centerX / 2;
-    dims.x2 = dims.hCenter + dims.centerX / 2;
+    dims.y1 = Math.floor(dims.vCenter - dims.centerY / 2);
+    dims.y2 = Math.ceil(dims.vCenter + dims.centerY / 2);
+    dims.x1 = Math.floor(dims.hCenter - dims.centerX / 2);
+    dims.x2 = Math.ceil(dims.hCenter + dims.centerX / 2);
 
     return dims;
   }
