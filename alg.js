@@ -64,36 +64,87 @@ var alg = (function (){
 
   var cube = (function(){
 
-    function algSimplify(alg) {
-      var algOut = [];
-      for (var i = 0; i < alg.length; i++) {
-        var move = alg[i];
-        if (algOut.length > 0 &&
-            algOut[algOut.length-1].startLayer == move.startLayer &&
-            algOut[algOut.length-1].endLayer == move.endLayer &&
-            algOut[algOut.length-1].base == move.base) {
-          var amount = algOut[algOut.length-1].amount + move.amount;
-          // Mod to [-2, -1, 0, 1, 2]
-          // x | 0 truncates x towards 0.
-          amount = amount - 4 * round(amount / 4);
-          if (amount == 0) {
-            algOut.pop();
-          }
-          else {
-            algOut[algOut.length-1].amount = amount;
-          }
-        }
-        else {
-          algOut.push(cloneMove(move));
-        }
-        //console.log(JSON.stringify(algOut));
-      }
-      return algOut;
+
+
+    var types = {
+      sequence:      {repeatable: false},
+      move:          {repeatable: true },
+      commutator:    {repeatable: true },
+      conjugate:     {repeatable: true },
+      group:         {repeatable: true },
+      pause:         {repeatable: false},
+      spacing:       {repeatable: false},
+      comment_short: {repeatable: false},
+      comment_long:  {repeatable: false},
+      timestamp:     {repeatable: false}
     }
 
-    var repeatableToString = {}
 
-    repeatableToString["move"] = function(move) {
+
+    /************************************************************************************************/
+
+
+
+    function stringToAlg(algString) {
+      return alg_jison.parse(algString);
+    }
+
+
+
+    // TODO: Document that it is not safe to mutate algs, because they may share moves.
+    function cloneMove(move) {
+      var newMove = {};
+      for (i in move) {
+        newMove[i] = move[i]
+      }
+      return newMove;
+    }
+
+
+
+   /************************************************************************************************/
+
+
+    function suffix(repeated) {
+
+      if (typeof repeated.amount === "undefined") {
+        throw "Amount not defined for repeatable: ", repeated
+      }
+
+      var amount = Math.abs(repeated.amount);
+      var amountDir = (repeated.amount > 0) ? 1 : -1; // Mutable
+
+      var suffix = ""
+      // Suffix Logic
+      if (amount > 1) {
+        suffix += "" + amount;
+      }
+
+      if (amountDir === -1) {
+        suffix += "'";
+      }
+      return suffix;
+    }
+
+
+    /****************************************************************/
+
+
+    function algToString(alg, dimension) {
+
+      var moveStrings = [];
+      for (var i = 0; i < alg.length; i++) {
+        var type = alg[i].type;
+        var moveString = algToString[type](alg[i]);
+        if (types[type].repeatable) {
+          moveString += suffix(alg[i]);
+        }
+        moveStrings.push(moveString);
+      }
+      return moveStrings.join(" ");
+    }
+
+    algToString.move = function(move) {
         var tL = move.layer;
         var sL = move.startLayer;
         var oL = move.endLayer;
@@ -117,100 +168,151 @@ var alg = (function (){
         return prefix + move.base;
     }
 
-    repeatableToString["commutator"] = function(commutator) {
+    algToString.commutator = function(commutator) {
       return "[" + algToString(commutator.A) + ", " + algToString(commutator.B) + "]";
     }
 
-    repeatableToString["conjugate"] = function(conjugate) {
+    algToString.conjugate = function(conjugate) {
       return "[" + algToString(conjugate.A) + ": " + algToString(conjugate.B) + "]";
     }
 
-    repeatableToString["group"] = function(group) {
+    algToString.group = function(group) {
       return "(" + algToString(group.A) + ")";
     }
 
-    function suffix(repeated) {
-
-      var amount = Math.abs(repeated.amount);
-      var amountDir = (repeated.amount > 0) ? 1 : -1; // Mutable
-
-      var suffix = ""
-      // Suffix Logic
-      if (amount > 1) {
-        suffix += "" + amount;
-      }
-
-      if (amountDir === -1) {
-        suffix += "'";
-      }
-      return suffix;
+    algToString.timestamp = function(timestamp) {
+      return "@" + timestamp.time + "s";
     }
 
-    function algToString(alg, dimension) {
-
-      var moveStrings = [];
-      for (i in alg) {
-        var moveString = repeatableToString[alg[i].type](alg[i]) + suffix(alg[i]);
-        moveStrings.push(moveString);
-      }
-      return moveStrings.join(" ");
+    algToString.comment_short = function(comment_short) {
+      return comment_short.comment;
     }
 
-    function cloneMove(move) {
-      var newMove = {};
-      for (i in move) {
-        newMove[i] = move[i]
-      }
-      return newMove;
+    algToString.comment_long = function(comment_long) {
+      return comment_long.comment;
+    }
+
+    algToString.pause = function(pause) {
+      return ".";
+    }
+
+    algToString.spacing = function(spacing) {
+      return spacing.string;
     }
 
 
-    var invert = function(algIn) {
-      var moves = [];
-      for (i in algIn) {
-        moves = moves.concat(invert[algIn[i].type](algIn[i]));
-      }
-      moves.reverse();
-      return moves;
-    };
 
-    invert["move"] = function(move) {
-      var invertedMove = cloneMove(move);
-      if (move.base !== ".") {
-        invertedMove.amount = -invertedMove.amount;
-      }
-      return invertedMove;
-    }
+    /************************************************************************************************/
 
-    invert["commutator"] = function(commutator) {
-      return {
-        "type": "commutator",
-        "A": commutator.B,
-        "B": commutator.A,
-        "amount": commutator.amount
+
+    // Dispatch mechanism constructor.
+    function makeAlgTransform() {
+
+      var fn = function(alg) {
+        var stringInput = (typeof alg === "string");
+
+        if (stringInput) {alg = stringToAlg(alg);}
+        var output = fn.sequence(alg);
+        if (stringInput) {output = algToString(output);}
+
+        return output;
+      }
+
+      fn.sequence = function(algIn) {
+        var moves = [];
+        for (i in algIn) {
+          moves = moves.concat(fn[algIn[i].type](algIn[i]));
+        }
+        return moves;
       };
+
+      fn.move = function(move) {
+        return move;
+      }
+
+      fn.commutator = function(commutator) {
+        return {
+          "type": "commutator",
+          "A": fn(commutator.A),
+          "B": fn(commutator.B),
+          "amount": commutator.amount
+        };
+      }
+
+      fn.conjugate = function(conjugate) {
+        return {
+          "type": "conjugate",
+          "A": fn(conjugate.A),
+          "B": fn(conjugate.B),
+          "amount": conjugate.amount
+        };
+      }
+
+      fn.group = function(group) {
+        return {
+          "type": "group",
+          "A": fn(group.A),
+          "amount": group.amount
+        };
+      }
+
+      var id = function(x) {return x;};
+
+      fn.pause = id;
+      fn.spacing = id;
+      fn.comment_short = id;
+      fn.comment_long = id;
+      fn.timestamp = id;
+
+      // Make the defaults available to overrides.
+      // TODO: Use prototypes?
+      for (i in fn) {
+        fn["_" + i] = fn[i];
+      }
+
+      return fn;
     }
 
-    invert["conjugate"] = function(conjugate) {
-      return {
-        "type": "conjugate",
-        "A": conjugate.A,
-        "B": invert(conjugate.B),
-        "amount": conjugate.amount
-      };
+
+
+    /************************************************************************************************/
+
+
+
+    var algSimplify = makeAlgTransform();
+
+    algSimplify.sequence = function(sequence) {
+      var algOut = [];
+      for (var i = 0; i < sequence.length; i++) {
+        var move = sequence[i];
+        if (algOut.length > 0 &&
+            algOut[algOut.length-1].startLayer == move.startLayer &&
+            algOut[algOut.length-1].endLayer == move.endLayer &&
+            algOut[algOut.length-1].base == move.base) {
+          var amount = algOut[algOut.length-1].amount + move.amount;
+          // Mod to [-2, -1, 0, 1, 2]
+          // x | 0 truncates x towards 0.
+          amount = amount - 4 * round(amount / 4);
+          if (amount == 0) {
+            algOut.pop();
+          }
+          else {
+            algOut[algOut.length-1].amount = amount;
+          }
+        }
+        else {
+          algOut.push(cloneMove(move));
+        }
+        //console.log(JSON.stringify(algOut));
+      }
+      return algOut;
     }
 
-    invert["group"] = function(group) {
-      return {
-        "type": "group",
-        "A": invert(group.A),
-        "amount": group.amount
-      };
-    }
 
-    invert["timestamp"] = function(group) {
-      return [];
-    }
+
+    /************************************************************************************************/
+
+
 
     function repeatMoves(movesIn, accordingTo) {
 
@@ -231,52 +333,111 @@ var alg = (function (){
       return movesOut;
     }
 
-    function makeStructuralRecursion() {
 
-      var fn = function() {
-        return fn["sequence"].apply(this, arguments);
+    /****************************************************************/
+
+
+    function algToMoves(algIn) {
+      var moves = [];
+      for (i in algIn) {
+        moves = moves.concat(algToMoves[algIn[i].type](algIn[i]));
       }
-
-      fn["sequence"] = function(algIn) {
-        var moves = [];
-        for (i in algIn) {
-          moves = moves.concat(fn[algIn[i].type](algIn[i]));
-        }
-        return moves;
-      };
-
-      fn["move"] = function(move) {
-        return move;
-      }
-
-      fn["commutator"] = function(commutator) {
-        return {
-          "type": "commutator",
-          "A": fn(commutator.A),
-          "B": fn(commutator.B)
-        };
-      }
-
-      fn["conjugate"] = function(conjugate) {
-        return {
-          "type": "conjugate",
-          "A": fn(conjugate.A),
-          "B": fn(conjugate.B)
-        };
-      }
-
-      fn["group"] = function(group) {
-        return {
-          "type": "group",
-          "A": fn(group.A),
-        };
-      }
-
-      fn["timestamp"] = function(group) {
-        return group;
-      }
-      return fn;
+      return moves;
     }
+
+    algToMoves.move = function(move) {
+      return [move];
+    }
+
+    algToMoves.commutator = function(commutator) {
+      var once = [].concat(
+        algToMoves(commutator.A),
+        algToMoves(commutator.B),
+        invert(algToMoves(commutator.A)),
+        invert(algToMoves(commutator.B))
+      );
+      return repeatMoves(once, commutator);
+    }
+
+    algToMoves.conjugate = function(conjugate) {
+      var once = [].concat(
+        algToMoves(conjugate.A),
+        algToMoves(conjugate.B),
+        invert(algToMoves(conjugate.A))
+      );
+      return repeatMoves(once, conjugate);
+    }
+
+    algToMoves.group = function(group) {
+      var once = algToMoves(group.A);
+      return repeatMoves(once, group);
+    }
+
+    algToMoves.pause = function(timestamp) {return [];}
+    algToMoves.spacing = function(timestamp) {return [];}
+    algToMoves.comment_short = function(timestamp) {return [];}
+    algToMoves.comment_long = function(timestamp) {return [];}
+    algToMoves.timestamp = function(timestamp) {return [];}
+
+
+
+    /************************************************************************************************/
+
+
+
+    var invert = makeAlgTransform();
+
+    invert.sequence = function(sequence) {
+      var moves = invert["_sequence"](sequence);
+      moves.reverse();
+      return moves;
+
+    }
+
+    invert.move = function(move) {
+      var invertedMove = cloneMove(move);
+      if (move.base !== ".") {
+        invertedMove.amount = -invertedMove.amount;
+      }
+      return invertedMove;
+    }
+
+    invert.commutator = function(commutator) {
+      return {
+        "type": "commutator",
+        "A": commutator.B,
+        "B": commutator.A,
+        "amount": commutator.amount
+      };
+    }
+
+    invert.conjugate = function(conjugate) {
+      return {
+        "type": "conjugate",
+        "A": conjugate.A,
+        "B": invert(conjugate.B),
+        "amount": conjugate.amount
+      };
+    }
+
+    invert.group = function(group) {
+      return {
+        "type": "group",
+        "A": invert(group.A),
+        "amount": group.amount
+      };
+    }
+
+    // TODO: Reversing timestamps properly takes more work.
+    algToMoves.timestamp = function(timestamp) {
+      return [];
+    }
+
+
+
+    /************************************************************************************************/
+
+
 
     var mirrorSlicesAcrossM = {
       "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
@@ -288,10 +449,13 @@ var alg = (function (){
       ".": "."
     };
 
-    // TODO: Arbitrary mirrors and transformations.
-    var mirrorAlg = makeStructuralRecursion();
 
-    mirrorAlg["move"] = function(move) {
+    /****************************************************************/
+
+
+    var mirrorAlg = makeAlgTransform();
+
+    mirrorAlg.move = function(move) {
       var mirroredMove = cloneMove(move);
       if (["x", "M", "N", "."].indexOf(mirroredMove.base) === -1) {
         mirroredMove.base = mirrorSlicesAcrossM[mirroredMove.base];
@@ -300,64 +464,19 @@ var alg = (function (){
       return mirroredMove;
     }
 
-    function algToMoves(algIn) {
-      var moves = [];
-      for (i in algIn) {
-        moves = moves.concat(algToMoves[algIn[i].type](algIn[i]));
+
+
+    /************************************************************************************************/
+
+    // Metrics
+
+    function countMoves(algo, metric, dimension) {
+      var moves = algToMoves(algo); // TODO: multiple dispatch to avoid expanding algs
+      var moveCount = 0;
+      for (move in moves) {
+        moveCount += countMove(moves[move], metric, dimension);
       }
-      return moves;
-    }
-
-    algToMoves["move"] = function(move) {
-      return [move];
-    }
-
-    algToMoves["commutator"] = function(commutator) {
-      var once = [].concat(
-        algToMoves(commutator.A),
-        algToMoves(commutator.B),
-        invert(algToMoves(commutator.A)),
-        invert(algToMoves(commutator.B))
-      );
-      return repeatMoves(once, commutator);
-    }
-
-    algToMoves["conjugate"] = function(conjugate) {
-      var once = [].concat(
-        algToMoves(conjugate.A),
-        algToMoves(conjugate.B),
-        invert(algToMoves(conjugate.A))
-      );
-      return repeatMoves(once, conjugate);
-    }
-
-    algToMoves["group"] = function(group) {
-      var once = algToMoves(group.A);
-      return repeatMoves(once, group);
-    }
-
-    algToMoves["timestamp"] = function(group) {
-      return [];
-    }
-
-    function stringToAlg(algString) {
-      return alg_jison.parse(algString);
-    }
-
-    // Metric
-
-    var moveCountScalars = {
-       "obtm": {rotation: [0, 0], outer: [1, 0], inner: [2, 0]},
-        "btm": {rotation: [0, 0], outer: [1, 0], inner: [1, 0]},
-      "obqtm": {rotation: [0, 0], outer: [0, 1], inner: [0, 2]},
-        "etm": {rotation: [1, 0], outer: [1, 0], inner: [1, 0]}
-    }
-
-    function moveScale(amount, scalars) {
-      if (amount == 0) {
-        return 0; //TODO: ETM?
-      }
-      return scalars[0] + Math.abs(amount) * scalars[1];
+      return moveCount;
     }
 
     function countMove(move, metric, dimension) {
@@ -383,14 +502,23 @@ var alg = (function (){
       return moveScale(can.amount, scalars);
     }
 
-    function countMoves(algo, metric, dimension) {
-      var moves = algToMoves(algo); // TODO: multiple dispatch to avoid expanding algs
-      var moveCount = 0;
-      for (move in moves) {
-        moveCount += countMove(moves[move], metric, dimension);
-      }
-      return moveCount;
+    var moveCountScalars = {
+       "obtm": {rotation: [0, 0], outer: [1, 0], inner: [2, 0]},
+        "btm": {rotation: [0, 0], outer: [1, 0], inner: [1, 0]},
+      "obqtm": {rotation: [0, 0], outer: [0, 1], inner: [0, 2]},
+        "etm": {rotation: [1, 0], outer: [1, 0], inner: [1, 0]}
     }
+
+    function moveScale(amount, scalars) {
+      if (amount == 0) {
+        return 0; //TODO: ETM?
+      }
+      return scalars[0] + Math.abs(amount) * scalars[1];
+    }
+
+
+
+    /************************************************************************************************/
 
     // Exports
 
@@ -398,6 +526,7 @@ var alg = (function (){
       algToString: algToString,
       algSimplify: algSimplify,
       stringToAlg: stringToAlg,
+      makeAlgTransform: makeAlgTransform,
       invert: invert,
       mirrorAcrossM: mirrorAlg,
       canonicalizeMove: canonicalizeMove,
