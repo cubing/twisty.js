@@ -22,8 +22,8 @@
 "'"                    return "PRIME"
 "."                    return "PAUSE"
 
-"//"[^\n\r]*           /* ignore comment */
-"/*"[^]*?"*/"          /* ignore comment */
+"//"[^\n\r]*           return "COMMENT_SHORT"
+"/*"[^]*?"*/"          return "COMMENT_LONG"
 [\n\r]                 return "NEWLINE"
 
 "["                    return "OPEN_BRACKET"
@@ -63,6 +63,13 @@ AMOUNT
         {$$ = -$REPETITION;}
     | PRIME
         {$$ = -1;}
+    ;
+
+COMMENT
+    : COMMENT_SHORT
+        {$$ = {type: "comment_short", comment: $COMMENT_SHORT};}
+    | COMMENT_LONG
+        {$$ = {type: "comment_long", comment: $COMMENT_LONG};}
     ;
 
 BASE_WIDE
@@ -115,9 +122,10 @@ REPEATED
     | REPEATABLE AMOUNT
         {$REPEATABLE.amount = $AMOUNT; $$ = $REPEATABLE;}
     | PAUSE
-        {$$ = {type: "move", base: ".", amount: 1};}
+        {$$ = {type: "pause"};}
     | NEWLINE
-        {$$ = {type: "move", base: ".", amount: 1};}
+        {$$ = {type: "newline"};}
+    | COMMENT
     ;
 
 NESTED_ALG

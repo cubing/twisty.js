@@ -192,7 +192,7 @@ twisty.scene = function(options) {
 
   function renderOnce() {
     if (!control.animating) {
-      requestAnimFrame(render);
+      requestAnimationFrame(render);
     }
   }
 
@@ -652,7 +652,7 @@ twisty.scene = function(options) {
     fireListener("position", model.position);
 
     if (control.animating) {
-      requestAnimFrame(animFrame);
+      requestAnimationFrame(animFrame);
     }
   }
 
@@ -785,6 +785,10 @@ twisty.scene = function(options) {
 
   this.setIndex = function(idx) {
     this.setPosition(Math.floor(idx));
+  }
+
+  this.getMaxPosition = function(idx) {
+    return model.moveList.length;
   }
 
 
