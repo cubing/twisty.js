@@ -121,8 +121,8 @@ var alg = (function (){
       return "[" + algToString(commutator.A) + ", " + algToString(commutator.B) + "]";
     }
 
-    repeatableToString["conjugate"] = function(commutator) {
-      return "[" + algToString(commutator.A) + ", " + algToString(commutator.B) + "]";
+    repeatableToString["conjugate"] = function(conjugate) {
+      return "[" + algToString(conjugate.A) + ": " + algToString(conjugate.B) + "]";
     }
 
     repeatableToString["group"] = function(group) {
