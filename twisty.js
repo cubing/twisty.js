@@ -389,6 +389,14 @@ twisty.scene = function(options) {
     console.log(event);
     // console.log("[start] ", event.which, event.touches.length, event.changedTouches[0].identifier);
 
+    if (kind == "mouse") {
+      event.changedTouches = [{
+        "identifier": "mouse",
+        "pageX": event.x,
+        "pageY": event.y,
+      }]
+    }
+
     for (i = 0; i < event.changedTouches.length; i++) {
       var touch = event.changedTouches[i];
       var touchData = {};
@@ -409,7 +417,7 @@ twisty.scene = function(options) {
     renderOnce();
     event.preventDefault();
 
-    if ($.isEmptyObject(control.touchData) <= 1) { // Don't add a move listener more than once.
+    if ($.isEmptyObject(control.touchData) <= 1 || kind == "mouse") { // Don't add a move listener more than once.
       for (listener in listeners[kind]) {
         window.addEventListener(listener, listeners[kind][listener], false);
       }
@@ -441,6 +449,13 @@ twisty.scene = function(options) {
 
   function onMove(event) {
     var kind = eventKind(event);
+    if (kind == "mouse") {
+      event.touches = [{
+        "identifier": "mouse",
+        "pageX": event.x,
+        "pageY": event.y,
+      }]
+    }
     for (i = 0; i < event.touches.length; i++) {
       updateTouch(event.touches[i]);
     }
@@ -517,6 +532,13 @@ twisty.scene = function(options) {
   function onEnd(event) {
     var kind = eventKind(event);
 
+    if (kind == "mouse") {
+      event.changedTouches = [{
+        "identifier": "mouse",
+        "pageX": event.x,
+        "pageY": event.y,
+      }]
+    }
 
     for (i = 0; i < event.changedTouches.length; i++) {
       var touch = event.changedTouches[i];
@@ -529,7 +551,7 @@ twisty.scene = function(options) {
 
         // that.play.skip();
 
-        var move = alg.cube.stringToAlg(moveString);
+        var move = alg.cube.fromString(moveString);
         that.queueMoves(move);
         that.play.start();
         fireListener("moveStart", move[0]); // TODO: DRY this.
@@ -542,6 +564,12 @@ twisty.scene = function(options) {
       touchData.startSectorDiv.remove();
       touchData.endSectorDiv.remove()
       delete control.touchData[touch.identifier];
+    }
+
+    if (kind == "mouse") { // Don't add a move listener more than once.
+      for (listener in listeners[kind]) {
+        window.removeEventListener(listener, listeners[kind][listener], false);
+      }
     }
   }
 

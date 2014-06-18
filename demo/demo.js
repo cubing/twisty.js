@@ -145,8 +145,8 @@ $(document).ready(function() {
 
   twistyScene.addListener("moveAdvance", function() {
     if(cubeState != CubeState.scrambling) {
-      var simplifiedAlg = alg.cube.algSimplify(twistyScene.getMoveList());
-      var algString = alg.cube.algToString(simplifiedAlg);
+      var simplifiedAlg = alg.cube.simplify(twistyScene.getMoveList());
+      var algString = alg.cube.toString(simplifiedAlg);
       var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
       if (scrambleMoves.length > 0) {
         console.log(alg.cube.algToString(alg.cube.algSimplify(scrambleMoves)));
