@@ -187,7 +187,7 @@ twisty.scene = function(options) {
 
   function renderOnce() {
     if (!control.animating) {
-      requestAnimFrame(render);
+      requestAnimationFrame(render);
     }
   }
 
@@ -424,7 +424,7 @@ twisty.scene = function(options) {
     fireListener("position", model.position);
 
     if (control.animating) {
-      requestAnimFrame(animFrame);
+      requestAnimationFrame(animFrame);
     }
   }
 

@@ -209,7 +209,7 @@ hintTemplate.translateZ(-3);
 var cubieTemplate = new THREE.Object3D();
 
 var w = 1.8;
-var cubieGeometry = new THREE.CubeGeometry(w, w, w);
+var cubieGeometry = new THREE.BoxGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
 cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
 var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
@@ -218,7 +218,7 @@ cubieTemplate1.translateZ(-1);
 cubieTemplate.add(cubieTemplate1);
 
 var w = 1.9;
-var cubieGeometry = new THREE.CubeGeometry(w, w, w);
+var cubieGeometry = new THREE.BoxGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
 cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
 var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
