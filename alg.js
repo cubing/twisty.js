@@ -171,7 +171,6 @@ var alg = (function (){
         moves = moves.concat(invert[algIn[i].type](algIn[i]));
       }
       moves.reverse();
-      console.log("x", moves);
       return moves;
     };
 
@@ -180,7 +179,6 @@ var alg = (function (){
       if (move.base !== ".") {
         invertedMove.amount = -invertedMove.amount;
       }
-      console.log("x", invertedMove);
       return invertedMove;
     }
 
@@ -242,8 +240,6 @@ var alg = (function (){
       fn["sequence"] = function(algIn) {
         var moves = [];
         for (i in algIn) {
-          console.log(this);
-          console.log(algIn[i].type);
           moves = moves.concat(fn[algIn[i].type](algIn[i]));
         }
         return moves;
