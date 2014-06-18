@@ -72,7 +72,7 @@ COMMENT
         {$$ = {type: "comment_long", comment: $COMMENT_LONG};}
     ;
 
-SHOTCOMMENT
+BASE_WIDE
     : BASE_W
     | BASE_LOWERCASE
     ;
@@ -124,7 +124,7 @@ REPEATED
     | PAUSE
         {$$ = {type: "pause"};}
     | NEWLINE
-        {$$ = {type: "spacing", string: $NEWLINE};}
+        {$$ = {type: "newline"};}
     | COMMENT
     ;
 

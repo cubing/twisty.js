@@ -64,7 +64,7 @@ var alg = (function (){
       conjugate:     {repeatable: true },
       group:         {repeatable: true },
       pause:         {repeatable: false},
-      spacing:       {repeatable: false},
+      newline:       {repeatable: false},
       comment_short: {repeatable: false},
       comment_long:  {repeatable: false},
       timestamp:     {repeatable: false}
@@ -131,8 +131,17 @@ var alg = (function (){
           moveString += suffix(alg[i]);
         }
         moveStrings.push(moveString);
+
+        var lastMove = (i == alg.length - 1);
+        var afterNewline = (alg[i].type === "newline");
+        var beforeNewline = ((i + 1) in alg && alg[i + 1].type === "newline");
+        var betweenPauses = ((i + 1) in alg && alg[i].type === "pause" && alg[i + 1].type === "pause");
+
+        if (!lastMove && !afterNewline && !beforeNewline && !betweenPauses) {
+          moveStrings.push(" ");
+        }
       }
-      return moveStrings.join(" ");
+      return moveStrings.join("");
     }
 
     toString.move = function(move) {
@@ -187,8 +196,8 @@ var alg = (function (){
       return ".";
     }
 
-    toString.spacing = function(spacing) {
-      return spacing.string;
+    toString.newline = function(newline) {
+      return "\n";
     }
 
 
@@ -250,7 +259,7 @@ var alg = (function (){
       var id = function(x) {return x;};
 
       fn.pause = id;
-      fn.spacing = id;
+      fn.newline = id;
       fn.comment_short = id;
       fn.comment_long = id;
       fn.timestamp = id;
@@ -384,7 +393,7 @@ var alg = (function (){
     var emptySequence = function(timestamp) {return [];}
 
     toMoves.pause = emptySequence;
-    toMoves.spacing = emptySequence;
+    toMoves.newline = emptySequence;
     toMoves.comment_short = emptySequence;
     toMoves.comment_long = emptySequence;
     toMoves.timestamp = emptySequence;
@@ -398,10 +407,29 @@ var alg = (function (){
     var invert = makeAlgTransform();
 
     invert.sequence = function(sequence) {
-      var moves = invert["_sequence"](sequence);
-      moves.reverse();
-      return moves;
-
+      var currentLine;
+      var lines = [currentLine = []];
+      for (var i = 0; i < sequence.length; i++) {
+        if (sequence[i].type == "newline") {
+          lines.push(currentLine = []);
+        }
+        else {
+          currentLine.push(invert[sequence[i].type](sequence[i]));
+        }
+      }
+      var out = [];
+      for (var i = lines.length - 1; i >= 0; i--) {
+        lines[i].reverse()
+        if (lines[i][0].type == "comment_short") {
+          var comment = lines[i].splice(0, 1)[0];
+          lines[i].push(comment);
+        }
+        if (i > 0) {
+          lines[i].push({type: "newline"});
+        }
+        out = out.concat(lines[i]);
+      }
+      return out;
     }
 
     invert.move = function(move) {
