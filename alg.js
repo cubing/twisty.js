@@ -164,14 +164,54 @@ var alg = (function (){
       return newMove;
     }
 
-    function invert(algIn) {
-      var algInverse = [];
+
+    var invert = function(algIn) {
+      var moves = [];
       for (i in algIn) {
-        var move = cloneMove(algIn[i]);
-        move.amount *= -1;
-        algInverse.push(move);
+        moves = moves.concat(invert[algIn[i].type](algIn[i]));
       }
-      return algInverse.reverse();
+      moves.reverse();
+      console.log("x", moves);
+      return moves;
+    };
+
+    invert["move"] = function(move) {
+      var invertedMove = cloneMove(move);
+      if (move.base !== ".") {
+        invertedMove.amount = -invertedMove.amount;
+      }
+      console.log("x", invertedMove);
+      return invertedMove;
+    }
+
+    invert["commutator"] = function(commutator) {
+      return {
+        "type": "commutator",
+        "A": commutator.B,
+        "B": commutator.A,
+        "amount": commutator.amount
+      };
+    }
+
+    invert["conjugate"] = function(conjugate) {
+      return {
+        "type": "conjugate",
+        "A": conjugate.A,
+        "B": invert(conjugate.B),
+        "amount": conjugate.amount
+      };
+    }
+
+    invert["group"] = function(group) {
+      return {
+        "type": "group",
+        "A": invert(group.A),
+        "amount": group.amount
+      };
+    }
+
+    invert["timestamp"] = function(group) {
+      return [];
     }
 
     function repeatMoves(movesIn, accordingTo) {
