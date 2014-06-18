@@ -544,6 +544,10 @@ twisty.scene = function(options) {
     this.setPosition(Math.floor(idx));
   }
 
+  this.getMaxPosition = function(idx) {
+    return model.moveList.length;
+  }
+
 
   /******** Getters/setters ********/
 
