@@ -449,30 +449,58 @@ var alg = (function (){
 
 
 
-    var mirrorSlicesAcrossM = {
-      "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
-      "F": "F", "Fw": "Fw", "f": "f", "S": "S", "z": "z",
-      "R": "L", "Rw": "Lw", "r": "l", "N": "N", "x": "x",
-      "B": "B", "Bw": "Bw", "b": "b",
-      "L": "R", "Lw": "Rw", "l": "r", "M": "M",
-      "D": "D", "Dw": "Dw", "d": "d", "E": "E",
-      ".": "."
+    var mirrorM = {
+      fixed: ["x", "M", "N"],
+      sliceMap: {
+        "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
+        "F": "F", "Fw": "Fw", "f": "f", "S": "S", "z": "z",
+        "R": "L", "Rw": "Lw", "r": "l", "N": "N", "x": "x",
+        "B": "B", "Bw": "Bw", "b": "b",
+        "L": "R", "Lw": "Rw", "l": "r", "M": "M",
+        "D": "D", "Dw": "Dw", "d": "d", "E": "E"
+      }
+    };
+
+
+    var mirrorS = {
+      fixed: ["z", "S"],
+      sliceMap: {
+        "U": "U", "Uw": "Uw", "u": "u",           "y": "y",
+        "F": "B", "Fw": "Bw", "f": "b", "S": "S", "z": "z",
+        "R": "R", "Rw": "Rw", "r": "r", "N": "N", "x": "x",
+        "B": "F", "Fw": "Fw", "b": "f",
+        "L": "L", "Lw": "Lw", "l": "l", "M": "M",
+        "D": "D", "Dw": "Dw", "d": "d", "E": "E"
+      }
     };
 
 
     /****************************************************************/
 
 
-    var mirrorAlg = makeAlgTransform();
+    var mirrorAcrossM = makeAlgTransform();
 
-    mirrorAlg.move = function(move) {
+    mirrorAcrossM.move = function(move) {
       var mirroredMove = cloneMove(move);
-      if (["x", "M", "N", "."].indexOf(mirroredMove.base) === -1) {
-        mirroredMove.base = mirrorSlicesAcrossM[mirroredMove.base];
+      if (mirrorM.fixed.indexOf(mirroredMove.base) === -1) {
+        mirroredMove.base = mirrorM.sliceMap[mirroredMove.base];
         mirroredMove.amount = -mirroredMove.amount;
       }
       return mirroredMove;
     }
+
+
+    var mirrorAcrossS = makeAlgTransform();
+
+    mirrorAcrossS.move = function(move) {
+      var mirroredMove = cloneMove(move);
+      if (mirrorS.fixed.indexOf(mirroredMove.base) === -1) {
+        mirroredMove.base = mirrorS.sliceMap[mirroredMove.base];
+        mirroredMove.amount = -mirroredMove.amount;
+      }
+      return mirroredMove;
+    }
+
 
 
 
@@ -538,7 +566,8 @@ var alg = (function (){
       fromString: fromString,
       makeAlgTransform: makeAlgTransform,
       invert: invert,
-      mirrorAcrossM: mirrorAlg,
+      mirrorAcrossM: mirrorAcrossM,
+      mirrorAcrossS: mirrorAcrossS,
       canonicalizeMove: canonicalizeMove,
       toMoves: toMoves,
       expand: expand,
