@@ -420,7 +420,7 @@ var alg = (function (){
       var out = [];
       for (var i = lines.length - 1; i >= 0; i--) {
         lines[i].reverse()
-        if (lines[i][0].type == "comment_short") {
+        if (lines[i].length > 0 && lines[i][0].type == "comment_short") {
           var comment = lines[i].splice(0, 1)[0];
           lines[i].push(comment);
         }
