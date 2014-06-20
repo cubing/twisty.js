@@ -392,7 +392,15 @@ var alg = (function (){
 
     var emptySequence = function(timestamp) {return [];}
 
-    toMoves.pause = emptySequence;
+    // TODO: Allow handling semantic data in addition to pure moves during animation.
+    toMoves.pause = function(pause) {
+      return {
+        "type": "move",
+        "base": ".",
+        "amount": 1,
+        "location": pause.location
+      };
+    };
     toMoves.newline = emptySequence;
     toMoves.comment_short = emptySequence;
     toMoves.comment_long = emptySequence;
@@ -414,6 +422,7 @@ var alg = (function (){
           lines.push(currentLine = []);
         }
         else {
+          console.log(sequence[i])
           currentLine.push(invert[sequence[i].type](sequence[i]));
         }
       }
