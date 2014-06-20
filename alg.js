@@ -205,53 +205,76 @@ var alg = (function (){
     /************************************************************************************************/
 
 
+
+    // From twisty.js.
+    function getOptions(input, defaults) {
+      var output = {};
+      for (var key in defaults) {
+        output[key] = (key in input) ? input[key] : defaults[key];
+      }
+      return output;
+    }
+
+
+    /****************************************************************/
+
+
     // Dispatch mechanism constructor.
-    function makeAlgTransform() {
+    function makeAlgTraversal(options) {
 
-      var fn = function(alg) {
+      options = getOptions(options || {}, {
+        outputIsAlg: true,
+        inputValidator: function(){return true;}
+      });
+
+      var fn = function(alg, data) {
         var stringInput = (typeof alg === "string");
-
         if (stringInput) {alg = fromString(alg);}
-        var output = fn.sequence(alg);
-        if (stringInput) {output = toString(output);}
+
+        if (!options.inputValidator(alg, data)) {
+          throw "Validation failed."
+        }
+
+        var output = fn.sequence(alg, data);
+        if (stringInput && options.outputIsAlg) {output = toString(output);}
 
         return output;
       }
 
-      fn.sequence = function(algIn) {
+      fn.sequence = function(algIn, data) {
         var moves = [];
         for (var i = 0; i < algIn.length; i++) {
-          moves = moves.concat(fn[algIn[i].type](algIn[i]));
+          moves = moves.concat(fn[algIn[i].type](algIn[i], data));
         }
         return moves;
       };
 
-      fn.move = function(move) {
+      fn.move = function(move, data) {
         return move;
       }
 
-      fn.commutator = function(commutator) {
+      fn.commutator = function(commutator, data) {
         return {
           "type": "commutator",
-          "A": fn(commutator.A),
-          "B": fn(commutator.B),
+          "A": fn(commutator.A, data),
+          "B": fn(commutator.B, data),
           "amount": commutator.amount
         };
       }
 
-      fn.conjugate = function(conjugate) {
+      fn.conjugate = function(conjugate, data) {
         return {
           "type": "conjugate",
-          "A": fn(conjugate.A),
-          "B": fn(conjugate.B),
+          "A": fn(conjugate.A, data),
+          "B": fn(conjugate.B, data),
           "amount": conjugate.amount
         };
       }
 
-      fn.group = function(group) {
+      fn.group = function(group, data) {
         return {
           "type": "group",
-          "A": fn(group.A),
+          "A": fn(group.A, data),
           "amount": group.amount
         };
       }
@@ -291,7 +314,7 @@ var alg = (function (){
     /****************************************************************/
 
 
-    var simplify = makeAlgTransform();
+    var simplify = makeAlgTraversal();
 
     simplify.sequence = function(sequence) {
       var algOut = [];
@@ -353,7 +376,7 @@ var alg = (function (){
     /****************************************************************/
 
 
-    var expand = makeAlgTransform();
+    var expand = makeAlgTraversal();
 
     expand.commutator = function(commutator) {
       var once = [].concat(
@@ -384,7 +407,7 @@ var alg = (function (){
 
 
 
-    var toMoves = makeAlgTransform();
+    var toMoves = makeAlgTraversal();
 
     toMoves.commutator = expand.commutator;
     toMoves.conjugate = expand.conjugate;
@@ -412,7 +435,7 @@ var alg = (function (){
 
 
 
-    var invert = makeAlgTransform();
+    var invert = makeAlgTraversal();
 
     invert.sequence = function(sequence) {
       var currentLine;
@@ -422,7 +445,6 @@ var alg = (function (){
           lines.push(currentLine = []);
         }
         else {
-          console.log(sequence[i])
           currentLine.push(invert[sequence[i].type](sequence[i]));
         }
       }
@@ -515,7 +537,7 @@ var alg = (function (){
     /****************************************************************/
 
 
-    var mirrorAcrossM = makeAlgTransform();
+    var mirrorAcrossM = makeAlgTraversal();
 
     mirrorAcrossM.move = function(move) {
       var mirroredMove = cloneMove(move);
@@ -527,7 +549,7 @@ var alg = (function (){
     }
 
 
-    var mirrorAcrossS = makeAlgTransform();
+    var mirrorAcrossS = makeAlgTraversal();
 
     mirrorAcrossS.move = function(move) {
       var mirroredMove = cloneMove(move);
@@ -545,37 +567,6 @@ var alg = (function (){
 
     // Metrics
 
-    function countMoves(algo, metric, dimension) {
-      var moves = toMoves(algo); // TODO: multiple dispatch to avoid expanding algs
-      var moveCount = 0;
-      for (move in moves) {
-        moveCount += countMove(moves[move], metric, dimension);
-      }
-      return moveCount;
-    }
-
-    function countMove(move, metric, dimension) {
-      // Assumes `move` is a valid move.
-      var can = canonicalizeMove(move, dimension);
-
-      var mKind = moveKind(can.base);
-      if (mKind === "pause") {
-        return 0;
-      }
-
-      var scalarKind;
-      if (can.startLayer === 1 && can.endLayer === dimension) {
-        scalarKind = "rotation";
-      } else if (can.startLayer === 1 || can.endLayer === dimension) {
-        scalarKind = "outer";
-      } else if (1 < can.startLayer && can.startLayer <= can.endLayer && can.endLayer < dimension) {
-        scalarKind = "inner";
-      } else {
-        throw "Unkown move.";
-      }
-      var scalars = moveCountScalars[metric][scalarKind];
-      return moveScale(can.amount, scalars);
-    }
 
     var moveCountScalars = {
        "obtm": {rotation: [0, 0], outer: [1, 0], inner: [2, 0]},
@@ -591,6 +582,93 @@ var alg = (function (){
       return scalars[0] + Math.abs(amount) * scalars[1];
     }
 
+    var add = function(a, b) {
+      return a + b;
+    };
+
+    var arraySum = function(arr) {
+      return arr.reduce(add, 0);
+    }
+
+
+    function countMovesValidator(alg, data) {
+      if (!data.metric) {
+        console.error("No metric given. Valid options: " + Object.keys(moveCountScalars).join(", "));
+        return false;
+      }
+      if (!(data.metric in moveCountScalars)) {
+        console.error("Invalid metric. Valid options: " + Object.keys(moveCountScalars).join(", "));
+        return false;
+      }
+      if (!data.dimension) {
+        console.error("No dimension given.");
+        return false;
+      }
+      return true;
+    }
+
+
+
+    /****************************************************************/
+
+
+
+    // Example: alg.cube.countMoves("R", {metric: "obtm", dimension: 3})
+    // TODO: Default to obtm and 3x3x3.
+    // TODO: Dimension independence?
+
+    var countMoves = makeAlgTraversal({
+      outputIsAlg: false,
+      inputValidator: countMovesValidator
+    });
+
+    countMoves.sequence = function(move, data) {
+      var counts = countMoves._sequence(move, data);
+      return arraySum(counts);
+    }
+
+    countMoves.move = function(move, data) {
+      var can = canonicalizeMove(move, data.dimension);
+
+      var scalarKind;
+      if (can.startLayer === 1 && can.endLayer === data.dimension) {
+        scalarKind = "rotation";
+      } else if (can.startLayer === 1 || can.endLayer === data.dimension) {
+        scalarKind = "outer";
+      } else if (1 < can.startLayer && can.startLayer <= can.endLayer && can.endLayer < data.dimension) {
+        scalarKind = "inner";
+      } else {
+        throw "Unkown move.";
+      }
+      var scalars = moveCountScalars[data.metric][scalarKind];
+      return moveScale(can.amount, scalars);
+    }
+
+    countMoves.commutator = function(commutator, data) {
+      // TODO: map/reduce framework for structural recursion?
+      var counts = countMoves._commutator(commutator, data);
+      return (counts.A * 2 + counts.B * 2) * Math.abs(counts.amount);
+    }
+
+    countMoves.conjugate = function(conjugate, data) {
+      var counts = countMoves._conjugate(conjugate, data);
+      return (counts.A * 2 + counts.B * 1) * Math.abs(counts.amount);
+    }
+
+    countMoves.group = function(group, data) {
+      var counts = countMoves._group(group, data);
+      return (counts.A) * Math.abs(counts.amount);
+    }
+
+    var zero = function(group, data) {
+      return 0;
+    }
+
+    countMoves.pause = zero;
+    countMoves.newline = zero;
+    countMoves.comment_short = zero;
+    countMoves.comment_long = zero;
+    countMoves.timestamp = zero;
 
 
     /************************************************************************************************/
@@ -601,7 +679,7 @@ var alg = (function (){
       toString: toString,
       simplify: simplify,
       fromString: fromString,
-      makeAlgTransform: makeAlgTransform,
+      makeAlgTraversal: makeAlgTraversal,
       invert: invert,
       mirrorAcrossM: mirrorAcrossM,
       mirrorAcrossS: mirrorAcrossS,
