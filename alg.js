@@ -11,13 +11,21 @@ var alg = (function (){
     pause: /^\.$/
   };
 
-  function moveKind(moveString) {
-    for (s in patterns) {
-      if (patterns[s].test(moveString)) {
-        return s;
+  // function moveKind(moveString) {
+  //   for (s in patterns) {
+  //     if (patterns[s].test(moveString)) {
+  //       return s;
+  //     }
+  //   }
+  //   return "UNKNOWN";
+  // }
+
+  function moveKind(move) {
+    for (i in patterns) {
+      if (patterns[i].test(move.base)) {
+        return i;
       }
     }
-    return "UNKNOWN";
   }
 
   var directionMap = {
@@ -36,16 +44,18 @@ var alg = (function (){
     move.amount = orig.amount;
     move.base = directionMap[orig.base];
 
-    if (patterns.single.test(orig.base)) {
+    var mKind = moveKind(orig);
+
+    if (mKind == "single") {
       move.startLayer = orig.layer || 1;
       move.endLayer = move.startLayer;
-    } else if (patterns.wide.test(orig.base)) {
+    } else if (mKind == "wide") {
       move.startLayer = orig.startLayer || 1;
       move.endLayer = orig.endLayer || 2;
-    } else if (patterns.slice.test(orig.base)) {
+    } else if (mKind == "slice") {
       move.startLayer = 2;
       move.endLayer = dimension - 1;
-    } else if (patterns.rotation.test(orig.base)) {
+    } else if (mKind == "rotation") {
       move.startLayer = 1;
       move.endLayer = dimension;
     }
@@ -600,10 +610,6 @@ var alg = (function (){
         console.error("Invalid metric. Valid options: " + Object.keys(moveCountScalars).join(", "));
         return false;
       }
-      if (!data.dimension) {
-        console.error("No dimension given.");
-        return false;
-      }
       return true;
     }
 
@@ -613,7 +619,7 @@ var alg = (function (){
 
 
 
-    // Example: alg.cube.countMoves("R", {metric: "obtm", dimension: 3})
+    // Example: alg.cube.countMoves("R", {metric: "obtm"})
     // TODO: Default to obtm and 3x3x3.
     // TODO: Dimension independence?
 
@@ -628,17 +634,17 @@ var alg = (function (){
     }
 
     countMoves.move = function(move, data) {
-      var can = canonicalizeMove(move, data.dimension);
+      // TODO: Get layer info without dummy number.
+      var can = canonicalizeMove(move, 10000);
 
       var scalarKind;
-      if (can.startLayer === 1 && can.endLayer === data.dimension) {
+      var mKind = moveKind(move);
+      if (mKind == "rotation") {
         scalarKind = "rotation";
-      } else if (can.startLayer === 1 || can.endLayer === data.dimension) {
+      } else if (can.startLayer === 1) {
         scalarKind = "outer";
-      } else if (1 < can.startLayer && can.startLayer <= can.endLayer && can.endLayer < data.dimension) {
+      } else if (can.startLayer > 1) {
         scalarKind = "inner";
-      } else {
-        throw "Unkown move.";
       }
       var scalars = moveCountScalars[data.metric][scalarKind];
       return moveScale(can.amount, scalars);
