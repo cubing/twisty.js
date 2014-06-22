@@ -434,7 +434,7 @@ var alg = (function (){
         "location": pause.location
       };
     };
-    toMoves.newline = emptySequence;
+    toMoves.newline = toMoves.pause;
     toMoves.comment_short = emptySequence;
     toMoves.comment_long = emptySequence;
     toMoves.timestamp = emptySequence;
