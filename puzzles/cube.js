@@ -484,7 +484,7 @@ for (var i = 0; i < numSides; i++) {
 
     var keyCode = e.keyCode;
     if (keyCode in cubeKeyMapping) {
-      var move = alg.cube.stringToAlg(cubeKeyMapping[keyCode])[0];
+      var move = alg.cube.fromString(cubeKeyMapping[keyCode])[0];
       twistyScene.queueMoves(move);
       twistyScene.play.start();
 
@@ -504,8 +504,8 @@ for (var i = 0; i < numSides; i++) {
     }
   }
   function areMatricesEqual(m1, m2) {
-    var flatM1 = m1.flattenToArray(new Array(16));
-    var flatM2 = m2.flattenToArray(new Array(16));
+    var flatM1 = m1.flattenToArrayOffset(new Array(16), 0);
+    var flatM2 = m2.flattenToArrayOffset(new Array(16), 0);
     for (var i = 0; i < flatM1.length; i++) {
       if(flatM1[i] != flatM2[i]) {
         return false;

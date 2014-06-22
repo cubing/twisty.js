@@ -67,19 +67,19 @@ function refreshTimer() {
 var pendingTimerRefresh = null;
 function startRefreshTimerLoop() {
   if(pendingTimerRefresh == null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    pendingTimerRefresh = requestAnimationFrame(refreshTimerLoop, $('#timer')[0]);
   }
 }
 function stopRefreshTimerLoop() {
   if(pendingTimerRefresh != null) {
-    cancelRequestAnimFrame(pendingTimerRefresh);
+    cancelRequestAnimationFrame(pendingTimerRefresh);
     pendingTimerRefresh = null;
   }
 }
 function refreshTimerLoop() {
   refreshTimer();
   if(pendingTimerRefresh != null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    pendingTimerRefresh = requestAnimationFrame(refreshTimerLoop, $('#timer')[0]);
   }
 }
 
@@ -142,7 +142,7 @@ $(document).ready(function() {
   });
 
   $("#lucasparity").bind("click", function() {
-    var lucasparity = alg.cube.stringToAlg("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
+    var lucasparity = alg.cube.fromString("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
     twistyScene.queueMoves(lucasparity);
     twistyScene.play.start();
   });
@@ -162,21 +162,21 @@ $(document).ready(function() {
 
   $("#alg_superflip").bind("click", function() {
     var once = "M' U' M' U' M' U' M' U' x y ";
-    var superflip = alg.cube.stringToAlg(once + once + once);
+    var superflip = alg.cube.fromString(once + once + once);
     twistyScene.queueMoves(superflip);
     twistyScene.play.start();
   });
 
   $("#parsed_alg1").bind("click", function() {
-    var algo = alg.cube.stringToAlg($("#parse_alg").val());
+    var algo = alg.cube.fromString($("#parse_alg").val());
     var moves = alg.cube.algToMoves(algo);
     twistyScene.queueMoves(moves);
     twistyScene.play.start();
   });
 
   $("#parsed_alg2").bind("click", function() {
-    var init = alg.cube.stringToAlg($("#init").val());
-    var algo = alg.cube.stringToAlg($("#parse_alg").val());
+    var init = alg.cube.fromString($("#init").val());
+    var algo = alg.cube.fromString($("#parse_alg").val());
     var type = $("#solve").is(':checked') ? "solve" : "gen";
 
     init = alg.cube.algToMoves(init);
