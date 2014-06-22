@@ -199,7 +199,12 @@ borderGeometry.vertices.push( new THREE.Vector3(-c, -c, 0) );
 var borderMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: cubeOptions.borderWidth, opacity: cubeOptions.opacity});
 var borderTemplate = new THREE.Line(borderGeometry, borderMaterial);
 
-var innerGeometry = new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth);
+// var innerGeometry = new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth);
+// var innerTemplate = new THREE.Mesh(innerGeometry);
+// innerTemplate.translateZ(0.05);
+
+
+var innerGeometry = new THREE.BoxGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth, 0.05);
 var innerTemplate = new THREE.Mesh(innerGeometry);
 
 var hintGeometry = innerGeometry.clone();
@@ -209,21 +214,21 @@ hintTemplate.translateZ(-3);
 
 var cubieTemplate = new THREE.Object3D();
 
-var w = 1.8;
+var w = 2;
 var cubieGeometry = new THREE.BoxGeometry(w, w, w);
-var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
-cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
+var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0 });
+// cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
 var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
 cubieTemplate1.translateZ(-1);
 
 cubieTemplate.add(cubieTemplate1);
 
-var w = 1.9;
-var cubieGeometry = new THREE.BoxGeometry(w, w, w);
-var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
-cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
-var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
-cubieTemplate1.translateZ(-1);
+// var w = 2;
+// var cubieGeometry = new THREE.BoxGeometry(w, w, w);
+// var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
+// // cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
+// var cubieTemplate1 = new THREE.Mesh(cubieGeometry, cubieMaterial);
+// cubieTemplate1.translateZ(-1);
 
 cubieTemplate.add(cubieTemplate1);
 
