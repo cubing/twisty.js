@@ -74,8 +74,8 @@
 var alg_jison = (function(){
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"TOP_LEVEL_ALG":4,"EOF":5,"OPTIONAL_WHITESPACE":6,"LAYER":7,"NUMBER":8,"REPETITION":9,"AMOUNT":10,"PRIME":11,"COMMENT":12,"COMMENT_SHORT":13,"COMMENT_LONG":14,"BASE_WIDE":15,"BASE_W":16,"BASE_LOWERCASE":17,"BASE":18,"BASE_UPPERCASE":19,"BASE_ROTATION":20,"BASE_SLICE":21,"BLOCK":22,"DASH":23,"TIMESTAMP":24,"AT":25,"FLOAT":26,"SECONDS":27,"WHITESPACE":28,"REPEATABLE":29,"OPEN_BRACKET":30,"NESTED_ALG":31,"COMMA":32,"CLOSE_BRACKET":33,"COLON":34,"OPEN_PARENTHESIS":35,"CLOSE_PARENTHESIS":36,"REPEATED":37,"PAUSE":38,"NEWLINE":39,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",8:"NUMBER",11:"PRIME",13:"COMMENT_SHORT",14:"COMMENT_LONG",16:"BASE_W",17:"BASE_LOWERCASE",19:"BASE_UPPERCASE",20:"BASE_ROTATION",21:"BASE_SLICE",23:"DASH",25:"AT",26:"FLOAT",27:"SECONDS",28:"WHITESPACE",30:"OPEN_BRACKET",32:"COMMA",33:"CLOSE_BRACKET",34:"COLON",35:"OPEN_PARENTHESIS",36:"CLOSE_PARENTHESIS",38:"PAUSE",39:"NEWLINE"},
+symbols_: {"error":2,"expressions":3,"TOP_LEVEL_ALG":4,"END_OF_ALG":5,"OPTIONAL_WHITESPACE":6,"LAYER":7,"NUMBER":8,"REPETITION":9,"AMOUNT":10,"PRIME":11,"COMMENT":12,"COMMENT_SHORT":13,"COMMENT_LONG":14,"BASE_WIDE":15,"BASE_W":16,"BASE_LOWERCASE":17,"BASE":18,"BASE_UPPERCASE":19,"BASE_ROTATION":20,"BASE_SLICE":21,"BLOCK":22,"DASH":23,"TIMESTAMP":24,"@":25,"FLOAT":26,"SECONDS":27,"WHITESPACE":28,"REPEATABLE":29,"[":30,"NESTED_ALG":31,",":32,"]":33,":":34,"(":35,")":36,"REPEATED":37,"PAUSE":38,"NEWLINE":39,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"END_OF_ALG",8:"NUMBER",11:"PRIME",13:"COMMENT_SHORT",14:"COMMENT_LONG",16:"BASE_W",17:"BASE_LOWERCASE",19:"BASE_UPPERCASE",20:"BASE_ROTATION",21:"BASE_SLICE",23:"DASH",25:"@",26:"FLOAT",27:"SECONDS",28:"WHITESPACE",30:"[",32:",",33:"]",34:":",35:"(",36:")",38:"PAUSE",39:"NEWLINE"},
 productions_: [0,[3,2],[3,2],[7,1],[9,1],[10,1],[10,2],[10,1],[12,1],[12,1],[15,1],[15,1],[18,1],[18,1],[18,1],[18,1],[22,1],[22,2],[22,2],[22,4],[24,3],[6,1],[6,0],[6,2],[29,1],[29,5],[29,5],[29,3],[37,1],[37,2],[37,1],[37,1],[37,1],[31,3],[31,2],[4,1],[4,3],[4,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
@@ -631,19 +631,19 @@ case 14:return "COMMENT_LONG"
 break;
 case 15:return "NEWLINE"
 break;
-case 16:return "OPEN_BRACKET"
+case 16:return "["
 break;
-case 17:return "CLOSE_BRACKET"
+case 17:return "]"
 break;
-case 18:return "OPEN_PARENTHESIS"
+case 18:return "("
 break;
-case 19:return "CLOSE_PARENTHESIS"
+case 19:return ")"
 break;
-case 20:return "COMMA"
+case 20:return ","
 break;
-case 21:return "COLON"
+case 21:return ":"
 break;
-case 22:return "EOF"
+case 22:return "END_OF_ALG"
 break;
 case 23:return "INVALID"
 break;

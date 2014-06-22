@@ -5,7 +5,7 @@
 %%
 
 
-"@"                               { this.begin("timestamp"); return 'AT' }
+"@"                               { this.begin("timestamp"); return '@' }
 <timestamp>[0-9]+("."[0-9]+)?     return 'FLOAT'
 <timestamp>"s"                    { this.popState(); return 'SECONDS' }
 
@@ -26,14 +26,14 @@
 "/*"[^]*?"*/"          return "COMMENT_LONG"
 [\n\r]                 return "NEWLINE"
 
-"["                    return "OPEN_BRACKET"
-"]"                    return "CLOSE_BRACKET"
-"("                    return "OPEN_PARENTHESIS"
-")"                    return "CLOSE_PARENTHESIS"
-","                    return "COMMA"
-":"                    return "COLON"
+"["                    return "["
+"]"                    return "]"
+"("                    return "("
+")"                    return ")"
+","                    return ","
+":"                    return ":"
 
-<<EOF>>                return "EOF"
+<<EOF>>                return "END_OF_ALG"
 .                      return "INVALID"
 
 /lex
@@ -41,9 +41,9 @@
 %% /* language grammar */
 
 expressions
-    : TOP_LEVEL_ALG EOF
+    : TOP_LEVEL_ALG END_OF_ALG
         { return $TOP_LEVEL_ALG; }
-    | OPTIONAL_WHITESPACE EOF
+    | OPTIONAL_WHITESPACE END_OF_ALG
         { return []; }
     ;
 
@@ -96,7 +96,7 @@ BLOCK
     ;
 
 TIMESTAMP
-    : AT FLOAT SECONDS
+    : "@" FLOAT SECONDS
         {$$ = {type: "timestamp", time: parseFloat($2)};}
     ;
 
@@ -108,11 +108,11 @@ OPTIONAL_WHITESPACE
 
 REPEATABLE
     : BLOCK
-    | OPEN_BRACKET NESTED_ALG COMMA NESTED_ALG CLOSE_BRACKET
+    | "[" NESTED_ALG "," NESTED_ALG "]"
         {$$ = {"type": "commutator", "A": $2, "B": $4};}
-    | OPEN_BRACKET NESTED_ALG COLON NESTED_ALG CLOSE_BRACKET
+    | "[" NESTED_ALG ":" NESTED_ALG "]"
         {$$ = {"type": "conjugate", "A": $2, "B": $4};}
-    | OPEN_PARENTHESIS NESTED_ALG CLOSE_PARENTHESIS
+    | "(" NESTED_ALG ")"
         {$$ = {"type": "group", "A": $NESTED_ALG};}
     ;
 
