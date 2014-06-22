@@ -700,3 +700,5 @@ var alg = (function (){
     cube: cube
   }
 })();
+
+var c = alg.cube;
