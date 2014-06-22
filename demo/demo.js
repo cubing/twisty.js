@@ -67,19 +67,19 @@ function refreshTimer() {
 var pendingTimerRefresh = null;
 function startRefreshTimerLoop() {
   if(pendingTimerRefresh == null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    pendingTimerRefresh = requestAnimationFrame(refreshTimerLoop, $('#timer')[0]);
   }
 }
 function stopRefreshTimerLoop() {
   if(pendingTimerRefresh != null) {
-    cancelRequestAnimFrame(pendingTimerRefresh);
+    cancelRequestAnimationFrame(pendingTimerRefresh);
     pendingTimerRefresh = null;
   }
 }
 function refreshTimerLoop() {
   refreshTimer();
   if(pendingTimerRefresh != null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    pendingTimerRefresh = requestAnimationFrame(refreshTimerLoop, $('#timer')[0]);
   }
 }
 
@@ -149,8 +149,8 @@ $(document).ready(function() {
       var algString = alg.cube.toString(simplifiedAlg);
       var url = "http://alg.cubing.net/?alg=" + escape_alg(algString);
       if (scrambleMoves.length > 0) {
-        console.log(alg.cube.algToString(alg.cube.algSimplify(scrambleMoves)));
-        url += "&setup=" + encodeURIComponent(escape_alg(alg.cube.algToString(scrambleMoves)));
+        console.log(alg.cube.toString(alg.cube.simplify(scrambleMoves)));
+        url += "&setup=" + encodeURIComponent(escape_alg(alg.cube.toString(scrambleMoves)));
         if (stopTime !== null) {
           url += "&title=Solve:%20" + prettyTime(stopTime) + "%20seconds";
         }
@@ -181,7 +181,7 @@ $(document).ready(function() {
   });
 
   $("#lucasparity").bind("click", function() {
-    var lucasparity = alg.cube.stringToAlg("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
+    var lucasparity = alg.cube.fromString("r U2 x r U2 r U2 r' U2 L U2 r' U2 r U2 r' U2 r'");
     twistyScene.queueMoves(lucasparity);
     twistyScene.play.start();
   });
