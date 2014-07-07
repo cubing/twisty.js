@@ -209,7 +209,7 @@ hintTemplate.translateZ(-3);
 
 var cubieTemplate = new THREE.Object3D();
 
-var w = 1.8;
+var w = 2;
 var cubieGeometry = new THREE.BoxGeometry(w, w, w);
 var cubieMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 });
 cubieMaterial.side = THREE.BackSide; // Hack to get around z-fighting.
