@@ -107,7 +107,7 @@ twisty.scene = function(options) {
 
 
   var iniDefaults = {
-    speed: 1, // qtps is 3*speed
+    speed: 1, // qtps is 1.5*speed
     renderer: THREE.CanvasRenderer,
     allowDragging: true,
     stats: false
@@ -399,7 +399,7 @@ twisty.scene = function(options) {
       var prevPosition = model.position;
 
       model.time = Date.now();
-      model.position = prevPosition + (model.time - prevTime) * control.speed * 3 / 1000;
+      model.position = prevPosition + (model.time - prevTime) * control.speed * 1.5 / 1000;
 
       if (Math.floor(model.position) > Math.floor(prevPosition)) {
         // If we finished a move, snap to the beginning of the next. (Will never skip a move.)
