@@ -1,5 +1,7 @@
 var aaa, bbb;
 
+
+
 /*
  * model.twisty.js
  *
@@ -38,6 +40,13 @@ var twisty = {};
  */
 
 twisty.puzzles = {};
+
+
+// TODO: Find a better way to expose this for multiple twisties on a page.
+twisty.cachedRenderer = {}
+twisty.cachedRenderer[THREE.CanvasRenderer] = null;
+twisty.cachedRenderer[THREE.WebGLRenderer] = null;
+twisty.cachedRenderer[THREE.SVGRenderer] = null;
 
 twisty.scene = function(options) {
 
@@ -99,7 +108,8 @@ twisty.scene = function(options) {
     stats: null,
     model: model,
     view: view,
-    control: control
+    control: control,
+    cachedRenderer: false
   }
 
 
@@ -110,11 +120,13 @@ twisty.scene = function(options) {
     speed: 1, // qtps is 1.5*speed
     renderer: THREE.CanvasRenderer,
     allowDragging: true,
-    stats: false
+    stats: false,
+    cachedRenderer: false
   }
 
   function initialize(options) {
     options = getOptions(options, iniDefaults);
+    that.debug.cachedRenderer = options.cachedRenderer;
 
     view.initialize(options.renderer);
 
@@ -158,14 +170,24 @@ twisty.scene = function(options) {
     view.scene = new THREE.Scene();
     view.camera = new THREE.PerspectiveCamera( 30, 1, 0.001, 1000 );
 
-    view.renderer = new Renderer({
-      antialias: true,
-      alpha: true,
-      // TODO: We're using this so we can save pictures of WebGL canvases.
-      // Investigate if there's a significant performance penalty.
-      // Better yet, allow rendering to a CanvasRenderer view separately.
-      preserveDrawingBuffer: true
-    });
+
+
+    if (that.debug.cachedRenderer && twisty.cachedRenderer[Renderer]) {
+      view.renderer = twisty.cachedRenderer[Renderer]
+    }
+    else {
+      view.renderer = new Renderer({
+        antialias: true,
+        alpha: true,
+        // TODO: We're using this so we can save pictures of WebGL canvases.
+        // Investigate if there's a significant performance penalty.
+        // Better yet, allow rendering to a CanvasRenderer view separately.
+        preserveDrawingBuffer: true
+      });
+    }
+    if (that.debug.cachedRenderer) {
+      twisty.cachedRenderer[Renderer] = view.renderer;
+    }
 
     var canvas = view.renderer.domElement;
     $(canvas).css('position', 'absolute').css('top', 0).css('left', 0);
