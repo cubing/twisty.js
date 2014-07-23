@@ -1,5 +1,12 @@
-
-var alg = (function (){
+// Compatibility shim to work both in browers and node.js
+// Based on on https://gist.github.com/rpflorence/1198466
+(function (name, definition){
+  if (typeof module !== "undefined" && module.exports) { // Node.js
+    module.exports = definition(require("./alg/alg_jison"));
+  } else { // Browser
+    window[name] = definition(alg_jison);
+  }
+})("alg", function (alg_jison) {
 
   var debug = false;
 
@@ -699,6 +706,7 @@ var alg = (function (){
   return {
     cube: cube
   }
-})();
 
-var c = alg.cube;
+});
+
+// var c = alg.cube;
