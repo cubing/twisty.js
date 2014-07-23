@@ -1,0 +1,3 @@
+[submodule "alg"]
+	path = alg
+	url = https://github.com/cubing/alg.js
