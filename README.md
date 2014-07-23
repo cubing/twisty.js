@@ -1,7 +1,7 @@
 # twisty.js
 
 A javascript library for twistypuzzles.  
-Developed in conjunction with [`alg.cubing.net`](https://github.com/cubing/alg.cubing.net).
+Developed in conjunction with [`alg.js`](https://github.com/cubing/alg.js) and [`alg.cubing.net`](https://github.com/cubing/alg.cubing.net).
 
 Started by [Lucas Garron](https://www.garron.net/), July 2011. Includes work from [Jeremy Fleischman](https://github.com/jfly).
 
