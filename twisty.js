@@ -314,8 +314,11 @@ twisty.scene = function(options) {
   }
 
   function onWheel(event) {
-    var deltaX = -event.wheelDeltaX/CONSTANTS.SCROLL_RESISTANCE_X;
-    var deltaY = event.wheelDeltaY/CONSTANTS.SCROLL_RESISTANCE_Y;
+
+    var deltaX = -("wheelDeltaX" in event ? event.wheelDeltaX : -event.deltaX)/CONSTANTS.SCROLL_RESISTANCE_X;
+    var deltaY = ("wheelDeltaY" in event ? event.wheelDeltaY : -event.deltaY)/CONSTANTS.SCROLL_RESISTANCE_Y;
+
+    console.log()
 
     moveCameraDelta(deltaX, deltaY);
 
