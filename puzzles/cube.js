@@ -137,6 +137,16 @@ twisty.puzzles.cube = function(twistyScene, twistyParameters) {
     [0,0,0,12,12,12,12,12,12],
     [13,13,6,13,13,13,13,13,13]
   ];
+  stageStickers.void = [
+    [1,1,1,1,0,1,1,1,1],
+    [2,2,2,2,0,2,2,2,2],
+    [3,3,3,3,0,3,3,3,3],
+    [4,4,4,4,0,4,4,4,4],
+    [5,5,5,5,0,5,5,5,5],
+    [6,6,6,6,0,6,6,6,6]
+  ];
+
+  var isVoidCube = cubeOptions.stage == "void";
 
   var stickers = stageStickers.full;
   if (cubeOptions.stage in stageStickers) {
@@ -262,6 +272,13 @@ for (var i = 0; i < numSides; i++) {
 
   for (var su = 0; su < cubeOptions.dimension; su++) {
     for (var sv = 0; sv < cubeOptions.dimension; sv++) {
+
+      if (isVoidCube &&
+          (0 < su && su < cubeOptions.dimension - 1) &&
+          (0 < sv && sv < cubeOptions.dimension - 1)
+        ) {
+        continue;
+      }
 
       var sticker = stickerTemplate.clone();
 
