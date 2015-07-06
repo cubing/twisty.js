@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<title>three.js css3d - periodic table</title>
+		<title>twisty.js reboot</title>
 		<style>
 			html, body {
 				height: 100%;
@@ -28,6 +28,7 @@
 				text-align: center;
 				cursor: default;
 				background: url(https://garron.net/photography/2560px/Berkeley%20Hills.jpg);
+				background-size: 200% 200%;
 			}
 
 			.element:hover {
@@ -56,29 +57,80 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 10000;
+				var dimension = 2;
+
+
+				var sides = function() {
+					var h = dimension / 2;
+
+					var x = new THREE.Vector3(h, 0, 0);
+					var y = new THREE.Vector3(h, 0, 0);
+					var z = new THREE.Vector3(h, 0, 0);
+
+					var x_ = new THREE.Vector3().negate(x);
+					var y_ = new THREE.Vector3().negate(y);
+					var z_ = new THREE.Vector3().negate(z);
+
+					var sides = {
+						U: {face: new THREE.Matrix4().lookAt(z , z_, y )},
+						L: {face: new THREE.Matrix4().lookAt(x_, x , z )},
+						F: {face: new THREE.Matrix4().lookAt(y_, y , z )},
+						R: {face: new THREE.Matrix4().lookAt(x , x_, z )},
+						B: {face: new THREE.Matrix4().lookAt(y , y_, z )},
+						D: {face: new THREE.Matrix4().lookAt(z_, z , y_)},
+					}
+
+					return sides;
+				}();
 
 				scene = new THREE.Scene();
 
-				// table
+				for (i in sides) {
+					var side = sides[i];
+
+					for (var i = 0; i < dimension; i++) {
+						for (var j = 0; j < dimension; j++) {
+							var element = document.createElement( 'div' );
+							element.className = "element"
+							element.style.backgroundPosition = "" + ((i) * 100) + "% " + ((j) * 100) + "%";
+							var object = new THREE.CSS3DObject(element);
+
+							object.matrixAutoUpdate = false;
 
 
 
-				for (var i = -15; i < 15; i++) {
-					for (var j = -15; j < 15; j++) {
-						var element = document.createElement( 'div' );
-						element.className = "element"
-						element.style.backgroundPosition = "" + ((i + 15 ) * 100) + "px " + ((j + 15 ) * 100) + "px";
-						var object = new THREE.CSS3DObject( element );
-						object.position.x = i * 120;
-						object.position.y = j * 120;
-						object.position.z = 0;
-						object.rotation.z = 0;
-						scene.add( object );
+var m1 = new THREE.Matrix4();
+m1.makeRotationY(Math.PI/2);
+
+var m2 = new THREE.Matrix4()
+m2.makeTranslation(i * 100, j * 100, 0);
+
+object.matrix.multiply( m1 );
+object.matrix.multiply( m2 );
+
+console.log(object.matrix);
+							// object.matrix.multiply(side.face);
+							// object.matrix.multiply(
+							// 	new THREE.Matrix4().set(
+							// 		1, 0, 0, 0,
+							// 		0, 1, 0, 0,
+							// 		0, 0, 1, 0,
+							// 		0, 0, 0, 1
+							// 	)
+							// );
+
+							// console.log(object.matrix);
+
+							scene.add(object);
+						}
 					}
 				}
 
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1000;
+
+				// table
 
 
 				renderer = new THREE.CSS3DRenderer();
