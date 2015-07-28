@@ -22,23 +22,32 @@
 				overflow: hidden;
 			}
 			.sticker {
+				background-clip: padding-box;
 				width: 100px;
 				height: 100px;
-				border: 5px solid black;
+				border: 5px solid rgba(0, 0, 0, 1);
 				text-align: center;
 				cursor: default;
 				background: blue; /*url(https://garron.net/photography/2560px/Berkeley%20Hills.jpg);*/
 				background-size: 200% 200%;
-				opacity: 0.5;
-				border-style:dotted;
+				/*opacity: 0.5;*/
+				/*border-style:dotted;*/
+				background-clip: padding-box;
+			}
+			.cubie {
+				width: 120px;
+				height: 120px;
+				background: black;
+				/*opacity: 0.5;*/
+				/*border-style:dotted;*/
 			}
 
-			.U { background: white; }
-			.L { background: orange; }
-			.F { background: green; }
-			.R { background: red; }
-			.B { background: blue; }
-			.D { background: yellow; }
+			.sticker.U { background: white; }
+			.sticker.L { background: orange; }
+			.sticker.F { background: green; }
+			.sticker.R { background: red; }
+			.sticker.B { background: blue; }
+			.sticker.D { background: yellow; }
 
 			.element:hover {
 				border: 1px solid black);
@@ -51,153 +60,9 @@
 		<script src="lib/TrackballControls.js"></script>
 		<script src="lib/CSS3DRenderer.js"></script>
 
-		<div id="container"></div>
+		<div id="container" style="width: 50%"></div>
 
-		<script>
-
-			var camera, scene, renderer;
-			var controls;
-
-			var objects = [];
-			var targets = { table: [], sphere: [], helix: [], grid: [] };
-
-			init();
-			animate();
-
-			function init() {
-
-				var dimension = 3;
-
-var scale = 120;
-				zoom = 600;
-
-				var sides = function() {
-					var h = dimension / 2;
-
-					var x = new THREE.Vector3(h, 0, 0);
-					var y = new THREE.Vector3(h, 0, 0);
-					var z = new THREE.Vector3(h, 0, 0);
-
-					var x_ = new THREE.Vector3().negate(x);
-					var y_ = new THREE.Vector3().negate(y);
-					var z_ = new THREE.Vector3().negate(z);
-
-					var sides = {
-						U: {face: new THREE.Matrix4().lookAt(z , z_, y )},
-						L: {face: new THREE.Matrix4().lookAt(x_, x , z )},
-						F: {face: new THREE.Matrix4().lookAt(y_, y , z )},
-						R: {face: new THREE.Matrix4().lookAt(x , x_, z )},
-						B: {face: new THREE.Matrix4().lookAt(y , y_, z )},
-						D: {face: new THREE.Matrix4().lookAt(z_, z , y_)},
-					}
-
-					return sides;
-				}();
-
-				scene = new THREE.Scene();
-
-				for (s in sides) {
-					var side = sides[s];
-
-					for (var i = 0; i < dimension; i++) {
-						for (var j = 0; j < dimension; j++) {
-							var element = document.createElement( 'div' );
-							element.classList.add("sticker", s);
-							element.style.backgroundPosition = "" + ((i) * 100) + "% " + ((j) * 100) + "%";
-							var object = new THREE.CSS3DObject(element);
-
-							object.matrixAutoUpdate = false;
-
-
-
-var m1 = new THREE.Matrix4();
-console.log(s);
-switch (s) {
-	case "U": m1.makeRotationX(-Math.PI/2); break;
-	case "L": m1.makeRotationY(-Math.PI/2); break;
-	case "F": m1.makeRotationZ(0); break;
-	case "R": m1.makeRotationY(Math.PI/2); break;
-	case "B": m1.makeRotationY(Math.PI); break;
-	case "D": m1.makeRotationX(Math.PI/2); break;
-}
-
-
-var m2 = new THREE.Matrix4()
-m2.makeTranslation((i + (1 - dimension)/2) * scale, (j + (1 - dimension)/2) * scale, dimension / 2 * scale);
-
-object.matrix.multiply( m1 );
-object.matrix.multiply( m2 );
-
-// console.log(object.matrix);
-							// object.matrix.multiply(side.face);
-							// object.matrix.multiply(
-							// 	new THREE.Matrix4().set(
-							// 		1, 0, 0, 0,
-							// 		0, 1, 0, 0,
-							// 		0, 0, 1, 0,
-							// 		0, 0, 0, 1
-							// 	)
-							// );
-
-							// console.log(object.matrix);
-
-							scene.add(object);
-						}
-					}
-				}
-
-
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = zoom;
-				camera.position.y = zoom;
-				camera.position.z = zoom;
-
-				// table
-
-
-				renderer = new THREE.CSS3DRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.position = 'absolute';
-				document.getElementById( 'container' ).appendChild( renderer.domElement );
-
-				//
-
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 6;
-				controls.minDistance = 500;
-				controls.maxDistance = 6000;
-				controls.addEventListener( 'change', render );
-
-				render()
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				controls.update();
-
-			}
-
-			function render() {
-
-				renderer.render( scene, camera );
-
-			}
+		<script src="Twisty.View.js"></script>
 
 		</script>
 	</body>
