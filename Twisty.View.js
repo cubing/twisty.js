@@ -25,6 +25,7 @@ function init() {
   scene = new THREE.Scene();
 
   console.log(sides);
+  var root = document.getElementById('container').createShadowRoot();
 
   for (s in sides) {
     var side = sides[s];
@@ -59,7 +60,7 @@ function init() {
 
   renderer = new THREE.CSS3DRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('container').appendChild(renderer.domElement);
+  root.appendChild(renderer.domElement);
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.rotateSpeed = 6;
