@@ -1,0 +1,59 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  /* Checkerboard */
+  background-color: #EAEAEA;
+  background-image: linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%, #DDD 75%, #DDD),
+    linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%, #DDD 75%, #DDD);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+
+  margin: 0;
+  font-family: Helvetica, sans-serif;;
+  overflow: hidden;
+
+  display: flex;
+  flex-flow: row  wrap;
+}
+.sticker {
+  background-clip: padding-box;
+  width: 100px;
+  height: 100px;
+  border: 5px solid rgba(0, 0, 0, 1);
+  text-align: center;
+  cursor: default;
+  background: url(wca-watermark.svg);
+  background-size: 200% 200%;
+  /*opacity: 0.5;*/
+  /*border-style:dotted;*/
+  background-clip: padding-box;
+}
+.cubie {
+  width: 120px;
+  height: 120px;
+  background: black;
+  /*opacity: 0.5;*/
+  /*border-style:dotted;*/
+}
+
+div.container {
+  margin: -1px;
+  padding: 0;
+  border: 1px solid black;
+  height: 50%;
+  width: 50%;
+}
+
+.sticker.U { background-color: white; }
+.sticker.L { background-color: orange; }
+.sticker.F { background-color: green;}
+.sticker.R { background-color: red; }
+.sticker.B { background-color: blue; }
+.sticker.D { background-color: yellow; }
+
+.element:hover {
+  border: 1px solid black);
+  background: green;
+}
