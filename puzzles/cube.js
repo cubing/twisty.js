@@ -19,10 +19,7 @@ twisty.puzzles.cube = function(twistyScene, twistyParameters) {
     return x * (2 - x); // Ease out.
   };
   easing.boingy_sproingy = function(x) {
-    // TODO: make this less jarring.
-    var y = x * x; // Ease in.
-    return 3 * (y * (2 - y) - (x / 1.5)); // Ease out.
-    return x;
+    return x*x*x*(10-x*(15+6*x));
   };
 
   //Defaults
