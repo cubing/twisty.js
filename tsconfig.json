@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "es6",
+    "declaration": true,
+    "outDir": "./build"
+  }
+}
