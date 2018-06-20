@@ -1,0 +1,11 @@
+{
+  "name": "twisty",
+  "version": "0.0.3",
+  "description": "Twisty puzzle simulation library. Stub; coming soon.",
+  "main": "twisty.ts",
+  "dependencies": {
+    "alg": "*"
+  },
+  "author": "Lucas Garron <code@garron.net> (https://garron.net/)",
+  "license": "MIT"
+}
