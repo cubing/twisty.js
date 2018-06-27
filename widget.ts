@@ -8,8 +8,8 @@ import {Puzzle} from "./puzzle"
 interface Document {
     mozCancelFullScreen: () => void;
     msExitFullscreen: () => void;
-    mozFullScreenElement: HTMLElement
-    msFullscreenElement: HTMLElement
+    mozFullScreenElement: HTMLElement;
+    msFullscreenElement: HTMLElement;
 }
 
 interface Element {
@@ -21,22 +21,22 @@ namespace FullscreenAPI {
   export function element() {
     return document.fullscreenElement ||
            document.webkitFullscreenElement ||
-           document.mozFullScreenElement ||
-           document.msFullscreenElement ||
+           (document as any).mozFullScreenElement ||
+           (document as any).msFullscreenElement ||
            document.webkitFullscreenElement;
   }
   export function request(element: HTMLElement) {
     var requestFullscreen = element.requestFullscreen ||
-                            element.mozRequestFullScreen ||
-                            element.msRequestFullscreen ||
-                            element.webkitRequestFullscreen;
+                            (element as any).mozRequestFullScreen ||
+                            (element as any).msRequestFullscreen ||
+                            (element as any).webkitRequestFullscreen;
     requestFullscreen.call(element);
   }
   export function exit() {
     var exitFullscreen = document.exitFullscreen ||
-                         document.mozCancelFullScreen ||
-                         document.msExitFullscreen ||
-                         document.webkitExitFullscreen;
+                         (document as any).mozCancelFullScreen ||
+                         (document as any).msExitFullscreen ||
+                         (document as any).webkitExitFullscreen;
     exitFullscreen.call(document);
   }
 }
