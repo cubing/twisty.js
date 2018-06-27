@@ -3,9 +3,6 @@ import {Puzzle} from "./puzzle"
 
 "use strict";
 
-namespace Twisty {
-export namespace Anim {
-
 export interface CursorObserver {
   animCursorChanged: (cursor: Cursor<Puzzle>) => void; // TODO cursor.position?
 }
@@ -227,7 +224,4 @@ class FrameScheduler {
     this.start();
     this.stop();
   }
-}
-
-}
 }

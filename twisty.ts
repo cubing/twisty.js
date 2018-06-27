@@ -1,13 +1,16 @@
-import {Alg} from "alg"
-import {Cursor} from "./cursor.ts"
+import * as Alg from "alg"
+import * as KPuzzle from "kpuzzle"
+
+import * as Anim from "./anim"
+import {Cursor} from "./cursor"
+import {Puzzle, State, KSolvePuzzle} from "./puzzle"
+import * as Widget from "./widget"
 
 "use strict";
 
-namespace Twisty {
-
 class TwistyParams {
    alg?: Alg.Algorithm;
-   puzzle?: KSolve.PuzzleDefinition;
+   puzzle?: KPuzzle.KPuzzleDefinition;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
@@ -15,10 +18,10 @@ export class Twisty {
   private alg: Alg.Algorithm;
   private anim: Anim.Model;
   private cursor: Cursor<Puzzle>;
-  private puzzleDef: KSolve.PuzzleDefinition; // TODO: Replace this with a Puzzle instance.
+  private puzzleDef: KPuzzle.KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
   constructor(public element: Element, config: TwistyParams = {}) {
-    this.alg = config.alg || Alg.Example.Niklas;
-    this.puzzleDef = config.puzzle || KSolve.Puzzles["333"];
+    this.alg = config.alg || Alg.Niklas;
+    this.puzzleDef = config.puzzle || KPuzzle.Puzzles["333"];
     this.cursor = new Cursor(this.alg, new KSolvePuzzle(this.puzzleDef));
     // this.timeline = new Timeline(Alg.Example.HeadlightSwaps);
     this.anim = new Anim.Model(this.cursor);
@@ -32,12 +35,12 @@ function paramsFromTwistyElem(elem: Element): TwistyParams {
 
   var puzzle = elem.getAttribute("puzzle");
   if (puzzle) {
-    params.puzzle = KSolve.Puzzles[puzzle];
+    params.puzzle = KPuzzle.Puzzles[puzzle];
   }
 
   var alg = elem.getAttribute("alg");
   if (alg) {
-    params.alg = Alg.Example.Niklas; // TODO: parse
+    params.alg = Alg.Niklas; // TODO: parse
   }
 
   return params;
@@ -63,5 +66,3 @@ function autoInitializePage() {
 }
 
 window.addEventListener("load", autoInitializePage);
-
-}

@@ -1,0 +1,3 @@
+.PHONY: js
+js:
+	tsc

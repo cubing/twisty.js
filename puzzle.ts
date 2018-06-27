@@ -1,3 +1,5 @@
+import * as KPuzzle from "kpuzzle"
+
 export type MoveName = string
 
 export interface MoveProgress {
@@ -27,26 +29,26 @@ export abstract class Puzzle {
   abstract equivalent(s1: State<Puzzle>, s2: State<Puzzle>): boolean
 }
 
-interface KSolvePuzzleState extends KSolve.Transformation, State<KSolvePuzzle> {
+interface KSolvePuzzleState extends KPuzzle.Transformation, State<KSolvePuzzle> {
 }
 
 export class KSolvePuzzle extends Puzzle {
-  constructor(private definition: KSolve.PuzzleDefinition) {
+  constructor(private definition: KPuzzle.KPuzzleDefinition) {
     super();
   }
 
   static fromID(id: string): KSolvePuzzle {
-    return new KSolvePuzzle(KSolve.Puzzles[id]);
+    return new KSolvePuzzle(KPuzzle.Puzzles[id]);
   }
 
   startState(): KSolvePuzzleState {
     return this.definition.startPieces;
   }
   invert(state: KSolvePuzzleState): KSolvePuzzleState {
-    return KSolve.Invert(this.definition, state);
+    return KPuzzle.Invert(this.definition, state);
   }
   combine(s1: KSolvePuzzleState, s2: KSolvePuzzleState): KSolvePuzzleState {
-    return KSolve.Combine(this.definition, s1, s2);
+    return KPuzzle.Combine(this.definition, s1, s2);
   }
   stateFromMove(moveName: MoveName): KSolvePuzzleState {
      var state = this.definition.moves[moveName];
@@ -56,7 +58,7 @@ export class KSolvePuzzle extends Puzzle {
      return state;
   }
   equivalent(s1: KSolvePuzzleState, s2: KSolvePuzzleState): boolean {
-    return KSolve.EquivalentStates(this.definition, s1, s2);
+    return KPuzzle.EquivalentStates(this.definition, s1, s2);
   }
 }
 

@@ -1,10 +1,15 @@
-"use strict";
+import * as Alg from "alg"
+import * as KPuzzle from "kpuzzle"
+
+import * as Anim from "./anim"
+import {Cursor} from "./cursor"
+import {Puzzle} from "./puzzle"
 
 interface Document {
     mozCancelFullScreen: () => void;
     msExitFullscreen: () => void;
-    mozFullScreenElement: Element
-    msFullscreenElement: Element
+    mozFullScreenElement: HTMLElement
+    msFullscreenElement: HTMLElement
 }
 
 interface Element {
@@ -20,7 +25,7 @@ namespace FullscreenAPI {
            document.msFullscreenElement ||
            document.webkitFullscreenElement;
   }
-  export function request(element: Element) {
+  export function request(element: HTMLElement) {
     var requestFullscreen = element.requestFullscreen ||
                             element.mozRequestFullScreen ||
                             element.msRequestFullscreen ||
@@ -35,9 +40,6 @@ namespace FullscreenAPI {
     exitFullscreen.call(document);
   }
 }
-
-namespace Twisty {
-export namespace Widget {
 
 export abstract class Button {
   public element: HTMLButtonElement;
@@ -55,7 +57,7 @@ export abstract class Button {
 export module Button {
 
   export class Fullscreen extends Button {
-    constructor(private fullscreenElement: Element) {
+    constructor(private fullscreenElement: HTMLElement) {
       super("Full Screen", "fullscreen");
     }
 
@@ -107,7 +109,7 @@ export module Button {
 
 export class ControlBar {
   public element: HTMLElement;
-  constructor(private anim: Anim.Model, private twistyElement: Element) {
+  constructor(private anim: Anim.Model, private twistyElement: HTMLElement) {
     this.element = document.createElement("twisty-control-bar");
 
     this.element.appendChild((new Button.Fullscreen(twistyElement)).element);
@@ -167,7 +169,7 @@ export class Scrubber implements Anim.CursorObserver {
 }
 
 export class CursorTextView implements Anim.CursorObserver {
-  public readonly element: Element;
+  public readonly element: HTMLElement;
   constructor(private anim: Anim.Model) {
     this.element = document.createElement("cursor-text-view");
     this.element.textContent = String(this.anim.cursor.currentTimestamp());
@@ -180,7 +182,7 @@ export class CursorTextView implements Anim.CursorObserver {
 }
 
 export class CursorTextMoveView implements Anim.CursorObserver {
-  public readonly element: Element;
+  public readonly element: HTMLElement;
   constructor(private anim: Anim.Model) {
     this.element = document.createElement("cursor-text-view");
     this.anim.dispatcher.registerCursorObserver(this);
@@ -205,13 +207,13 @@ export class CursorTextMoveView implements Anim.CursorObserver {
 }
 
 export class KSolveView implements Anim.CursorObserver {
-  public readonly element: Element;
-  private svg: KSolve.SVG;
-  constructor(private anim: Anim.Model, private definition: KSolve.PuzzleDefinition) {
+  public readonly element: HTMLElement;
+  private svg: KPuzzle.SVG;
+  constructor(private anim: Anim.Model, private definition: KPuzzle.KPuzzleDefinition) {
     this.element = document.createElement("ksolve-svg-view");
     this.anim.dispatcher.registerCursorObserver(this);
 
-    this.svg = new KSolve.SVG(definition); // TODO: Dynamic puzzle
+    this.svg = new KPuzzle.SVG(definition); // TODO: Dynamic puzzle
     this.element.appendChild(this.svg.element);
   }
 
@@ -222,21 +224,21 @@ export class KSolveView implements Anim.CursorObserver {
       var move = (pos.moves[0].move as Alg.BlockMove);
 
       var def = this.definition;
-      var newState = KSolve.Combine(
+      var newState = KPuzzle.Combine(
         def,
-        pos.state as KSolve.Transformation,
-        KSolve.Multiply(def, def.moves[move.base], move.amount * pos.moves[0].direction)
+        pos.state as KPuzzle.Transformation,
+        KPuzzle.Multiply(def, def.moves[move.base], move.amount * pos.moves[0].direction)
       );
-      this.svg.draw(this.definition, pos.state as KSolve.Transformation, newState, pos.moves[0].fraction);
+      this.svg.draw(this.definition, pos.state as KPuzzle.Transformation, newState, pos.moves[0].fraction);
     } else {
-      this.svg.draw(this.definition, pos.state as KSolve.Transformation);
+      this.svg.draw(this.definition, pos.state as KPuzzle.Transformation);
     }
   }
 }
 
 export class Player {
-  public element: Element;
-  constructor(private anim: Anim.Model, definition: KSolve.PuzzleDefinition) {
+  public element: HTMLElement;
+  constructor(private anim: Anim.Model, definition: KPuzzle.KPuzzleDefinition) {
     this.element = document.createElement("player");
 
     this.element.appendChild((new KSolveView(this.anim, definition)).element);
@@ -244,7 +246,4 @@ export class Player {
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
     this.element.appendChild((new CursorTextMoveView(this.anim)).element);
   }
-}
-
-}
 }
