@@ -20,7 +20,7 @@ export class Twisty {
   private cursor: Cursor<Puzzle>;
   private puzzleDef: KPuzzle.KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
   constructor(public element: Element, config: TwistyParams = {}) {
-    this.alg = config.alg || Alg.Niklas;
+    this.alg = config.alg || Alg.Example.Niklas;
     this.puzzleDef = config.puzzle || KPuzzle.Puzzles["333"];
     this.cursor = new Cursor(this.alg, new KSolvePuzzle(this.puzzleDef));
     // this.timeline = new Timeline(Alg.Example.HeadlightSwaps);
@@ -40,7 +40,7 @@ function paramsFromTwistyElem(elem: Element): TwistyParams {
 
   var alg = elem.getAttribute("alg");
   if (alg) {
-    params.alg = Alg.Niklas; // TODO: parse
+    params.alg = Alg.Example.Niklas; // TODO: parse
   }
 
   return params;
@@ -65,4 +65,6 @@ function autoInitializePage() {
   }
 }
 
-window.addEventListener("load", autoInitializePage);
+if (typeof window !== "undefined") {
+  window.addEventListener("load", autoInitializePage);
+}

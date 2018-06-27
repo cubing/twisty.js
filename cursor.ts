@@ -1,11 +1,12 @@
 import * as Alg from "alg"
+import {Traversal} from "alg"
 import {Puzzle, State} from "./puzzle"
 
 "use strict";
 
 export class Cursor<P extends Puzzle> {
   private moves: Alg.Sequence;
-  private durationFn: Alg.Up<Cursor.Duration>;
+  private durationFn: Traversal.Up<Cursor.Duration>;
 
   private state: State<P>;
   private moveIdx: number;
@@ -207,7 +208,7 @@ export namespace Cursor {
     }
   }
 
-  export class AlgDuration extends Alg.Up<Duration> {
+  export class AlgDuration extends Traversal.Up<Duration> {
     // TODO: Pass durationForAmount as Down type instead?
     constructor(public durationForAmount = DefaultDurationForAmount) {
       super()
