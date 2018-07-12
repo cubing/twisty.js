@@ -1,12 +1,42 @@
 import * as Alg from "alg"
-import {Traversal} from "alg"
+import {TraversalUp} from "alg"
 import {Puzzle, State} from "./puzzle"
 
 "use strict";
 
+// TODO: Include Pause.
+class CountAnimatedMoves extends TraversalUp<number> {
+  public traverseSequence(sequence: Alg.Sequence): number {
+    var total = 0;
+    for (var part of sequence.nestedAlgs) {
+      total += this.traverse(part);
+    }
+    return total;
+  }
+  public traverseGroup(group: Alg.Group): number {
+    return this.traverse(group.nestedAlg);
+  }
+  public traverseBlockMove(blockMove: Alg.BlockMove): number {
+    return 1;
+  }
+  public traverseCommutator(commutator: Alg.Commutator): number {
+    return 2*(this.traverse(commutator.A) + this.traverse(commutator.B));
+  }
+  public traverseConjugate(conjugate: Alg.Conjugate): number {
+    return 2*(this.traverse(conjugate.A)) + this.traverse(conjugate.B);
+  }
+  public traversePause(pause: Alg.Pause):                      number { return 0; }
+  public traverseNewLine(newLine: Alg.NewLine):                number { return 0; }
+  public traverseCommentShort(commentShort: Alg.CommentShort): number { return 0; }
+  public traverseCommentLong(commentLong: Alg.CommentLong):    number { return 0; }
+}
+
+const countAnimatedMovesInstance = new CountAnimatedMoves();
+const countAnimatedMoves = countAnimatedMovesInstance.traverse.bind(countAnimatedMovesInstance);
+
 export class Cursor<P extends Puzzle> {
   private moves: Alg.Sequence;
-  private durationFn: Traversal.Up<Cursor.Duration>;
+  private durationFn: TraversalUp<Cursor.Duration>;
 
   private state: State<P>;
   private moveIdx: number;
@@ -20,7 +50,7 @@ export class Cursor<P extends Puzzle> {
   }
 
   private setMoves(alg: Alg.Algorithm) {
-    var moves = alg.expand();
+    var moves = Alg.expand(alg);
     if (moves instanceof Alg.Sequence) {
       this.moves = moves
     } else {
@@ -40,7 +70,7 @@ export class Cursor<P extends Puzzle> {
 
   private numMoves() {
     // TODO: Cache internally once performance matters.
-    return this.moves.countBlockMoves();
+    return countAnimatedMoves(this.moves);
   }
 
   setPositionToStart() {
@@ -112,7 +142,7 @@ export class Cursor<P extends Puzzle> {
       }
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.multiply(this.puzzle.stateFromMove(move.base), move.amount)
+        this.puzzle.multiply(this.puzzle.stateFromMove(move.family), move.amount)
       );
       this.moveIdx += 1;
       this.moveStartTimestamp += lengthOfMove;
@@ -147,7 +177,7 @@ export class Cursor<P extends Puzzle> {
 
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.multiply(this.puzzle.stateFromMove(prevMove.base), -prevMove.amount)
+        this.puzzle.multiply(this.puzzle.stateFromMove(prevMove.family), -prevMove.amount)
       );
       var lengthOfMove = this.durationFn.traverse(prevMove);
       this.moveIdx -= 1;
@@ -208,7 +238,7 @@ export namespace Cursor {
     }
   }
 
-  export class AlgDuration extends Traversal.Up<Duration> {
+  export class AlgDuration extends TraversalUp<Duration> {
     // TODO: Pass durationForAmount as Down type instead?
     constructor(public durationForAmount = DefaultDurationForAmount) {
       super()

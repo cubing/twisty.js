@@ -227,7 +227,7 @@ export class KSolveView implements Anim.CursorObserver {
       var newState = KPuzzle.Combine(
         def,
         pos.state as KPuzzle.Transformation,
-        KPuzzle.Multiply(def, def.moves[move.base], move.amount * pos.moves[0].direction)
+        KPuzzle.Multiply(def, def.moves[move.family], move.amount * pos.moves[0].direction)
       );
       this.svg.draw(this.definition, pos.state as KPuzzle.Transformation, newState, pos.moves[0].fraction);
     } else {

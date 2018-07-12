@@ -1,4 +1,4 @@
-import * as Alg from "alg"
+import * as alg from "alg"
 import * as KPuzzle from "kpuzzle"
 
 import * as Anim from "./anim"
@@ -9,21 +9,21 @@ import * as Widget from "./widget"
 "use strict";
 
 class TwistyParams {
-   alg?: Alg.Algorithm;
+   alg?: alg.Algorithm;
    puzzle?: KPuzzle.KPuzzleDefinition;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
 export class Twisty {
-  private alg: Alg.Algorithm;
+  private alg: alg.Algorithm;
   private anim: Anim.Model;
   private cursor: Cursor<Puzzle>;
   private puzzleDef: KPuzzle.KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
   constructor(public element: Element, config: TwistyParams = {}) {
-    this.alg = config.alg || Alg.Example.Niklas;
+    this.alg = config.alg || alg.Example.Niklas;
     this.puzzleDef = config.puzzle || KPuzzle.Puzzles["333"];
     this.cursor = new Cursor(this.alg, new KSolvePuzzle(this.puzzleDef));
-    // this.timeline = new Timeline(Alg.Example.HeadlightSwaps);
+    // this.timeline = new Timeline(alg.Example.HeadlightSwaps);
     this.anim = new Anim.Model(this.cursor);
 
     this.element.appendChild((new Widget.Player(this.anim, this.puzzleDef)).element);
@@ -38,9 +38,9 @@ function paramsFromTwistyElem(elem: Element): TwistyParams {
     params.puzzle = KPuzzle.Puzzles[puzzle];
   }
 
-  var alg = elem.getAttribute("alg");
-  if (alg) {
-    params.alg = Alg.Example.Niklas; // TODO: parse
+  var algo = elem.getAttribute("alg");
+  if (algo) {
+    params.alg = alg.parse(algo); // TODO: parse
   }
 
   return params;
