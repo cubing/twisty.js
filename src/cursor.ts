@@ -43,10 +43,14 @@ export class Cursor<P extends Puzzle> {
   private moveStartTimestamp: Cursor.Duration;
   private algTimestamp: Cursor.Duration;
   constructor(public alg: Alg.Algorithm, private puzzle: P) {
-    this.setMoves(alg);
-    this.setPositionToStart();
+    this.setAlg(alg);
 
     this.durationFn = new Cursor.AlgDuration(Cursor.DefaultDurationForAmount)
+  }
+
+  public setAlg(alg: Alg.Algorithm) {
+    this.setMoves(alg);
+    this.setPositionToStart();
   }
 
   private setMoves(alg: Alg.Algorithm) {

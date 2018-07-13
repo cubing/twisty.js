@@ -28,6 +28,12 @@ export class Twisty {
 
     this.element.appendChild((new Widget.Player(this.anim, this.puzzleDef)).element);
   }
+
+  public setAlg(alg: alg.Algorithm): void {
+    this.anim.skipToStart();
+    this.alg = alg;
+    this.cursor.setAlg(alg);
+  }
 }
 
 function paramsFromTwistyElem(elem: Element): TwistyParams {

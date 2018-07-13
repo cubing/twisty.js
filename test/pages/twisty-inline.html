@@ -30,6 +30,7 @@
     This should become initialized via JS:
   </p>
   <twisty id="custom-example" initialization="custom"></twisty>
+  <button id="change-alg">Change alg!</button>
   <script>
     var elem = document.querySelector("#custom-example");
     var twisty = new twisty.Twisty(elem, {
@@ -40,6 +41,13 @@
         new alg.BlockMove("U",2),
         new alg.BlockMove("R",2)
       ])
+    });
+    document.querySelector("#change-alg").addEventListener("click", function() {
+      twisty.setAlg(new alg.Sequence([
+        new alg.BlockMove("F", 1),
+        new alg.BlockMove("R", 1),
+        new alg.BlockMove("U", 1)
+      ]));
     });
   </script>
   <p>
