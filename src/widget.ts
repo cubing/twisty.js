@@ -200,7 +200,7 @@ export class CursorTextMoveView implements Anim.CursorObserver {
     var pos = cursor.currentPosition();
     var s = "" + Math.floor(cursor.currentTimestamp());
     if (pos.moves.length > 0) {
-      s += " " + pos.moves[0].move.toString() + " " + this.formatFraction(pos.moves[0].fraction);
+      s += " " + Alg.algToString(pos.moves[0].move) + " " + this.formatFraction(pos.moves[0].fraction);
     }
     this.element.textContent = s;
   }
