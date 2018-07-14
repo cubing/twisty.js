@@ -1,0 +1,29 @@
+{
+  "name": "twisty",
+  "version": "0.0.3",
+  "description": "Twisty puzzle simulation library. Stub; coming soon.",
+  "author": "Lucas Garron <code@garron.net> (https://garron.net/)",
+  "license": "MIT",
+  "main": "./dist/twisty.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "alg": "*",
+    "kpuzzle": "*"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.3",
+    "chai": "^4.1.2",
+    "jison": "^0.4.18",
+    "mocha": "^5.2.0",
+    "ts-loader": "^4.4.2",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8",
+    "webpack-notifier": "^1.6.0"
+  },
+  "scripts": {
+    "prepublish": "make dist"
+  }
+}

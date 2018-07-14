@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Lucas Garron
+Copyright (c) 2018 Lucas Garron
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-## Libraries
-
-`twisty.js` includes libraries from the following projects. All of them are also MIT licensed:
-
-- [`three.js`](https://github.com/mrdoob/three.js/blob/master/LICENSE)
-- [`jQuery`](https://jquery.org/license/)
-- [`jison`](https://github.com/zaach/jison#license)
