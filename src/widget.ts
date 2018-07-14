@@ -1,7 +1,7 @@
 import {algToString, BlockMove} from "alg"
 import {Combine, KPuzzleDefinition, Multiply, SVG, Transformation} from "kpuzzle"
 
-import {CursorObserver, DirectionObserver, Model} from "./anim"
+import {CursorObserver, DirectionObserver, AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle} from "./puzzle"
 
@@ -71,17 +71,17 @@ export module Button {
   }
 
   export class SkipToStart extends Button {
-    constructor(private anim: Model) {
+    constructor(private anim: AnimModel) {
       super("Skip To Start", "skip-to-start"); }
     onpress(): void { this.anim.skipToStart(); }
   }
   export class SkipToEnd extends Button {
-    constructor(private anim: Model) {
+    constructor(private anim: AnimModel) {
       super("Skip To End", "skip-to-end"); }
     onpress(): void { this.anim.skipToEnd(); }
   }
   export class PlayPause extends Button implements DirectionObserver {
-    constructor(private anim: Model) {
+    constructor(private anim: AnimModel) {
       super("Play", "play");
       this.anim.dispatcher.registerDirectionObserver(this);
     }
@@ -96,12 +96,12 @@ export module Button {
     }
   }
   export class StepForward extends Button {
-    constructor(private anim: Model) {
+    constructor(private anim: AnimModel) {
       super("Step forward", "step-forward"); }
     onpress(): void { this.anim.stepForward(); }
   }
   export class StepBackward extends Button {
-    constructor(private anim: Model) {
+    constructor(private anim: AnimModel) {
       super("Step backward", "step-backward"); }
     onpress(): void { this.anim.stepBackward(); }
   }
@@ -109,7 +109,7 @@ export module Button {
 
 export class ControlBar {
   public element: HTMLElement;
-  constructor(private anim: Model, private twistyElement: HTMLElement) {
+  constructor(private anim: AnimModel, private twistyElement: HTMLElement) {
     this.element = document.createElement("twisty-control-bar");
 
     this.element.appendChild((new Button.Fullscreen(twistyElement)).element);
@@ -123,7 +123,7 @@ export class ControlBar {
 
 export class Scrubber implements CursorObserver {
   public readonly element: HTMLInputElement;
-  constructor(private anim: Model) {
+  constructor(private anim: AnimModel) {
     this.element = document.createElement("input");
     this.element.classList.add("scrubber");
     this.element.type = "range";
@@ -170,7 +170,7 @@ export class Scrubber implements CursorObserver {
 
 export class CursorTextView implements CursorObserver {
   public readonly element: HTMLElement;
-  constructor(private anim: Model) {
+  constructor(private anim: AnimModel) {
     this.element = document.createElement("cursor-text-view");
     this.element.textContent = String(this.anim.cursor.currentTimestamp());
     this.anim.dispatcher.registerCursorObserver(this);
@@ -183,7 +183,7 @@ export class CursorTextView implements CursorObserver {
 
 export class CursorTextMoveView implements CursorObserver {
   public readonly element: HTMLElement;
-  constructor(private anim: Model) {
+  constructor(private anim: AnimModel) {
     this.element = document.createElement("cursor-text-view");
     this.anim.dispatcher.registerCursorObserver(this);
 
@@ -209,7 +209,7 @@ export class CursorTextMoveView implements CursorObserver {
 export class KSolveView implements CursorObserver {
   public readonly element: HTMLElement;
   private svg: SVG;
-  constructor(private anim: Model, private definition: KPuzzleDefinition) {
+  constructor(private anim: AnimModel, private definition: KPuzzleDefinition) {
     this.element = document.createElement("ksolve-svg-view");
     this.anim.dispatcher.registerCursorObserver(this);
 
@@ -238,7 +238,7 @@ export class KSolveView implements CursorObserver {
 
 export class Player {
   public element: HTMLElement;
-  constructor(private anim: Model, definition: KPuzzleDefinition) {
+  constructor(private anim: AnimModel, definition: KPuzzleDefinition) {
     this.element = document.createElement("player");
 
     this.element.appendChild((new KSolveView(this.anim, definition)).element);

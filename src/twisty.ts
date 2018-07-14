@@ -1,7 +1,7 @@
 import {Algorithm, Example, parse} from "alg"
 import {KPuzzle, KPuzzleDefinition, Puzzles} from "kpuzzle"
 
-import {Model as AnimModel} from "./anim"
+import {AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle, State, KSolvePuzzle} from "./puzzle"
 import {Player} from "./widget"

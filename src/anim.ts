@@ -49,7 +49,7 @@ export class Dispatcher implements CursorObserver, DirectionObserver {
   }
 }
 
-export class Model {
+export class AnimModel {
   private lastCursorTime: Cursor.Timestamp = 0;
   private direction: Cursor.Direction = Cursor.Direction.Paused;
   private breakpointType: Cursor.BreakpointType = Cursor.BreakpointType.EntireMoveSequence;
