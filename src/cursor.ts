@@ -1,4 +1,17 @@
-import * as Alg from "alg"
+import {
+  Algorithm,
+  BlockMove,
+  CommentLong,
+  CommentShort,
+  Commutator,
+  Conjugate,
+  Example,
+  Group,
+  NewLine,
+  Pause,
+  Sequence,
+  expand
+} from "alg"
 import {TraversalUp} from "alg"
 import {Puzzle, State} from "./puzzle"
 
@@ -6,55 +19,55 @@ import {Puzzle, State} from "./puzzle"
 
 // TODO: Include Pause.
 class CountAnimatedMoves extends TraversalUp<number> {
-  public traverseSequence(sequence: Alg.Sequence): number {
+  public traverseSequence(sequence: Sequence): number {
     var total = 0;
     for (var part of sequence.nestedAlgs) {
       total += this.traverse(part);
     }
     return total;
   }
-  public traverseGroup(group: Alg.Group): number {
+  public traverseGroup(group: Group): number {
     return this.traverse(group.nestedAlg);
   }
-  public traverseBlockMove(blockMove: Alg.BlockMove): number {
+  public traverseBlockMove(blockMove: BlockMove): number {
     return 1;
   }
-  public traverseCommutator(commutator: Alg.Commutator): number {
+  public traverseCommutator(commutator: Commutator): number {
     return 2*(this.traverse(commutator.A) + this.traverse(commutator.B));
   }
-  public traverseConjugate(conjugate: Alg.Conjugate): number {
+  public traverseConjugate(conjugate: Conjugate): number {
     return 2*(this.traverse(conjugate.A)) + this.traverse(conjugate.B);
   }
-  public traversePause(pause: Alg.Pause):                      number { return 0; }
-  public traverseNewLine(newLine: Alg.NewLine):                number { return 0; }
-  public traverseCommentShort(commentShort: Alg.CommentShort): number { return 0; }
-  public traverseCommentLong(commentLong: Alg.CommentLong):    number { return 0; }
+  public traversePause(pause: Pause):                      number { return 0; }
+  public traverseNewLine(newLine: NewLine):                number { return 0; }
+  public traverseCommentShort(commentShort: CommentShort): number { return 0; }
+  public traverseCommentLong(commentLong: CommentLong):    number { return 0; }
 }
 
 const countAnimatedMovesInstance = new CountAnimatedMoves();
 const countAnimatedMoves = countAnimatedMovesInstance.traverse.bind(countAnimatedMovesInstance);
 
 export class Cursor<P extends Puzzle> {
-  private moves: Alg.Sequence;
+  private moves: Sequence;
   private durationFn: TraversalUp<Cursor.Duration>;
 
   private state: State<P>;
   private moveIdx: number;
   private moveStartTimestamp: Cursor.Duration;
   private algTimestamp: Cursor.Duration;
-  constructor(public alg: Alg.Algorithm, private puzzle: P) {
+  constructor(public alg: Algorithm, private puzzle: P) {
     this.setMoves(alg);
     this.setPositionToStart();
 
     this.durationFn = new Cursor.AlgDuration(Cursor.DefaultDurationForAmount)
   }
 
-  private setMoves(alg: Alg.Algorithm) {
-    var moves = Alg.expand(alg);
-    if (moves instanceof Alg.Sequence) {
+  private setMoves(alg: Algorithm) {
+    var moves = expand(alg);
+    if (moves instanceof Sequence) {
       this.moves = moves
     } else {
-      this.moves = new Alg.Sequence([moves]);
+      this.moves = new Sequence([moves]);
     }
 
     if (this.moves.nestedAlgs.length === 0) {
@@ -132,7 +145,7 @@ export class Cursor<P extends Puzzle> {
 
     while (this.moveIdx < this.numMoves()) {
       var move = this.moves.nestedAlgs[this.moveIdx];
-      if(!(move instanceof Alg.BlockMove)) {
+      if(!(move instanceof BlockMove)) {
         throw "TODO - only BlockMove supported";
       }
       var lengthOfMove = this.durationFn.traverse(move);
@@ -171,7 +184,7 @@ export class Cursor<P extends Puzzle> {
       }
 
       var prevMove = this.moves.nestedAlgs[this.moveIdx - 1];
-      if(!(prevMove instanceof Alg.BlockMove)) {
+      if(!(prevMove instanceof BlockMove)) {
         throw "TODO - only BlockMove supported";
       }
 
@@ -204,7 +217,7 @@ export namespace Cursor {
   }
 
   export interface MoveProgress {
-    move: Alg.Algorithm
+    move: Algorithm
     direction: Direction
     fraction: number
   }
@@ -244,25 +257,25 @@ export namespace Cursor {
       super()
     }
 
-    public traverseSequence(sequence: Alg.Sequence):             Duration {
+    public traverseSequence(sequence: Sequence):             Duration {
       var total = 0;
       for (var alg of sequence.nestedAlgs) {
         total += this.traverse(alg)
       }
       return total;
     }
-    public traverseGroup(group: Alg.Group):                      Duration { return group.amount * this.traverse(group.nestedAlg); }
-    public traverseBlockMove(blockMove: Alg.BlockMove):          Duration { return this.durationForAmount(blockMove.amount); }
-    public traverseCommutator(commutator: Alg.Commutator):       Duration { return commutator.amount * 2 * (this.traverse(commutator.A) + this.traverse(commutator.B)); }
-    public traverseConjugate(conjugate: Alg.Conjugate):          Duration { return conjugate.amount * (2 * this.traverse(conjugate.A) + this.traverse(conjugate.B)); }
-    public traversePause(pause: Alg.Pause):                      Duration { return this.durationForAmount(1); }
-    public traverseNewLine(newLine: Alg.NewLine):                Duration { return this.durationForAmount(1); }
-    public traverseCommentShort(commentShort: Alg.CommentShort): Duration { return this.durationForAmount(0); }
-    public traverseCommentLong(commentLong: Alg.CommentLong):    Duration { return this.durationForAmount(0); }
+    public traverseGroup(group: Group):                      Duration { return group.amount * this.traverse(group.nestedAlg); }
+    public traverseBlockMove(blockMove: BlockMove):          Duration { return this.durationForAmount(blockMove.amount); }
+    public traverseCommutator(commutator: Commutator):       Duration { return commutator.amount * 2 * (this.traverse(commutator.A) + this.traverse(commutator.B)); }
+    public traverseConjugate(conjugate: Conjugate):          Duration { return conjugate.amount * (2 * this.traverse(conjugate.A) + this.traverse(conjugate.B)); }
+    public traversePause(pause: Pause):                      Duration { return this.durationForAmount(1); }
+    public traverseNewLine(newLine: NewLine):                Duration { return this.durationForAmount(1); }
+    public traverseCommentShort(commentShort: CommentShort): Duration { return this.durationForAmount(0); }
+    public traverseCommentLong(commentLong: CommentLong):    Duration { return this.durationForAmount(0); }
   }
 }
 
-// var c = new Cursor(Alg.Example.APermCompact);
+// var c = new Cursor(Example.APermCompact);
 // console.log(c.currentPosition());
 // c.forward(4321, false);
 // console.log(c.currentPosition());
@@ -278,9 +291,9 @@ export namespace Cursor {
 // console.log(c.currentPosition());
 
 
-// abstract class Position<AlgType extends Alg.Algorithm> {
+// abstract class Position<AlgType extends Algorithm> {
 //   Alg: AlgType;
 //   Direction: Timeline.Direction;
 //   TimeToSubAlg: Timeline.Duration;
-//   SubAlg: Alg.Algorithm | null;
+//   SubAlg: Algorithm | null;
 // }

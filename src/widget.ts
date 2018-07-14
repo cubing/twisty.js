@@ -1,7 +1,7 @@
-import * as Alg from "alg"
-import * as KPuzzle from "kpuzzle"
+import {algToString, BlockMove} from "alg"
+import {Combine, KPuzzleDefinition, Multiply, SVG, Transformation} from "kpuzzle"
 
-import * as Anim from "./anim"
+import {CursorObserver, DirectionObserver, Model} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle} from "./puzzle"
 
@@ -71,17 +71,17 @@ export module Button {
   }
 
   export class SkipToStart extends Button {
-    constructor(private anim: Anim.Model) {
+    constructor(private anim: Model) {
       super("Skip To Start", "skip-to-start"); }
     onpress(): void { this.anim.skipToStart(); }
   }
   export class SkipToEnd extends Button {
-    constructor(private anim: Anim.Model) {
+    constructor(private anim: Model) {
       super("Skip To End", "skip-to-end"); }
     onpress(): void { this.anim.skipToEnd(); }
   }
-  export class PlayPause extends Button implements Anim.DirectionObserver {
-    constructor(private anim: Anim.Model) {
+  export class PlayPause extends Button implements DirectionObserver {
+    constructor(private anim: Model) {
       super("Play", "play");
       this.anim.dispatcher.registerDirectionObserver(this);
     }
@@ -96,12 +96,12 @@ export module Button {
     }
   }
   export class StepForward extends Button {
-    constructor(private anim: Anim.Model) {
+    constructor(private anim: Model) {
       super("Step forward", "step-forward"); }
     onpress(): void { this.anim.stepForward(); }
   }
   export class StepBackward extends Button {
-    constructor(private anim: Anim.Model) {
+    constructor(private anim: Model) {
       super("Step backward", "step-backward"); }
     onpress(): void { this.anim.stepBackward(); }
   }
@@ -109,7 +109,7 @@ export module Button {
 
 export class ControlBar {
   public element: HTMLElement;
-  constructor(private anim: Anim.Model, private twistyElement: HTMLElement) {
+  constructor(private anim: Model, private twistyElement: HTMLElement) {
     this.element = document.createElement("twisty-control-bar");
 
     this.element.appendChild((new Button.Fullscreen(twistyElement)).element);
@@ -121,9 +121,9 @@ export class ControlBar {
   }
 }
 
-export class Scrubber implements Anim.CursorObserver {
+export class Scrubber implements CursorObserver {
   public readonly element: HTMLInputElement;
-  constructor(private anim: Anim.Model) {
+  constructor(private anim: Model) {
     this.element = document.createElement("input");
     this.element.classList.add("scrubber");
     this.element.type = "range";
@@ -168,9 +168,9 @@ export class Scrubber implements Anim.CursorObserver {
   }
 }
 
-export class CursorTextView implements Anim.CursorObserver {
+export class CursorTextView implements CursorObserver {
   public readonly element: HTMLElement;
-  constructor(private anim: Anim.Model) {
+  constructor(private anim: Model) {
     this.element = document.createElement("cursor-text-view");
     this.element.textContent = String(this.anim.cursor.currentTimestamp());
     this.anim.dispatcher.registerCursorObserver(this);
@@ -181,9 +181,9 @@ export class CursorTextView implements Anim.CursorObserver {
   }
 }
 
-export class CursorTextMoveView implements Anim.CursorObserver {
+export class CursorTextMoveView implements CursorObserver {
   public readonly element: HTMLElement;
-  constructor(private anim: Anim.Model) {
+  constructor(private anim: Model) {
     this.element = document.createElement("cursor-text-view");
     this.anim.dispatcher.registerCursorObserver(this);
 
@@ -200,20 +200,20 @@ export class CursorTextMoveView implements Anim.CursorObserver {
     var pos = cursor.currentPosition();
     var s = "" + Math.floor(cursor.currentTimestamp());
     if (pos.moves.length > 0) {
-      s += " " + Alg.algToString(pos.moves[0].move) + " " + this.formatFraction(pos.moves[0].fraction);
+      s += " " + algToString(pos.moves[0].move) + " " + this.formatFraction(pos.moves[0].fraction);
     }
     this.element.textContent = s;
   }
 }
 
-export class KSolveView implements Anim.CursorObserver {
+export class KSolveView implements CursorObserver {
   public readonly element: HTMLElement;
-  private svg: KPuzzle.SVG;
-  constructor(private anim: Anim.Model, private definition: KPuzzle.KPuzzleDefinition) {
+  private svg: SVG;
+  constructor(private anim: Model, private definition: KPuzzleDefinition) {
     this.element = document.createElement("ksolve-svg-view");
     this.anim.dispatcher.registerCursorObserver(this);
 
-    this.svg = new KPuzzle.SVG(definition); // TODO: Dynamic puzzle
+    this.svg = new SVG(definition); // TODO: Dynamic puzzle
     this.element.appendChild(this.svg.element);
   }
 
@@ -221,24 +221,24 @@ export class KSolveView implements Anim.CursorObserver {
     var pos = cursor.currentPosition();
     if (pos.moves.length > 0) {
 
-      var move = (pos.moves[0].move as Alg.BlockMove);
+      var move = (pos.moves[0].move as BlockMove);
 
       var def = this.definition;
-      var newState = KPuzzle.Combine(
+      var newState = Combine(
         def,
-        pos.state as KPuzzle.Transformation,
-        KPuzzle.Multiply(def, def.moves[move.family], move.amount * pos.moves[0].direction)
+        pos.state as Transformation,
+        Multiply(def, def.moves[move.family], move.amount * pos.moves[0].direction)
       );
-      this.svg.draw(this.definition, pos.state as KPuzzle.Transformation, newState, pos.moves[0].fraction);
+      this.svg.draw(this.definition, pos.state as Transformation, newState, pos.moves[0].fraction);
     } else {
-      this.svg.draw(this.definition, pos.state as KPuzzle.Transformation);
+      this.svg.draw(this.definition, pos.state as Transformation);
     }
   }
 }
 
 export class Player {
   public element: HTMLElement;
-  constructor(private anim: Anim.Model, definition: KPuzzle.KPuzzleDefinition) {
+  constructor(private anim: Model, definition: KPuzzleDefinition) {
     this.element = document.createElement("player");
 
     this.element.appendChild((new KSolveView(this.anim, definition)).element);

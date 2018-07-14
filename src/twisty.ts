@@ -1,32 +1,32 @@
-import * as alg from "alg"
-import * as KPuzzle from "kpuzzle"
+import {Algorithm, Example, parse} from "alg"
+import {KPuzzle, KPuzzleDefinition, Puzzles} from "kpuzzle"
 
-import * as Anim from "./anim"
+import {Model as AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle, State, KSolvePuzzle} from "./puzzle"
-import * as Widget from "./widget"
+import {Player} from "./widget"
 
 "use strict";
 
 class TwistyParams {
-   alg?: alg.Algorithm;
-   puzzle?: KPuzzle.KPuzzleDefinition;
+   alg?: Algorithm;
+   puzzle?: KPuzzleDefinition;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
 export class Twisty {
-  private alg: alg.Algorithm;
-  private anim: Anim.Model;
+  private alg: Algorithm;
+  private anim: AnimModel;
   private cursor: Cursor<Puzzle>;
-  private puzzleDef: KPuzzle.KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
+  private puzzleDef: KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
   constructor(public element: Element, config: TwistyParams = {}) {
-    this.alg = config.alg || alg.Example.Niklas;
-    this.puzzleDef = config.puzzle || KPuzzle.Puzzles["333"];
+    this.alg = config.alg || Example.Niklas;
+    this.puzzleDef = config.puzzle || Puzzles["333"];
     this.cursor = new Cursor(this.alg, new KSolvePuzzle(this.puzzleDef));
-    // this.timeline = new Timeline(alg.Example.HeadlightSwaps);
-    this.anim = new Anim.Model(this.cursor);
+    // this.timeline = new Timeline(Example.HeadlightSwaps);
+    this.anim = new AnimModel(this.cursor);
 
-    this.element.appendChild((new Widget.Player(this.anim, this.puzzleDef)).element);
+    this.element.appendChild((new Player(this.anim, this.puzzleDef)).element);
   }
 }
 
@@ -35,12 +35,12 @@ function paramsFromTwistyElem(elem: Element): TwistyParams {
 
   var puzzle = elem.getAttribute("puzzle");
   if (puzzle) {
-    params.puzzle = KPuzzle.Puzzles[puzzle];
+    params.puzzle = Puzzles[puzzle];
   }
 
   var algo = elem.getAttribute("alg");
   if (algo) {
-    params.alg = alg.parse(algo); // TODO: parse
+    params.alg = parse(algo); // TODO: parse
   }
 
   return params;
