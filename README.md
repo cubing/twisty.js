@@ -4,8 +4,8 @@
 
 Add to the header:
 
-  <link href="path/to/twisty.css" rel="stylesheet" type="text/css">
-  <script src="path/to/twisty.js"></script>
+    <link href="path/to/twisty.css" rel="stylesheet" type="text/css">
+    <script src="path/to/twisty.js"></script>
 
 Automatic (applet-style):
 
