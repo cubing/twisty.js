@@ -7,8 +7,8 @@
   "main": "./dist/twisty.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "alg": "*",
-    "kpuzzle": "*"
+    "alg": "^0.9.7",
+    "kpuzzle": "^0.9.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
