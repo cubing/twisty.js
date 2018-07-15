@@ -28,6 +28,6 @@
     "webpack-notifier": "^1.6.0"
   },
   "scripts": {
-    "prepublish": "make dist"
+    "prepublishOnly": "make dist"
   }
 }
