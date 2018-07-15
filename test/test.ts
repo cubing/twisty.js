@@ -1,5 +1,5 @@
 import { Example } from "alg"
-import { Cursor } from "../src/Cursor"
+import { Cursor } from "../src/cursor"
 
 import { expect } from "chai";
 
