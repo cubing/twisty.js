@@ -1,6 +1,6 @@
 import {
-  Algorithm,
-  BlockMove,
+  AlgPart,
+  SiGNMove,
   CommentLong,
   CommentShort,
   Commutator,
@@ -21,22 +21,22 @@ import {Puzzle, State} from "./puzzle"
 class CountAnimatedMoves extends TraversalUp<number> {
   public traverseSequence(sequence: Sequence): number {
     var total = 0;
-    for (var part of sequence.nestedAlgs) {
+    for (var part of sequence.nestedUnits) {
       total += this.traverse(part);
     }
     return total;
   }
   public traverseGroup(group: Group): number {
-    return this.traverse(group.nestedAlg);
+    return this.traverseSequence(group.nestedSequence);
   }
-  public traverseBlockMove(blockMove: BlockMove): number {
+  public traverseSiGNMove(signMove: SiGNMove): number {
     return 1;
   }
   public traverseCommutator(commutator: Commutator): number {
-    return 2*(this.traverse(commutator.A) + this.traverse(commutator.B));
+    return 2*(this.traverseSequence(commutator.A) + this.traverseSequence(commutator.B));
   }
   public traverseConjugate(conjugate: Conjugate): number {
-    return 2*(this.traverse(conjugate.A)) + this.traverse(conjugate.B);
+    return 2*(this.traverseSequence(conjugate.A)) + this.traverseSequence(conjugate.B);
   }
   public traversePause(pause: Pause):                      number { return 0; }
   public traverseNewLine(newLine: NewLine):                number { return 0; }
@@ -55,14 +55,14 @@ export class Cursor<P extends Puzzle> {
   private moveIdx: number;
   private moveStartTimestamp: Cursor.Duration;
   private algTimestamp: Cursor.Duration;
-  constructor(public alg: Algorithm, private puzzle: P) {
+  constructor(public alg: Sequence, private puzzle: P) {
     this.setMoves(alg);
     this.setPositionToStart();
 
     this.durationFn = new Cursor.AlgDuration(Cursor.DefaultDurationForAmount)
   }
 
-  private setMoves(alg: Algorithm) {
+  private setMoves(alg: Sequence) {
     var moves = expand(alg);
     if (moves instanceof Sequence) {
       this.moves = moves
@@ -70,7 +70,7 @@ export class Cursor<P extends Puzzle> {
       this.moves = new Sequence([moves]);
     }
 
-    if (this.moves.nestedAlgs.length === 0) {
+    if (this.moves.nestedUnits.length === 0) {
       throw "empty alg"
     }
     // TODO: Avoid assuming all base moves are block moves.
@@ -106,20 +106,21 @@ export class Cursor<P extends Puzzle> {
   }
   private moveDuration(): Cursor.Duration {
     // TODO: Cache
-    return this.durationFn.traverse(this.moves.nestedAlgs[this.moveIdx]);
+    return this.durationFn.traverse(this.moves.nestedUnits[this.moveIdx]);
   }
   currentPosition(): Cursor.Position<P> {
     var pos = <Cursor.Position<P>>{
       state: this.state,
       moves: []
     }
-    var move = this.moves.nestedAlgs[this.moveIdx];
+    var move = this.moves.nestedUnits[this.moveIdx];
     var moveTS = this.algTimestamp - this.moveStartTimestamp;
     if (moveTS !== 0) {
       pos.moves.push({
         move: move,
         direction: Cursor.Direction.Forwards,
-        fraction: moveTS / this.durationFn.traverse(move)
+        // TODO: Expose a way to traverse `Unit`s directly?
+        fraction: moveTS / this.durationFn.traverse(new Sequence([move]))
       });
     }
     return pos;
@@ -144,9 +145,9 @@ export class Cursor<P extends Puzzle> {
     var remainingOffset = (this.algTimestamp - this.moveStartTimestamp) + duration;
 
     while (this.moveIdx < this.numMoves()) {
-      var move = this.moves.nestedAlgs[this.moveIdx];
-      if(!(move instanceof BlockMove)) {
-        throw "TODO - only BlockMove supported";
+      var move = this.moves.nestedUnits[this.moveIdx];
+      if(!(move instanceof SiGNMove)) {
+        throw "TODO - only SiGNMove supported";
       }
       var lengthOfMove = this.durationFn.traverse(move);
       if (remainingOffset < lengthOfMove) {
@@ -183,9 +184,9 @@ export class Cursor<P extends Puzzle> {
         return true; // TODO
       }
 
-      var prevMove = this.moves.nestedAlgs[this.moveIdx - 1];
-      if(!(prevMove instanceof BlockMove)) {
-        throw "TODO - only BlockMove supported";
+      var prevMove = this.moves.nestedUnits[this.moveIdx - 1];
+      if(!(prevMove instanceof SiGNMove)) {
+        throw "TODO - only SiGNMove supported";
       }
 
       this.state = this.puzzle.combine(
@@ -217,7 +218,7 @@ export namespace Cursor {
   }
 
   export interface MoveProgress {
-    move: Algorithm
+    move: AlgPart
     direction: Direction
     fraction: number
   }
@@ -259,13 +260,13 @@ export namespace Cursor {
 
     public traverseSequence(sequence: Sequence):             Duration {
       var total = 0;
-      for (var alg of sequence.nestedAlgs) {
+      for (var alg of sequence.nestedUnits) {
         total += this.traverse(alg)
       }
       return total;
     }
-    public traverseGroup(group: Group):                      Duration { return group.amount * this.traverse(group.nestedAlg); }
-    public traverseBlockMove(blockMove: BlockMove):          Duration { return this.durationForAmount(blockMove.amount); }
+    public traverseGroup(group: Group):                      Duration { return group.amount * this.traverse(group.nestedSequence); }
+    public traverseSiGNMove(signMove: SiGNMove):             Duration { return this.durationForAmount(signMove.amount); }
     public traverseCommutator(commutator: Commutator):       Duration { return commutator.amount * 2 * (this.traverse(commutator.A) + this.traverse(commutator.B)); }
     public traverseConjugate(conjugate: Conjugate):          Duration { return conjugate.amount * (2 * this.traverse(conjugate.A) + this.traverse(conjugate.B)); }
     public traversePause(pause: Pause):                      Duration { return this.durationForAmount(1); }

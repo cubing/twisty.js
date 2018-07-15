@@ -1,4 +1,4 @@
-import {Algorithm, Example, parse} from "alg"
+import {Sequence, Example, parse} from "alg"
 import {KPuzzle, KPuzzleDefinition, Puzzles} from "kpuzzle"
 
 import {AnimModel} from "./anim"
@@ -9,13 +9,13 @@ import {Player} from "./widget"
 "use strict";
 
 class TwistyParams {
-   alg?: Algorithm;
+   alg?: Sequence;
    puzzle?: KPuzzleDefinition;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
 export class Twisty {
-  private alg: Algorithm;
+  private alg: Sequence;
   private anim: AnimModel;
   private cursor: Cursor<Puzzle>;
   private puzzleDef: KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.

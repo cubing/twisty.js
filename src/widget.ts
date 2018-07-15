@@ -1,4 +1,4 @@
-import {algToString, BlockMove} from "alg"
+import {Sequence, SiGNMove, algToString} from "alg"
 import {Combine, KPuzzleDefinition, Multiply, SVG, Transformation} from "kpuzzle"
 
 import {CursorObserver, DirectionObserver, AnimModel} from "./anim"
@@ -200,7 +200,9 @@ export class CursorTextMoveView implements CursorObserver {
     var pos = cursor.currentPosition();
     var s = "" + Math.floor(cursor.currentTimestamp());
     if (pos.moves.length > 0) {
-      s += " " + algToString(pos.moves[0].move) + " " + this.formatFraction(pos.moves[0].fraction);
+      // TODO: cache the name.
+      // TODO: Don't wrap in Sequence if we can add toString() to AlgPart interface?
+      s += " " + algToString(new Sequence([pos.moves[0].move])) + " " + this.formatFraction(pos.moves[0].fraction);
     }
     this.element.textContent = s;
   }
@@ -221,7 +223,7 @@ export class KSolveView implements CursorObserver {
     var pos = cursor.currentPosition();
     if (pos.moves.length > 0) {
 
-      var move = (pos.moves[0].move as BlockMove);
+      var move = (pos.moves[0].move as SiGNMove);
 
       var def = this.definition;
       var newState = Combine(

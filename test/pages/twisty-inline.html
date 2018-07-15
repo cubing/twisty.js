@@ -31,14 +31,18 @@
   </p>
   <twisty id="custom-example" initialization="custom"></twisty>
   <script>
+    const {Twisty} = twisty;
+    const {Puzzles} = kpuzzle;
+    const {Sequence, BareSiGNMove} = alg;
+
     var elem = document.querySelector("#custom-example");
-    var twisty = new twisty.Twisty(elem, {
-      puzzle: kpuzzle.Puzzles["222"],
-      alg: new alg.Sequence([
-        new alg.BlockMove("R",2),
-        new alg.BlockMove("F",2),
-        new alg.BlockMove("U",2),
-        new alg.BlockMove("R",2)
+    var twisty = new Twisty(elem, {
+      puzzle: Puzzles["222"],
+      alg: new Sequence([
+        BareSiGNMove("R", 2),
+        BareSiGNMove("F", 2),
+        BareSiGNMove("U", 2),
+        BareSiGNMove("R", 2)
       ])
     });
   </script>
