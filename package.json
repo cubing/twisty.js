@@ -1,14 +1,14 @@
 {
   "name": "twisty",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "Twisty puzzle simulation library. Stub; coming soon.",
   "author": "Lucas Garron <code@garron.net> (https://garron.net/)",
   "license": "MIT",
   "main": "./dist/twisty.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "alg": "^0.9.8",
-    "kpuzzle": "^0.9.8"
+    "alg": "^0.9.9",
+    "kpuzzle": "^0.9.9"
   },
   "externalsForWebpack": [
     "alg",
