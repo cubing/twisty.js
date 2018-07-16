@@ -156,7 +156,7 @@ export class Cursor<P extends Puzzle> {
       }
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.multiply(this.puzzle.stateFromMove(move.family), move.amount)
+        this.puzzle.stateFromMove(move)
       );
       this.moveIdx += 1;
       this.moveStartTimestamp += lengthOfMove;
@@ -191,7 +191,7 @@ export class Cursor<P extends Puzzle> {
 
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.multiply(this.puzzle.stateFromMove(prevMove.family), -prevMove.amount)
+        this.puzzle.invert(this.puzzle.stateFromMove(prevMove))
       );
       var lengthOfMove = this.durationFn.traverse(prevMove);
       this.moveIdx -= 1;
