@@ -85,7 +85,12 @@ export module Button {
       super("Play", "play");
       this.anim.dispatcher.registerDirectionObserver(this);
     }
-    onpress(): void { this.anim.togglePausePlayForward(); }
+    onpress(): void {
+      if (this.anim.isPaused() && this.anim.isAtEnd()) {
+        this.anim.skipToStart();
+      }
+      this.anim.togglePausePlayForward();
+    }
     animDirectionChanged(direction: Cursor.Direction): void {
       // TODO: Handle flash of pause button when pressed while the Twisty is already at the end.
       var newClass = direction === Cursor.Direction.Paused ? "play" : "pause";

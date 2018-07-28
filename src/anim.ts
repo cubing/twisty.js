@@ -116,7 +116,7 @@ export class AnimModel {
     this.breakpointType = breakpointType;
   }
 
-  private isPaused() {
+  public isPaused() {
     return this.direction === Cursor.Direction.Paused;
   }
 
@@ -167,6 +167,10 @@ export class AnimModel {
 
   skipToEnd(): void {
     this.skipAndPauseTo(this.cursor.endOfAlg());
+  }
+
+  public isAtEnd() {
+    return this.cursor.currentTimestamp() == this.cursor.endOfAlg();
   }
 
   stepForward(): void {
