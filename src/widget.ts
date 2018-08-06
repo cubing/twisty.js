@@ -1,7 +1,7 @@
 import {Sequence, SiGNMove, algToString} from "alg"
 import {Combine, KPuzzleDefinition, SVG, Transformation, stateForSiGNMove} from "kpuzzle"
 
-import {CursorObserver, DirectionObserver, AnimModel} from "./anim"
+import {CursorObserver, DirectionObserver, JumpObserver, AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle} from "./puzzle"
 
@@ -213,12 +213,13 @@ export class CursorTextMoveView implements CursorObserver {
   }
 }
 
-export class KSolveView implements CursorObserver {
+export class KSolveView implements CursorObserver, JumpObserver {
   public readonly element: HTMLElement;
   private svg: SVG;
   constructor(private anim: AnimModel, private definition: KPuzzleDefinition) {
     this.element = document.createElement("ksolve-svg-view");
     this.anim.dispatcher.registerCursorObserver(this);
+    this.anim.dispatcher.registerJumpObserver(this);
 
     this.svg = new SVG(definition); // TODO: Dynamic puzzle
     this.element.appendChild(this.svg.element);
@@ -241,6 +242,12 @@ export class KSolveView implements CursorObserver {
     } else {
       this.svg.draw(this.definition, pos.state as Transformation);
     }
+  }
+
+  animCursorJumped() {
+    console.log("jumped KSolve");
+    this.element.classList.add("flash");
+    setTimeout(() => this.element.classList.remove("flash"), 0);
   }
 }
 

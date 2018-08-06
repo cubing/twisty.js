@@ -92,7 +92,16 @@ twisty player ksolve-svg-view {
   align-items: center;
   justify-content: center;
 
+  /*For Flash*/
+  opacity: 1;
+  transition: opacity 0.4s;
+
   /* TODO: dynamic fitting */
+}
+
+twisty player ksolve-svg-view.flash {
+  opacity: 0.25;
+  transition: 0s;
 }
 
 twisty player ksolve-svg-view .svg-wrapper {

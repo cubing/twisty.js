@@ -11,6 +11,12 @@ export interface DirectionObserver {
   animDirectionChanged: (direction: Cursor.Direction) => void;
 }
 
+export interface JumpObserver {
+  // Called when the cursor jumps to a position rather than smoothly animating.
+  // Note: this may be called even if the cursor "jumps" to the same position.
+  animCursorJumped: () => void;
+}
+
 // export interface BoundsObserver {
 //   animBoundsChanged: (start: Timeline.Duration, end: Timeline.Duration) => void;
 // }
@@ -19,6 +25,7 @@ export interface DirectionObserver {
 export class Dispatcher implements CursorObserver, DirectionObserver {
   private cursorObservers: Set<CursorObserver> = new Set<CursorObserver>();
   private directionObservers: Set<DirectionObserver> = new Set<DirectionObserver>();
+  private jumpObservers: Set<JumpObserver> = new Set<JumpObserver>();
 
   registerCursorObserver(observer: CursorObserver) {
     if (this.cursorObservers.has(observer)) {
@@ -34,6 +41,13 @@ export class Dispatcher implements CursorObserver, DirectionObserver {
     this.directionObservers.add(observer);
   }
 
+  registerJumpObserver(observer: JumpObserver) {
+    if (this.jumpObservers.has(observer)) {
+      throw "Duplicate direction observer added.";
+    }
+    this.jumpObservers.add(observer);
+  }
+
   animCursorChanged(cursor: Cursor<Puzzle>) {
     // TODO: guard against nested changes and test.
     for (var observer of this.cursorObservers) {
@@ -45,6 +59,13 @@ export class Dispatcher implements CursorObserver, DirectionObserver {
     // TODO: guard against nested changes and test.
     for (var observer of this.directionObservers) {
       observer.animDirectionChanged(direction);
+    }
+  }
+
+  animCursorJumped() {
+    // TODO: guard against nested changes and test.
+    for (var observer of this.jumpObservers) {
+      observer.animCursorJumped();
     }
   }
 }
@@ -163,10 +184,14 @@ export class AnimModel {
 
   skipToStart(): void {
     this.skipAndPauseTo(this.cursor.startOfAlg());
+    // TODO: Wait for flash to finish before animating?
+    this.dispatcher.animCursorJumped();
   }
 
   skipToEnd(): void {
     this.skipAndPauseTo(this.cursor.endOfAlg());
+    // TODO: Wait for flash to finish before animating?
+    this.dispatcher.animCursorJumped();
   }
 
   public isAtEnd() {
