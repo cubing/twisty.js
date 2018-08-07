@@ -4,10 +4,10 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const WebpackNotifierPlugin = require("webpack-notifier");
 
 const package = require("./package.json");
-const libName = package["name"];
-const externals = package["externalsForWebpack"];
-
-const targetFileName = `${libName}.js`
+const umdName = package["umdName"] || package["name"];
+const externals = package["externalsForWebpack"] || [];
+const targetFileName = path.basename(package["main"]);
+const targetDirName = path.dirname(package["main"]);
 
 var PROD = JSON.parse(process.env.PROD || false);
 
@@ -35,8 +35,8 @@ module.exports = {
   },
   output: {
     filename: targetFileName,
-    path: path.resolve(__dirname, "dist"),
-    library: libName,
+    path: path.resolve(__dirname, targetDirName),
+    library: umdName,
     libraryTarget: "umd",
     // Workaround for Webpack 4. See https://github.com/webpack/webpack/issues/6522#issuecomment-371120689
     globalObject: "typeof self !== \"undefined\" ? self : this"
