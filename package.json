@@ -3,8 +3,8 @@
   "main": "./dist/twisty.js",
   "version": "0.9.10",
   "description": "Twisty puzzle simulation library. Stub; coming soon.",
-  "author": "Lucas Garron <code@garron.net> (https://garron.net/)",
-  "license": "MIT",
+  "author": "The js.cubing.net team",
+  "license": "GPL-3.0-or-later",
   "types": "./dist/index.d.ts",
   "dependencies": {
     "alg": "^0.9.10",
