@@ -1,14 +1,14 @@
 {
   "name": "twisty",
   "main": "./dist/twisty.js",
-  "version": "0.9.10",
+  "version": "0.9.16",
   "description": "Twisty puzzle simulation library. Stub; coming soon.",
   "author": "The js.cubing.net team",
   "license": "GPL-3.0-or-later",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "alg": "^0.9.10",
-    "kpuzzle": "^0.9.10"
+    "alg": "^0.9.16",
+    "kpuzzle": "^0.9.16"
   },
   "externalsForWebpack": [
     "alg",
