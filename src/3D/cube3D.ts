@@ -77,7 +77,7 @@ const r = {
   D: new THREE.Vector3( 0,  1,  0)
 }
 
-const edges: EdgeDef[] = [
+const edgeDefs: EdgeDef[] = [
   new EdgeDef(face.U, face.F, t(r.O, 0)),
   new EdgeDef(face.U, face.L, t(r.U, 1)),
   new EdgeDef(face.U, face.B, t(r.U, 2)),
@@ -95,6 +95,7 @@ const edges: EdgeDef[] = [
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
   private cube: THREE.Group;
+  private edges: THREE.Object3D[];
   constructor(def: KPuzzleDefinition) {
     super();
     if (def.name !== "333") {
@@ -152,10 +153,22 @@ export class Cube3D extends Twisty3D<Puzzle> {
     return cubie;
   }
 
+  private createCornerCubie(edge: EdgeDef): THREE.Object3D {
+    const cubie = new THREE.Group();
+    cubie.add(this.createCubieFoundation(new THREE.Vector3(0, 0, 0)));
+    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.U], axesInfo[edge.primaryStickerFace], false));
+    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.F], axesInfo[edge.secondaryStickerFace], false));
+    cubie.matrix.copy(edge.matrix);
+    cubie.matrixAutoUpdate = false;
+    return cubie;
+  }
+
   protected populateScene(): void {
+    this.edges = [];
     this.cube = new THREE.Group();
-    for (var edgeDef of edges) {
+    for (var edgeDef of edgeDefs) {
       const edge = this.createEdgeCubie(edgeDef);
+      this.edges.push(edge);
       this.cube.add(edge);
     }
     // for (var x = -1; x < 2; x++) {
@@ -171,6 +184,16 @@ export class Cube3D extends Twisty3D<Puzzle> {
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
-    this.cube.rotation.y = smootherStep(p.moves.length > 0 ? p.moves[0].fraction : 0) * TAU;
+    const rad = smootherStep(p.moves.length > 0 ? p.moves[0].fraction : 0) * TAU;
+    const uRotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(r.U, rad));
+    for (var i = 0; i < 4; i++) {
+      this.edges[i].matrix.copy(edgeDefs[i].matrix.clone());
+      this.edges[i].matrix.premultiply(uRotationMatrix);
+    }
+    const dRotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(r.U, -rad));
+    for (var i = 4; i < 8; i++) {
+      this.edges[i].matrix.copy(edgeDefs[i].matrix.clone());
+      this.edges[i].matrix.premultiply(dRotationMatrix);
+    }
   }
 }
