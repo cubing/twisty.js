@@ -78,6 +78,12 @@ const r = {
 
 const edgePos = new THREE.Vector3(0, 1, 1);
 const cornerPos = new THREE.Vector3(1, 1, 1);
+const centerPos = new THREE.Vector3(0, 1, 0);
+const cubieStickerOrder = [
+  face.U,
+  face.F,
+  face.R
+];
 
 const edgeDefs: CubieDef[] = [
   new CubieDef([face.U, face.F], edgePos, t(r.O, 0)),
@@ -105,11 +111,21 @@ const cornerDefs: CubieDef[] = [
   new CubieDef([face.D, face.B, face.R], cornerPos, t(r.F, 2).premultiply(t(r.D, 2)))
 ];
 
+const centerDefs: CubieDef[] = [
+  new CubieDef([face.U], centerPos, t(r.O, 0)),
+  new CubieDef([face.L], centerPos, t(r.R, 3).premultiply(t(r.U, 1))),
+  new CubieDef([face.F], centerPos, t(r.R, 3)),
+  new CubieDef([face.R], centerPos, t(r.R, 3).premultiply(t(r.D, 1))),
+  new CubieDef([face.B], centerPos, t(r.R, 3).premultiply(t(r.D, 2))),
+  new CubieDef([face.D], centerPos, t(r.R, 2))
+];
+
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
   private cube: THREE.Group;
   private edges: THREE.Object3D[];
   private corners: THREE.Object3D[];
+  private centers: THREE.Object3D[];
   constructor(def: KPuzzleDefinition) {
     super();
     if (def.name !== "333") {
@@ -135,41 +151,23 @@ export class Cube3D extends Twisty3D<Puzzle> {
     const box = new THREE.BoxGeometry(cubieDimensions.foundationWidth, cubieDimensions.foundationWidth, cubieDimensions.foundationWidth);
     return new THREE.Mesh(box, blackMesh);
   }
-  private createEdgeCubie(edge: CubieDef): THREE.Object3D {
+  private createCubie(edge: CubieDef): THREE.Object3D {
     const cubie = new THREE.Group();
     cubie.add(this.createCubieFoundation());
-    cubie.add(this.createSticker(axesInfo[face.U], axesInfo[edge.stickerFaces[0]], false));
-    cubie.add(this.createSticker(axesInfo[face.F], axesInfo[edge.stickerFaces[1]], false));
+    for (var i = 0; i < edge.stickerFaces.length; i++) {
+      cubie.add(this.createSticker(axesInfo[cubieStickerOrder[i]], axesInfo[edge.stickerFaces[i]], false));
+    }
     cubie.matrix.copy(edge.matrix);
     cubie.matrixAutoUpdate = false;
-    return cubie;
-  }
-
-  private createCornerCubie(corner: CubieDef): THREE.Object3D {
-    const cubie = new THREE.Group();
-    cubie.add(this.createCubieFoundation());
-    cubie.add(this.createSticker(axesInfo[face.U], axesInfo[corner.stickerFaces[0]], false));
-    cubie.add(this.createSticker(axesInfo[face.F], axesInfo[corner.stickerFaces[1]], false));
-    cubie.add(this.createSticker(axesInfo[face.R], axesInfo[corner.stickerFaces[2]], false));
-    cubie.matrix.copy(corner.matrix);
-    cubie.matrixAutoUpdate = false;
+    this.cube.add(cubie);
     return cubie;
   }
 
   protected populateScene(): void {
-    this.edges = [];
     this.cube = new THREE.Group();
-    for (var edgeDef of edgeDefs) {
-      const edge = this.createEdgeCubie(edgeDef);
-      this.edges.push(edge);
-      this.cube.add(edge);
-    }
-    this.corners = [];
-    for (var cornerDef of cornerDefs) {
-      const corner = this.createCornerCubie(cornerDef);
-      this.corners.push(corner);
-      this.cube.add(corner);
-    }
+    this.edges = edgeDefs.map(this.createCubie.bind(this));
+    this.corners = cornerDefs.map(this.createCubie.bind(this));
+    this.centers = centerDefs.map(this.createCubie.bind(this));
     this.cube.scale.set(1/3, 1/3, 1/3);
     this.scene.add(this.cube);
   }
@@ -184,6 +182,11 @@ export class Cube3D extends Twisty3D<Puzzle> {
 
       this.corners[i].matrix.copy(cornerDefs[i].matrix.clone());
       this.corners[i].matrix.premultiply(uRotationMatrix);
+
+      if (i == 0) {
+        this.centers[i].matrix.copy(centerDefs[i].matrix.clone());
+        this.centers[i].matrix.premultiply(uRotationMatrix);
+      }
     }
     for (var i = 4; i < 8; i++) {
       this.edges[i].matrix.copy(edgeDefs[i].matrix.clone());
@@ -191,6 +194,11 @@ export class Cube3D extends Twisty3D<Puzzle> {
 
       this.corners[i].matrix.copy(cornerDefs[i].matrix.clone());
       this.corners[i].matrix.premultiply(dRotationMatrix);
+
+      if (i == 5) {
+        this.centers[i].matrix.copy(centerDefs[i].matrix.clone());
+        this.centers[i].matrix.premultiply(dRotationMatrix);
+      }
     }
   }
 }
