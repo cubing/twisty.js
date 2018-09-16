@@ -4,6 +4,7 @@ import {Combine, KPuzzleDefinition, SVG, Transformation, stateForBlockMove} from
 import {CursorObserver, DirectionObserver, JumpObserver, AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle} from "./puzzle"
+import {Cube3D} from "./3D/cube3D"
 
 interface Document {
     mozCancelFullScreen: () => void;
@@ -251,12 +252,39 @@ export class KSolveView implements CursorObserver, JumpObserver {
   }
 }
 
+export class Cube3DView implements CursorObserver, JumpObserver {
+  public readonly element: HTMLElement;
+  private cube3D: Cube3D;
+  constructor(private anim: AnimModel, private definition: KPuzzleDefinition) {
+    this.element = document.createElement("cube3d-view");
+    this.anim.dispatcher.registerCursorObserver(this);
+    this.anim.dispatcher.registerJumpObserver(this);
+
+    this.cube3D = new Cube3D(definition); // TODO: Dynamic puzzle
+
+    setTimeout(function() {
+      this.cube3D.newVantage(this.element)
+    }.bind(this), 0);
+  }
+
+  animCursorChanged(cursor: Cursor<Puzzle>) {
+    this.cube3D.draw(cursor.currentPosition());
+  }
+
+  animCursorJumped() {
+    console.log("jumped KSolve");
+    this.element.classList.add("flash");
+    setTimeout(() => this.element.classList.remove("flash"), 0);
+  }
+}
+
 export class Player {
   public element: HTMLElement;
   constructor(private anim: AnimModel, definition: KPuzzleDefinition) {
     this.element = document.createElement("player");
 
-    this.element.appendChild((new KSolveView(this.anim, definition)).element);
+    // this.element.appendChild((new KSolveView(this.anim, definition)).element);
+    this.element.appendChild((new Cube3DView(this.anim, definition)).element);
     this.element.appendChild((new Scrubber(this.anim)).element);
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
     this.element.appendChild((new CursorTextMoveView(this.anim)).element);
