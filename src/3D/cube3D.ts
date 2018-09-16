@@ -70,30 +70,34 @@ export class Cube3D extends Twisty3D<Puzzle> {
     return new THREE.Mesh(box, blackMesh);
   }
 
+  private createCubie(position: THREE.Vector3): THREE.Object3D {
+    const cubie = new THREE.Group();
+    if (cubieConfig.showFoundation) {
+      cubie.add(this.createCubieFoundation(position));
+    }
+    for (var axisInfo of axesInfo) {
+      if (position.dot(axisInfo.vector) != 1) {
+        // Skip stickers that don't exist on this cubie.
+        continue;
+      }
+      if (cubieConfig.showMainStickers) {
+        cubie.add(this.createSticker(position, axisInfo, true));
+      }
+      if (cubieConfig.showHintStickers) {
+        cubie.add(this.createSticker(position, axisInfo, false));
+      }
+    }
+    cubie.position.set(position.x, position.y, position.z);
+    return cubie;
+  }
+
   protected populateScene(): void {
     this.cube = new THREE.Group();
     for (var x = -1; x < 2; x++) {
       for (var y = -1; y < 2; y++) {
         for (var z = -1; z < 2; z++) {
           const position = new THREE.Vector3(x, y, z);
-          const cubie = new THREE.Group();
-          if (cubieConfig.showFoundation) {
-            cubie.add(this.createCubieFoundation(position));
-          }
-          for (var axisInfo of axesInfo) {
-            if (position.dot(axisInfo.vector) != 1) {
-              // Skip stickers that don't exist on this cubie.
-              continue;
-            }
-            if (cubieConfig.showMainStickers) {
-              cubie.add(this.createSticker(position, axisInfo, true));
-            }
-            if (cubieConfig.showHintStickers) {
-              cubie.add(this.createSticker(position, axisInfo, false));
-            }
-          }
-          cubie.position.set(x, y, z);
-          this.cube.add(cubie);
+          this.cube.add(this.createCubie(position));
         }
       }
     }
