@@ -1,4 +1,4 @@
-import {KPuzzleDefinition} from "kpuzzle"
+import {KPuzzleDefinition, Transformation} from "kpuzzle"
 import * as THREE from 'three'
 
 import {Puzzle} from "../puzzle"
@@ -77,8 +77,11 @@ const r = {
 }
 
 const edgePos = new THREE.Vector3(0, 1, 1);
+const edgeRot = [0, 1].map(i => new THREE.Matrix4().makeRotationAxis(edgePos.clone().normalize(), -i * TAU/2));
 const cornerPos = new THREE.Vector3(1, 1, 1);
+const cornerRot = [0, 1, 2].map(i => new THREE.Matrix4().makeRotationAxis(cornerPos.clone().normalize(), -i * TAU/3));
 const centerPos = new THREE.Vector3(0, 1, 0);
+const centerRot = [0, 1, 2, 3].map(i => new THREE.Matrix4().makeRotationAxis(centerPos.clone().normalize(), -i * TAU/4));
 const cubieStickerOrder = [
   face.U,
   face.F,
@@ -96,8 +99,8 @@ const edgeDefs: CubieDef[] = [
   new CubieDef([face.D, face.L], edgePos, t(r.F, 2).premultiply(t(r.D, 3))),
   new CubieDef([face.F, face.R], edgePos, t(r.U, 3).premultiply(t(r.R, 3))),
   new CubieDef([face.F, face.L], edgePos, t(r.U, 1).premultiply(t(r.R, 3))),
-  new CubieDef([face.B, face.L], edgePos, t(r.U, 1).premultiply(t(r.R, 1))),
-  new CubieDef([face.B, face.R], edgePos, t(r.U, 3).premultiply(t(r.R, 1)))
+  new CubieDef([face.B, face.R], edgePos, t(r.U, 3).premultiply(t(r.R, 1))),
+  new CubieDef([face.B, face.L], edgePos, t(r.U, 1).premultiply(t(r.R, 1)))
 ];
 
 const cornerDefs: CubieDef[] = [
@@ -169,32 +172,21 @@ export class Cube3D extends Twisty3D<Puzzle> {
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
-    const rad = smootherStep(p.moves.length > 0 ? p.moves[0].fraction : 0) * TAU;
-    const uRotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(r.U, rad));
-    const dRotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(r.U, -rad));
-    for (var i = 0; i < 4; i++) {
-      this.edges[i].matrix.copy(edgeDefs[i].matrix.clone());
-      this.edges[i].matrix.premultiply(uRotationMatrix);
-
-      this.corners[i].matrix.copy(cornerDefs[i].matrix.clone());
-      this.corners[i].matrix.premultiply(uRotationMatrix);
-
-      if (i == 0) {
-        this.centers[i].matrix.copy(centerDefs[i].matrix.clone());
-        this.centers[i].matrix.premultiply(uRotationMatrix);
-      }
+    const reid333 = <Transformation>p.state;
+    for (var i = 0; i < 12; i++) {
+      const j = reid333["EDGE"].permutation[i];
+      this.edges[j].matrix.copy(edgeDefs[i].matrix);
+      this.edges[j].matrix.multiply(edgeRot[reid333["EDGE"].orientation[i]]);
     }
-    for (var i = 4; i < 8; i++) {
-      this.edges[i].matrix.copy(edgeDefs[i].matrix.clone());
-      this.edges[i].matrix.premultiply(dRotationMatrix);
-
-      this.corners[i].matrix.copy(cornerDefs[i].matrix.clone());
-      this.corners[i].matrix.premultiply(dRotationMatrix);
-
-      if (i == 5) {
-        this.centers[i].matrix.copy(centerDefs[i].matrix.clone());
-        this.centers[i].matrix.premultiply(dRotationMatrix);
-      }
+    for (var i = 0; i < 8; i++) {
+      const j = reid333["CORNER"].permutation[i];
+      this.corners[j].matrix.copy(cornerDefs[i].matrix);
+      this.corners[j].matrix.multiply(cornerRot[reid333["CORNER"].orientation[i]]);
+    }
+    for (var i = 0; i < 6; i++) {
+      const j = reid333["CENTER"].permutation[i];
+      this.centers[j].matrix.copy(centerDefs[i].matrix);
+      this.centers[j].matrix.multiply(centerRot[reid333["CORNER"].orientation[i]]);
     }
   }
 }
