@@ -106,6 +106,18 @@ twisty player cube3d-view.flash {
   transition: 0s;
 }
 
+twisty player cube3d-view {
+  position: relative;
+}
+
+twisty player cube3d-view cube3d-back-wrapper {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 25%;
+  height: 25%;
+}
+
 twisty player ksolve-svg-view .svg-wrapper,
 twisty player cube3d {
   width:  100%;

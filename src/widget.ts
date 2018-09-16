@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 import {Sequence, BlockMove, algToString} from "alg"
 import {Combine, KPuzzleDefinition, SVG, Transformation, stateForBlockMove} from "kpuzzle"
 
@@ -264,6 +266,17 @@ export class Cube3DView implements CursorObserver, JumpObserver {
 
     setTimeout(function() {
       this.cube3D.newVantage(this.element)
+    }.bind(this), 0);
+
+    this.createBackViewForTesting();
+  }
+
+  // TODO: Remove
+  createBackViewForTesting() {
+    const backWrapper = document.createElement("cube3d-back-wrapper");
+    this.element.appendChild(backWrapper);
+    setTimeout(function() {
+      this.cube3D.newVantage(backWrapper, {position: new THREE.Vector3(-1.25, -2.5, -2.5)})
     }.bind(this), 0);
   }
 
