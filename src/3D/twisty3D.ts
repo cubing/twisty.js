@@ -17,7 +17,7 @@ export type VantageOptions = {
   renderer?: THREE.Renderer
 }
 
-const defaultVantagePosition = new THREE.Vector3(2, 4, 3);
+const defaultVantagePosition = new THREE.Vector3(1.25, 2.5, 2.5);
 function createDefaultRenderer(): THREE.Renderer {
   return new THREE.WebGLRenderer({
     antialias: true,
