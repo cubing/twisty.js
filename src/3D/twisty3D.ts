@@ -17,6 +17,11 @@ export type VantageOptions = {
   renderer?: THREE.Renderer
 }
 
+// TODO: Handle if you move across screens?
+function pixelRatio(): number {
+  return devicePixelRatio || 1;
+}
+
 const defaultVantagePosition = new THREE.Vector3(1.25, 2.5, 2.5);
 function createDefaultRenderer(): THREE.Renderer {
   return new THREE.WebGLRenderer({
@@ -38,13 +43,22 @@ export abstract class Twisty3D<P extends Puzzle> {
     this.populateScene();
   }
 
+  private setRendererSize(renderer: THREE.Renderer, w: number, h: number): void {
+    renderer.setSize(w * pixelRatio(), h * pixelRatio());
+    renderer.domElement.width;
+    renderer.domElement.style.width = `${w}px`;
+    renderer.domElement.style.height = `${h}px`;
+    renderer.domElement.width = w * devicePixelRatio;
+    renderer.domElement.height = h * devicePixelRatio;
+  }
+
   public newVantage(element: HTMLElement, options: VantageOptions = {}): Vantage {
     let camera = new THREE.PerspectiveCamera(30, element.offsetWidth / element.offsetHeight, 0.1, 1000);
     camera.position.copy(options.position ? options.position : defaultVantagePosition);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     let renderer = options.renderer ? options.renderer : createDefaultRenderer();
-    renderer.setSize(element.offsetWidth, element.offsetHeight);
+    this.setRendererSize(renderer, element.offsetWidth, element.offsetHeight);
 
     renderer.render(this.scene, camera);
 
