@@ -86,7 +86,8 @@ twisty player cursor-text-view {
   font-family: monospace;
 }
 
-twisty player ksolve-svg-view {
+twisty player ksolve-svg-view,
+twisty player cube3d-view {
   display: flex;
   flex: 4 0 0;
   align-items: center;
@@ -99,12 +100,14 @@ twisty player ksolve-svg-view {
   /* TODO: dynamic fitting */
 }
 
-twisty player ksolve-svg-view.flash {
+twisty player ksolve-svg-view.flash,
+twisty player cube3d-view.flash {
   opacity: 0.25;
   transition: 0s;
 }
 
-twisty player ksolve-svg-view .svg-wrapper {
+twisty player ksolve-svg-view .svg-wrapper,
+twisty player cube3d {
   width:  100%;
   height: 100%;
   display: flex;
@@ -112,7 +115,7 @@ twisty player ksolve-svg-view .svg-wrapper {
   justify-content: center;
 }
 
-twisty player ksolve-svg-view .svg-wrapper svg {
+twisty player ksolve-svg-view .svg-wrapper  {
   width: 90%;
   height: 90%;
 }
