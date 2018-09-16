@@ -137,11 +137,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
     const geo = new THREE.PlaneGeometry(cubieDimensions.stickerWidth, cubieDimensions.stickerWidth);
     var stickerMesh = new THREE.Mesh(geo, isHint ? materialAxisInfo.hintStickerMaterial : materialAxisInfo.stickerMaterial);
     stickerMesh.setRotationFromEuler(posAxisInfo.fromZ);
-    stickerMesh.position.set(
-      posAxisInfo.vector.x,
-      posAxisInfo.vector.y,
-      posAxisInfo.vector.z
-    );
+    stickerMesh.position.copy(posAxisInfo.vector);
     stickerMesh.position.multiplyScalar(isHint ? cubieDimensions.hintStickerElevation : cubieDimensions.stickerElevation);
     return stickerMesh;
   }
