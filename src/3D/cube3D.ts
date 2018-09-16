@@ -26,6 +26,15 @@ const axesInfo: AxisInfo[] = [
   new AxisInfo(new THREE.Vector3( 0, -1,  0), new THREE.Euler( TAU/4,  0,  0), 0xffff00)
 ];
 
+const face = {
+  U: 0,
+  L: 1,
+  F: 2,
+  R: 3,
+  B: 4,
+  D: 5
+}
+
 const cubieDimensions = {
   stickerWidth: 0.85,
   stickerElevation: 0.501,
@@ -41,6 +50,48 @@ const cubieConfig = {
 
 const blackMesh = new THREE.MeshBasicMaterial({color: 0x000000});
 
+
+// TODO: Move outside class
+class EdgeDef {
+  public matrix: THREE.Matrix4;
+  constructor(public primaryStickerFace: number, public secondaryStickerFace: number, q: THREE.Quaternion) {
+    this.matrix = new THREE.Matrix4();
+    this.matrix.setPosition(new THREE.Vector3(0, 1, 1));
+    this.matrix.premultiply(new THREE.Matrix4().makeRotationFromQuaternion(q));
+  }
+}
+
+// TODO: Move outside class
+
+function t(v: THREE.Vector3, t4: number): THREE.Quaternion {
+  return new THREE.Quaternion().setFromAxisAngle(v, TAU * t4 / 4);
+}
+
+const r = {
+  O: new THREE.Vector3( 0,  0,  0),
+  U: new THREE.Vector3( 0, -1,  0),
+  L: new THREE.Vector3( 1,  0,  0),
+  F: new THREE.Vector3( 0,  0, -1),
+  R: new THREE.Vector3(-1,  0,  0),
+  B: new THREE.Vector3( 0,  0,  1),
+  D: new THREE.Vector3( 0,  1,  0)
+}
+
+const edges: EdgeDef[] = [
+  new EdgeDef(face.U, face.F, t(r.O, 0)),
+  new EdgeDef(face.U, face.L, t(r.U, 1)),
+  new EdgeDef(face.U, face.B, t(r.U, 2)),
+  new EdgeDef(face.U, face.R, t(r.U, 3)),
+  new EdgeDef(face.D, face.F, t(r.F, 2)),
+  new EdgeDef(face.D, face.R, t(r.F, 2).premultiply(t(r.D, 1))),
+  new EdgeDef(face.D, face.B, t(r.F, 2).premultiply(t(r.D, 2))),
+  new EdgeDef(face.D, face.L, t(r.F, 2).premultiply(t(r.D, 3))),
+  new EdgeDef(face.F, face.R, t(r.U, 3).premultiply(t(r.R, 3))),
+  new EdgeDef(face.F, face.L, t(r.U, 1).premultiply(t(r.R, 3))),
+  new EdgeDef(face.B, face.L, t(r.U, 1).premultiply(t(r.R, 1))),
+  new EdgeDef(face.B, face.R, t(r.U, 3).premultiply(t(r.R, 1)))
+];
+
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
   private cube: THREE.Group;
@@ -51,14 +102,14 @@ export class Cube3D extends Twisty3D<Puzzle> {
     }
   }
 
-  private createSticker(position: THREE.Vector3, axisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
+  private createSticker(position: THREE.Vector3, posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
     const geo = new THREE.PlaneGeometry(cubieDimensions.stickerWidth, cubieDimensions.stickerWidth);
-    var stickerMesh = new THREE.Mesh(geo, isHint ? axisInfo.hintStickerMaterial : axisInfo.stickerMaterial);
-    stickerMesh.setRotationFromEuler(axisInfo.fromZ);
+    var stickerMesh = new THREE.Mesh(geo, isHint ? materialAxisInfo.hintStickerMaterial : materialAxisInfo.stickerMaterial);
+    stickerMesh.setRotationFromEuler(posAxisInfo.fromZ);
     stickerMesh.position.set(
-      axisInfo.vector.x,
-      axisInfo.vector.y,
-      axisInfo.vector.z
+      posAxisInfo.vector.x,
+      posAxisInfo.vector.y,
+      posAxisInfo.vector.z
     );
     stickerMesh.position.multiplyScalar(isHint ? cubieDimensions.hintStickerElevation : cubieDimensions.stickerElevation);
     return stickerMesh;
@@ -81,26 +132,40 @@ export class Cube3D extends Twisty3D<Puzzle> {
         continue;
       }
       if (cubieConfig.showMainStickers) {
-        cubie.add(this.createSticker(position, axisInfo, true));
+        cubie.add(this.createSticker(position, axisInfo, axisInfo, true));
       }
       if (cubieConfig.showHintStickers) {
-        cubie.add(this.createSticker(position, axisInfo, false));
+        cubie.add(this.createSticker(position, axisInfo, axisInfo, false));
       }
     }
     cubie.position.set(position.x, position.y, position.z);
     return cubie;
   }
 
+  private createEdgeCubie(edge: EdgeDef): THREE.Object3D {
+    const cubie = new THREE.Group();
+    cubie.add(this.createCubieFoundation(new THREE.Vector3(0, 0, 0)));
+    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.U], axesInfo[edge.primaryStickerFace], false));
+    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.F], axesInfo[edge.secondaryStickerFace], false));
+    cubie.matrix.copy(edge.matrix);
+    cubie.matrixAutoUpdate = false;
+    return cubie;
+  }
+
   protected populateScene(): void {
     this.cube = new THREE.Group();
-    for (var x = -1; x < 2; x++) {
-      for (var y = -1; y < 2; y++) {
-        for (var z = -1; z < 2; z++) {
-          const position = new THREE.Vector3(x, y, z);
-          this.cube.add(this.createCubie(position));
-        }
-      }
+    for (var edgeDef of edges) {
+      const edge = this.createEdgeCubie(edgeDef);
+      this.cube.add(edge);
     }
+    // for (var x = -1; x < 2; x++) {
+    //   for (var y = -1; y < 2; y++) {
+    //     for (var z = -1; z < 2; z++) {
+    //       const position = new THREE.Vector3(x, y, z);
+    //       this.cube.add(this.createEdgeCubie(position));
+    //     }
+    //   }
+    // }
     this.cube.scale.set(1/3, 1/3, 1/3);
     this.scene.add(this.cube);
   }
