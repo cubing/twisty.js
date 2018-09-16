@@ -117,7 +117,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
     }
   }
 
-  private createSticker(position: THREE.Vector3, posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
+  private createSticker(posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
     const geo = new THREE.PlaneGeometry(cubieDimensions.stickerWidth, cubieDimensions.stickerWidth);
     var stickerMesh = new THREE.Mesh(geo, isHint ? materialAxisInfo.hintStickerMaterial : materialAxisInfo.stickerMaterial);
     stickerMesh.setRotationFromEuler(posAxisInfo.fromZ);
@@ -131,37 +131,15 @@ export class Cube3D extends Twisty3D<Puzzle> {
   }
 
   // TODO: Support creating only the outward-facing parts?
-  private createCubieFoundation(position: THREE.Vector3): THREE.Mesh {
+  private createCubieFoundation(): THREE.Mesh {
     const box = new THREE.BoxGeometry(cubieDimensions.foundationWidth, cubieDimensions.foundationWidth, cubieDimensions.foundationWidth);
     return new THREE.Mesh(box, blackMesh);
   }
-
-  private createCubie(position: THREE.Vector3): THREE.Object3D {
-    const cubie = new THREE.Group();
-    if (cubieConfig.showFoundation) {
-      cubie.add(this.createCubieFoundation(position));
-    }
-    for (var axisInfo of axesInfo) {
-      if (position.dot(axisInfo.vector) != 1) {
-        // Skip stickers that don't exist on this cubie.
-        continue;
-      }
-      if (cubieConfig.showMainStickers) {
-        cubie.add(this.createSticker(position, axisInfo, axisInfo, true));
-      }
-      if (cubieConfig.showHintStickers) {
-        cubie.add(this.createSticker(position, axisInfo, axisInfo, false));
-      }
-    }
-    cubie.position.set(position.x, position.y, position.z);
-    return cubie;
-  }
-
   private createEdgeCubie(edge: CubieDef): THREE.Object3D {
     const cubie = new THREE.Group();
-    cubie.add(this.createCubieFoundation(new THREE.Vector3(0, 0, 0)));
-    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.U], axesInfo[edge.stickerFaces[0]], false));
-    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.F], axesInfo[edge.stickerFaces[1]], false));
+    cubie.add(this.createCubieFoundation());
+    cubie.add(this.createSticker(axesInfo[face.U], axesInfo[edge.stickerFaces[0]], false));
+    cubie.add(this.createSticker(axesInfo[face.F], axesInfo[edge.stickerFaces[1]], false));
     cubie.matrix.copy(edge.matrix);
     cubie.matrixAutoUpdate = false;
     return cubie;
@@ -169,10 +147,10 @@ export class Cube3D extends Twisty3D<Puzzle> {
 
   private createCornerCubie(corner: CubieDef): THREE.Object3D {
     const cubie = new THREE.Group();
-    cubie.add(this.createCubieFoundation(new THREE.Vector3(0, 0, 0)));
-    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.U], axesInfo[corner.stickerFaces[0]], false));
-    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.F], axesInfo[corner.stickerFaces[1]], false));
-    cubie.add(this.createSticker(new THREE.Vector3(0, 0, 0), axesInfo[face.R], axesInfo[corner.stickerFaces[2]], false));
+    cubie.add(this.createCubieFoundation());
+    cubie.add(this.createSticker(axesInfo[face.U], axesInfo[corner.stickerFaces[0]], false));
+    cubie.add(this.createSticker(axesInfo[face.F], axesInfo[corner.stickerFaces[1]], false));
+    cubie.add(this.createSticker(axesInfo[face.R], axesInfo[corner.stickerFaces[2]], false));
     cubie.matrix.copy(corner.matrix);
     cubie.matrixAutoUpdate = false;
     return cubie;
@@ -192,14 +170,6 @@ export class Cube3D extends Twisty3D<Puzzle> {
       this.corners.push(corner);
       this.cube.add(corner);
     }
-    // for (var x = -1; x < 2; x++) {
-    //   for (var y = -1; y < 2; y++) {
-    //     for (var z = -1; z < 2; z++) {
-    //       const position = new THREE.Vector3(x, y, z);
-    //       this.cube.add(this.createEdgeCubie(position));
-    //     }
-    //   }
-    // }
     this.cube.scale.set(1/3, 1/3, 1/3);
     this.scene.add(this.cube);
   }
