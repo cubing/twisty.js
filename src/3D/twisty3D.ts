@@ -40,7 +40,6 @@ export abstract class Twisty3D<P extends Puzzle> {
   protected vantages: Vantage[] = [];
   constructor() {
     this.scene = new THREE.Scene();
-    this.populateScene();
   }
 
   private setRendererSize(renderer: THREE.Renderer, w: number, h: number): void {
@@ -78,6 +77,5 @@ export abstract class Twisty3D<P extends Puzzle> {
     }
   }
 
-  protected abstract populateScene(): void;
   protected abstract updateScene(p: Cursor.Position<P>): void;
 }

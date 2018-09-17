@@ -135,12 +135,13 @@ const pieceDefs: PieceIndexed<CubieDef> = {
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
   private cube: THREE.Group;
-  private pieces: PieceIndexed<THREE.Object3D>;
+  private pieces: PieceIndexed<THREE.Object3D> = {};
   constructor(def: KPuzzleDefinition) {
     super();
     if (def.name !== "333") {
       throw "Invalid puzzle for this Cube3D implementation."
     }
+    this.populateScene();
   }
 
   private createSticker(posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
@@ -169,8 +170,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
     return cubie;
   }
 
-  protected populateScene(): void {
-    this.pieces = {};
+  private populateScene(): void {
     this.cube = new THREE.Group();
     for (var orbit in pieceDefs) {
       this.pieces[orbit] = pieceDefs[orbit].map(this.createCubie.bind(this));
