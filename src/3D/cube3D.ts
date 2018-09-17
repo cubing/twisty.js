@@ -132,16 +132,22 @@ const pieceDefs: PieceIndexed<CubieDef> = {
   ]
 }
 
+const CUBE_SCALE = 1/3;
+
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
-  private cube: THREE.Group;
+  private cube: THREE.Group = new THREE.Group();
   private pieces: PieceIndexed<THREE.Object3D> = {};
   constructor(def: KPuzzleDefinition) {
     super();
     if (def.name !== "333") {
       throw "Invalid puzzle for this Cube3D implementation."
     }
-    this.populateScene();
+    for (var orbit in pieceDefs) {
+      this.pieces[orbit] = pieceDefs[orbit].map(this.createCubie.bind(this));
+    }
+    this.cube.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
+    this.scene.add(this.cube);
   }
 
   private createSticker(posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
@@ -169,15 +175,6 @@ export class Cube3D extends Twisty3D<Puzzle> {
     cubie.matrixAutoUpdate = false;
     this.cube.add(cubie);
     return cubie;
-  }
-
-  private populateScene(): void {
-    this.cube = new THREE.Group();
-    for (var orbit in pieceDefs) {
-      this.pieces[orbit] = pieceDefs[orbit].map(this.createCubie.bind(this));
-    }
-    this.cube.scale.set(1/3, 1/3, 1/3);
-    this.scene.add(this.cube);
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
