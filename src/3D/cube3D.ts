@@ -150,21 +150,6 @@ export class Cube3D extends Twisty3D<Puzzle> {
     this.scene.add(this.cube);
   }
 
-  private createSticker(posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
-    const geo = new THREE.PlaneGeometry(cubieDimensions.stickerWidth, cubieDimensions.stickerWidth);
-    var stickerMesh = new THREE.Mesh(geo, isHint ? materialAxisInfo.hintStickerMaterial : materialAxisInfo.stickerMaterial);
-    stickerMesh.setRotationFromEuler(posAxisInfo.fromZ);
-    stickerMesh.position.copy(posAxisInfo.vector);
-    stickerMesh.position.multiplyScalar(isHint ? cubieDimensions.hintStickerElevation : cubieDimensions.stickerElevation);
-    return stickerMesh;
-  }
-
-  // TODO: Support creating only the outward-facing parts?
-  private createCubieFoundation(): THREE.Mesh {
-    const box = new THREE.BoxGeometry(cubieDimensions.foundationWidth, cubieDimensions.foundationWidth, cubieDimensions.foundationWidth);
-    return new THREE.Mesh(box, blackMesh);
-  }
-
   private createCubie(edge: CubieDef): THREE.Object3D {
     const cubie = new THREE.Group();
     cubie.add(this.createCubieFoundation());
@@ -175,6 +160,21 @@ export class Cube3D extends Twisty3D<Puzzle> {
     cubie.matrixAutoUpdate = false;
     this.cube.add(cubie);
     return cubie;
+  }
+
+  // TODO: Support creating only the outward-facing parts?
+  private createCubieFoundation(): THREE.Mesh {
+    const box = new THREE.BoxGeometry(cubieDimensions.foundationWidth, cubieDimensions.foundationWidth, cubieDimensions.foundationWidth);
+    return new THREE.Mesh(box, blackMesh);
+  }
+
+  private createSticker(posAxisInfo: AxisInfo, materialAxisInfo: AxisInfo, isHint: boolean): THREE.Mesh {
+    const geo = new THREE.PlaneGeometry(cubieDimensions.stickerWidth, cubieDimensions.stickerWidth);
+    var stickerMesh = new THREE.Mesh(geo, isHint ? materialAxisInfo.hintStickerMaterial : materialAxisInfo.stickerMaterial);
+    stickerMesh.setRotationFromEuler(posAxisInfo.fromZ);
+    stickerMesh.position.copy(posAxisInfo.vector);
+    stickerMesh.position.multiplyScalar(isHint ? cubieDimensions.hintStickerElevation : cubieDimensions.stickerElevation);
+    return stickerMesh;
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
