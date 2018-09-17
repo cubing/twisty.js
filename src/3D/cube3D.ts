@@ -158,6 +158,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
     const box = new THREE.BoxGeometry(cubieDimensions.foundationWidth, cubieDimensions.foundationWidth, cubieDimensions.foundationWidth);
     return new THREE.Mesh(box, blackMesh);
   }
+
   private createCubie(edge: CubieDef): THREE.Object3D {
     const cubie = new THREE.Group();
     cubie.add(this.createCubieFoundation());
