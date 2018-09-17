@@ -26,7 +26,7 @@ const axesInfo: AxisInfo[] = [
   new AxisInfo(new THREE.Vector3( 0, -1,  0), new THREE.Euler( TAU/4,  0,  0), 0xffff00)
 ];
 
-const face = {
+const face: {[s: string]: number} = {
   U: 0,
   L: 1,
   F: 2,
@@ -52,9 +52,14 @@ const blackMesh = new THREE.MeshBasicMaterial({color: 0x000000});
 
 class CubieDef {
   public matrix: THREE.Matrix4;
-  constructor(public stickerFaces: number[], pos: THREE.Vector3, q: THREE.Quaternion) {
+  public stickerFaces: number[];
+  // stickerFaceNames can be e.g. ["U", "F", "R"], "UFR" if every face is a single letter.
+  constructor(public orbit: string, stickerFaceNames: string[] | string, q: THREE.Quaternion) {
+    const individualStickerFaceNames = typeof stickerFaceNames === "string" ? stickerFaceNames.split("") : stickerFaceNames;
+    this.stickerFaces = individualStickerFaceNames.map(s => face[s]);
+    console.log(this.stickerFaces);
     this.matrix = new THREE.Matrix4();
-    this.matrix.setPosition(pos);
+    this.matrix.setPosition(firstPiecePosition[orbit]);
     this.matrix.premultiply(new THREE.Matrix4().makeRotationFromQuaternion(q));
   }
 }
@@ -73,59 +78,64 @@ const r = {
   D: new THREE.Vector3( 0,  1,  0)
 }
 
-const edgePos = new THREE.Vector3(0, 1, 1);
-const edgeRot = [0, 1].map(i => new THREE.Matrix4().makeRotationAxis(edgePos.clone().normalize(), -i * TAU/2));
-const cornerPos = new THREE.Vector3(1, 1, 1);
-const cornerRot = [0, 1, 2].map(i => new THREE.Matrix4().makeRotationAxis(cornerPos.clone().normalize(), -i * TAU/3));
-const centerPos = new THREE.Vector3(0, 1, 0);
-const centerRot = [0, 1, 2, 3].map(i => new THREE.Matrix4().makeRotationAxis(centerPos.clone().normalize(), -i * TAU/4));
+interface OrbitIndexed<T> {[s: string]: T}
+interface PieceIndexed<T> extends OrbitIndexed<T[]> {}
+
+const firstPiecePosition: OrbitIndexed<THREE.Vector3> = {
+  "EDGE": new THREE.Vector3(0, 1, 1),
+  "CORNER": new THREE.Vector3(1, 1, 1),
+  "CENTER": new THREE.Vector3(0, 1, 0)
+}
+const orientationRotation: OrbitIndexed<THREE.Matrix4[]> = {
+  "EDGE": [0, 1].map(i => new THREE.Matrix4().makeRotationAxis(firstPiecePosition["EDGE"].clone().normalize(), -i * TAU/2)),
+  "CORNER": [0, 1, 2].map(i => new THREE.Matrix4().makeRotationAxis(firstPiecePosition["CORNER"].clone().normalize(), -i * TAU/3)),
+  "CENTER": [0, 1, 2, 3].map(i => new THREE.Matrix4().makeRotationAxis(firstPiecePosition["CENTER"].clone().normalize(), -i * TAU/4))
+}
 const cubieStickerOrder = [
   face.U,
   face.F,
   face.R
 ];
 
-const edgeDefs: CubieDef[] = [
-  new CubieDef([face.U, face.F], edgePos, t(r.O, 0)),
-  new CubieDef([face.U, face.L], edgePos, t(r.U, 1)),
-  new CubieDef([face.U, face.B], edgePos, t(r.U, 2)),
-  new CubieDef([face.U, face.R], edgePos, t(r.U, 3)),
-  new CubieDef([face.D, face.F], edgePos, t(r.F, 2)),
-  new CubieDef([face.D, face.R], edgePos, t(r.F, 2).premultiply(t(r.D, 1))),
-  new CubieDef([face.D, face.B], edgePos, t(r.F, 2).premultiply(t(r.D, 2))),
-  new CubieDef([face.D, face.L], edgePos, t(r.F, 2).premultiply(t(r.D, 3))),
-  new CubieDef([face.F, face.R], edgePos, t(r.U, 3).premultiply(t(r.R, 3))),
-  new CubieDef([face.F, face.L], edgePos, t(r.U, 1).premultiply(t(r.R, 3))),
-  new CubieDef([face.B, face.R], edgePos, t(r.U, 3).premultiply(t(r.R, 1))),
-  new CubieDef([face.B, face.L], edgePos, t(r.U, 1).premultiply(t(r.R, 1)))
-];
-
-const cornerDefs: CubieDef[] = [
-  new CubieDef([face.U, face.F, face.R], cornerPos, t(r.O, 0)),
-  new CubieDef([face.U, face.R, face.B], cornerPos, t(r.U, 3)),
-  new CubieDef([face.U, face.B, face.L], cornerPos, t(r.U, 2)),
-  new CubieDef([face.U, face.L, face.F], cornerPos, t(r.U, 1)),
-  new CubieDef([face.D, face.R, face.F], cornerPos, t(r.F, 2).premultiply(t(r.D, 1))),
-  new CubieDef([face.D, face.F, face.L], cornerPos, t(r.F, 2).premultiply(t(r.D, 0))),
-  new CubieDef([face.D, face.L, face.B], cornerPos, t(r.F, 2).premultiply(t(r.D, 3))),
-  new CubieDef([face.D, face.B, face.R], cornerPos, t(r.F, 2).premultiply(t(r.D, 2)))
-];
-
-const centerDefs: CubieDef[] = [
-  new CubieDef([face.U], centerPos, t(r.O, 0)),
-  new CubieDef([face.L], centerPos, t(r.R, 3).premultiply(t(r.U, 1))),
-  new CubieDef([face.F], centerPos, t(r.R, 3)),
-  new CubieDef([face.R], centerPos, t(r.R, 3).premultiply(t(r.D, 1))),
-  new CubieDef([face.B], centerPos, t(r.R, 3).premultiply(t(r.D, 2))),
-  new CubieDef([face.D], centerPos, t(r.R, 2))
-];
+const pieceDefs: PieceIndexed<CubieDef> = {
+  "EDGE": [
+    new CubieDef("EDGE", "UF", t(r.O, 0)),
+    new CubieDef("EDGE", "UL", t(r.U, 1)),
+    new CubieDef("EDGE", "UB", t(r.U, 2)),
+    new CubieDef("EDGE", "UR", t(r.U, 3)),
+    new CubieDef("EDGE", "DF", t(r.F, 2)),
+    new CubieDef("EDGE", "DR", t(r.F, 2).premultiply(t(r.D, 1))),
+    new CubieDef("EDGE", "DB", t(r.F, 2).premultiply(t(r.D, 2))),
+    new CubieDef("EDGE", "DL", t(r.F, 2).premultiply(t(r.D, 3))),
+    new CubieDef("EDGE", "FR", t(r.U, 3).premultiply(t(r.R, 3))),
+    new CubieDef("EDGE", "FL", t(r.U, 1).premultiply(t(r.R, 3))),
+    new CubieDef("EDGE", "BR", t(r.U, 3).premultiply(t(r.R, 1))),
+    new CubieDef("EDGE", "BL", t(r.U, 1).premultiply(t(r.R, 1)))
+  ],
+  "CORNER": [
+    new CubieDef("CORNER", "UFR", t(r.O, 0)),
+    new CubieDef("CORNER", "URB", t(r.U, 3)),
+    new CubieDef("CORNER", "UBL", t(r.U, 2)),
+    new CubieDef("CORNER", "ULF", t(r.U, 1)),
+    new CubieDef("CORNER", "DRF", t(r.F, 2).premultiply(t(r.D, 1))),
+    new CubieDef("CORNER", "DFL", t(r.F, 2).premultiply(t(r.D, 0))),
+    new CubieDef("CORNER", "DLB", t(r.F, 2).premultiply(t(r.D, 3))),
+    new CubieDef("CORNER", "DBR", t(r.F, 2).premultiply(t(r.D, 2)))
+  ],
+  "CENTER": [
+    new CubieDef("CENTER", "U", t(r.O, 0)),
+    new CubieDef("CENTER", "L", t(r.R, 3).premultiply(t(r.U, 1))),
+    new CubieDef("CENTER", "F", t(r.R, 3)),
+    new CubieDef("CENTER", "R", t(r.R, 3).premultiply(t(r.D, 1))),
+    new CubieDef("CENTER", "B", t(r.R, 3).premultiply(t(r.D, 2))),
+    new CubieDef("CENTER", "D", t(r.R, 2))
+  ]
+}
 
 // TODO: Split into "scene model" and "view".
 export class Cube3D extends Twisty3D<Puzzle> {
   private cube: THREE.Group;
-  private edges: THREE.Object3D[];
-  private corners: THREE.Object3D[];
-  private centers: THREE.Object3D[];
+  private pieces: PieceIndexed<THREE.Object3D>;
   constructor(def: KPuzzleDefinition) {
     super();
     if (def.name !== "333") {
@@ -160,30 +170,24 @@ export class Cube3D extends Twisty3D<Puzzle> {
   }
 
   protected populateScene(): void {
+    this.pieces = {};
     this.cube = new THREE.Group();
-    this.edges = edgeDefs.map(this.createCubie.bind(this));
-    this.corners = cornerDefs.map(this.createCubie.bind(this));
-    this.centers = centerDefs.map(this.createCubie.bind(this));
+    for (var orbit in pieceDefs) {
+      this.pieces[orbit] = pieceDefs[orbit].map(this.createCubie.bind(this));
+    }
     this.cube.scale.set(1/3, 1/3, 1/3);
     this.scene.add(this.cube);
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
     const reid333 = <Transformation>p.state;
-    for (var i = 0; i < 12; i++) {
-      const j = reid333["EDGE"].permutation[i];
-      this.edges[j].matrix.copy(edgeDefs[i].matrix);
-      this.edges[j].matrix.multiply(edgeRot[reid333["EDGE"].orientation[i]]);
-    }
-    for (var i = 0; i < 8; i++) {
-      const j = reid333["CORNER"].permutation[i];
-      this.corners[j].matrix.copy(cornerDefs[i].matrix);
-      this.corners[j].matrix.multiply(cornerRot[reid333["CORNER"].orientation[i]]);
-    }
-    for (var i = 0; i < 6; i++) {
-      const j = reid333["CENTER"].permutation[i];
-      this.centers[j].matrix.copy(centerDefs[i].matrix);
-      this.centers[j].matrix.multiply(centerRot[reid333["CORNER"].orientation[i]]);
+    for (var orbit in pieceDefs) {
+      const pieces = pieceDefs[orbit];
+      for (var i = 0; i < pieces.length; i++) {
+        const j = reid333[orbit].permutation[i];
+        this.pieces[orbit][j].matrix.copy(pieceDefs[orbit][i].matrix);
+        this.pieces[orbit][j].matrix.multiply(orientationRotation[orbit][reid333[orbit].orientation[i]]);
+      }
     }
   }
 }
