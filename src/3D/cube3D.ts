@@ -50,7 +50,6 @@ const cubieConfig = {
 
 const blackMesh = new THREE.MeshBasicMaterial({color: 0x000000});
 
-// TODO: Move outside class
 class CubieDef {
   public matrix: THREE.Matrix4;
   constructor(public stickerFaces: number[], pos: THREE.Vector3, q: THREE.Quaternion) {
@@ -59,8 +58,6 @@ class CubieDef {
     this.matrix.premultiply(new THREE.Matrix4().makeRotationFromQuaternion(q));
   }
 }
-
-// TODO: Move outside class
 
 function t(v: THREE.Vector3, t4: number): THREE.Quaternion {
   return new THREE.Quaternion().setFromAxisAngle(v, TAU * t4 / 4);
