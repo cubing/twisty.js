@@ -50,7 +50,7 @@ if (PROD) {
     new UglifyJSPlugin({
       sourceMap: true,
       uglifyOptions: {
-        keep_classnames: true
+        mangle: false
       }
     })
   );
