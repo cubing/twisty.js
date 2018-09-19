@@ -1,10 +1,10 @@
-import {SiGNMove} from "alg"
-import {Combine, EquivalentStates, Invert, KPuzzle, KPuzzleDefinition, Puzzles, Transformation, stateForSiGNMove} from "kpuzzle"
+import {BlockMove} from "alg"
+import {Combine, EquivalentStates, Invert, KPuzzle, KPuzzleDefinition, Puzzles, Transformation, stateForBlockMove} from "kpuzzle"
 
 export type MoveName = string
 
 export interface MoveProgress {
-  signMove: SiGNMove
+  blockMove: BlockMove
   fraction: number
 }
 
@@ -26,7 +26,7 @@ export abstract class Puzzle {
     }
     return newState;
   }
-  abstract stateFromMove(signMove: SiGNMove): State<Puzzle>
+  abstract stateFromMove(blockMove: BlockMove): State<Puzzle>
   abstract equivalent(s1: State<Puzzle>, s2: State<Puzzle>): boolean
 }
 
@@ -51,8 +51,8 @@ export class KSolvePuzzle extends Puzzle {
   combine(s1: KSolvePuzzleState, s2: KSolvePuzzleState): KSolvePuzzleState {
     return Combine(this.definition, s1, s2);
   }
-  stateFromMove(signMove: SiGNMove): KSolvePuzzleState {
-    return stateForSiGNMove(this.definition, signMove);
+  stateFromMove(blockMove: BlockMove): KSolvePuzzleState {
+    return stateForBlockMove(this.definition, blockMove);
   }
   equivalent(s1: KSolvePuzzleState, s2: KSolvePuzzleState): boolean {
     return EquivalentStates(this.definition, s1, s2);
@@ -73,8 +73,8 @@ export class QTMCounterPuzzle extends Puzzle {
   combine(s1: QTMCounterState, s2: QTMCounterState): QTMCounterState {
     return new QTMCounterState(s1.value + s2.value);
   }
-  stateFromMove(signMove: SiGNMove): QTMCounterState {
-    return new QTMCounterState(Math.abs(signMove.amount));
+  stateFromMove(blockMove: BlockMove): QTMCounterState {
+    return new QTMCounterState(Math.abs(blockMove.amount));
   }
   equivalent(s1: QTMCounterState, s2: QTMCounterState): boolean {
     return s1.value === s2.value;

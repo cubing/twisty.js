@@ -1,6 +1,6 @@
 import {
   AlgPart,
-  SiGNMove,
+  BlockMove,
   CommentLong,
   CommentShort,
   Commutator,
@@ -29,7 +29,7 @@ class CountAnimatedMoves extends TraversalUp<number> {
   public traverseGroup(group: Group): number {
     return this.traverseSequence(group.nestedSequence);
   }
-  public traverseSiGNMove(signMove: SiGNMove): number {
+  public traverseBlockMove(blockMove: BlockMove): number {
     return 1;
   }
   public traverseCommutator(commutator: Commutator): number {
@@ -146,8 +146,8 @@ export class Cursor<P extends Puzzle> {
 
     while (this.moveIdx < this.numMoves()) {
       var move = this.moves.nestedUnits[this.moveIdx];
-      if(!(move instanceof SiGNMove)) {
-        throw "TODO - only SiGNMove supported";
+      if(!(move instanceof BlockMove)) {
+        throw "TODO - only BlockMove supported";
       }
       var lengthOfMove = this.durationFn.traverse(move);
       if (remainingOffset < lengthOfMove) {
@@ -185,8 +185,8 @@ export class Cursor<P extends Puzzle> {
       }
 
       var prevMove = this.moves.nestedUnits[this.moveIdx - 1];
-      if(!(prevMove instanceof SiGNMove)) {
-        throw "TODO - only SiGNMove supported";
+      if(!(prevMove instanceof BlockMove)) {
+        throw "TODO - only BlockMove supported";
       }
 
       this.state = this.puzzle.combine(
@@ -266,7 +266,7 @@ export namespace Cursor {
       return total;
     }
     public traverseGroup(group: Group):                      Duration { return group.amount * this.traverse(group.nestedSequence); }
-    public traverseSiGNMove(signMove: SiGNMove):             Duration { return this.durationForAmount(signMove.amount); }
+    public traverseBlockMove(blockMove: BlockMove):             Duration { return this.durationForAmount(blockMove.amount); }
     public traverseCommutator(commutator: Commutator):       Duration { return commutator.amount * 2 * (this.traverse(commutator.A) + this.traverse(commutator.B)); }
     public traverseConjugate(conjugate: Conjugate):          Duration { return conjugate.amount * (2 * this.traverse(conjugate.A) + this.traverse(conjugate.B)); }
     public traversePause(pause: Pause):                      Duration { return this.durationForAmount(1); }

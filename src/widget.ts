@@ -1,5 +1,5 @@
-import {Sequence, SiGNMove, algToString} from "alg"
-import {Combine, KPuzzleDefinition, SVG, Transformation, stateForSiGNMove} from "kpuzzle"
+import {Sequence, BlockMove, algToString} from "alg"
+import {Combine, KPuzzleDefinition, SVG, Transformation, stateForBlockMove} from "kpuzzle"
 
 import {CursorObserver, DirectionObserver, JumpObserver, AnimModel} from "./anim"
 import {Cursor} from "./cursor"
@@ -229,14 +229,14 @@ export class KSolveView implements CursorObserver, JumpObserver {
     var pos = cursor.currentPosition();
     if (pos.moves.length > 0) {
 
-      var move = (pos.moves[0].move as SiGNMove);
+      var move = (pos.moves[0].move as BlockMove);
 
       var def = this.definition;
-      var partialMove = new SiGNMove(move.outerLayer, move.innerLayer, move.family, move.amount * pos.moves[0].direction)
+      var partialMove = new BlockMove(move.outerLayer, move.innerLayer, move.family, move.amount * pos.moves[0].direction)
       var newState = Combine(
         def,
         pos.state as Transformation,
-        stateForSiGNMove(def, partialMove)
+        stateForBlockMove(def, partialMove)
       );
       this.svg.draw(this.definition, pos.state as Transformation, newState, pos.moves[0].fraction);
     } else {
