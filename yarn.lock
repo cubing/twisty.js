@@ -181,9 +181,9 @@ ajv@^6.1.0:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.1"
 
-alg@^0.9.16:
-  version "0.9.16"
-  resolved "https://registry.yarnpkg.com/alg/-/alg-0.9.16.tgz#954d536c7232adaf91a486460927e59e1a9883e0"
+alg@^0.9.17:
+  version "0.9.17"
+  resolved "https://registry.yarnpkg.com/alg/-/alg-0.9.17.tgz#33a5b1a6c2419641a5ce056bfee3052e4bb54d18"
 
 amdefine@>=0.0.4:
   version "1.0.1"
@@ -1908,11 +1908,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
-kpuzzle@^0.9.16:
-  version "0.9.16"
-  resolved "https://registry.yarnpkg.com/kpuzzle/-/kpuzzle-0.9.16.tgz#f95f9319a200d37837e6185b428a23d183c47bdb"
+kpuzzle@^0.9.17:
+  version "0.9.17"
+  resolved "https://registry.yarnpkg.com/kpuzzle/-/kpuzzle-0.9.17.tgz#123a1c8cab8a532f36f97d8c0eba51a61dc16c6f"
   dependencies:
-    alg "^0.9.16"
+    alg "^0.9.17"
 
 lcid@^1.0.0:
   version "1.0.0"
