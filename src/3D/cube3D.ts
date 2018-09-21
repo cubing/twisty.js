@@ -100,9 +100,9 @@ const cubieStickerOrder = [
 const pieceDefs: PieceIndexed<CubieDef> = {
   "EDGE": [
     new CubieDef("EDGE", "UF", t(r.O, 0)),
-    new CubieDef("EDGE", "UL", t(r.U, 1)),
-    new CubieDef("EDGE", "UB", t(r.U, 2)),
     new CubieDef("EDGE", "UR", t(r.U, 3)),
+    new CubieDef("EDGE", "UB", t(r.U, 2)),
+    new CubieDef("EDGE", "UL", t(r.U, 1)),
     new CubieDef("EDGE", "DF", t(r.F, 2)),
     new CubieDef("EDGE", "DR", t(r.F, 2).premultiply(t(r.D, 1))),
     new CubieDef("EDGE", "DB", t(r.F, 2).premultiply(t(r.D, 2))),
