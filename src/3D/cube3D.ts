@@ -57,7 +57,6 @@ class CubieDef {
   constructor(public orbit: string, stickerFaceNames: string[] | string, q: THREE.Quaternion) {
     const individualStickerFaceNames = typeof stickerFaceNames === "string" ? stickerFaceNames.split("") : stickerFaceNames;
     this.stickerFaces = individualStickerFaceNames.map(s => face[s]);
-    console.log(this.stickerFaces);
     this.matrix = new THREE.Matrix4();
     this.matrix.setPosition(firstPiecePosition[orbit]);
     this.matrix.premultiply(new THREE.Matrix4().makeRotationFromQuaternion(q));
