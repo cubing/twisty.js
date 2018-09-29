@@ -1,4 +1,5 @@
-import {KPuzzleDefinition, Transformation} from "kpuzzle"
+import {algToString, Sequence, BlockMove} from "alg"
+import {KPuzzleDefinition, Transformation, Puzzles} from "kpuzzle"
 import * as THREE from 'three'
 
 import {Puzzle} from "../puzzle"
@@ -177,6 +178,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
   }
 
   protected updateScene(p: Cursor.Position<Puzzle>) {
+    console.log(p);
     const reid333 = <Transformation>p.state;
     for (var orbit in pieceDefs) {
       const pieces = pieceDefs[orbit];
@@ -184,6 +186,21 @@ export class Cube3D extends Twisty3D<Puzzle> {
         const j = reid333[orbit].permutation[i];
         this.pieces[orbit][j].matrix.copy(pieceDefs[orbit][i].matrix);
         this.pieces[orbit][j].matrix.multiply(orientationRotation[orbit][reid333[orbit].orientation[i]]);
+      }
+      for (var moveProgress of p.moves) {
+        const blockMove = moveProgress.move as BlockMove;
+        const turnNormal = axesInfo[face[blockMove.family]].vector;
+        console.log(blockMove.family);
+        const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - moveProgress.fraction * moveProgress.direction * blockMove.amount * TAU/4);
+        if (algToString(new Sequence([moveProgress.move])) === "R") {
+          const affectedPieces = [];
+          for (var i = 0; i < pieces.length; i++) {
+            const j = Puzzles["333"].moves[blockMove.family][orbit].permutation[i];
+            if (i !== j || Puzzles["333"].moves[blockMove.family][orbit].orientation[i] !== 0) {
+              this.pieces[orbit][j].matrix.premultiply(moveMatrix);
+            }
+          }
+        }
       }
     }
   }
