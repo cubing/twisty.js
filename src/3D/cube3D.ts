@@ -1,4 +1,5 @@
-import {KPuzzleDefinition, Transformation} from "kpuzzle"
+import {algToString, Sequence, BlockMove} from "alg"
+import {KPuzzleDefinition, Transformation, Puzzles} from "kpuzzle"
 import * as THREE from 'three'
 
 import {Puzzle} from "../puzzle"
@@ -184,6 +185,18 @@ export class Cube3D extends Twisty3D<Puzzle> {
         const j = reid333[orbit].permutation[i];
         this.pieces[orbit][j].matrix.copy(pieceDefs[orbit][i].matrix);
         this.pieces[orbit][j].matrix.multiply(orientationRotation[orbit][reid333[orbit].orientation[i]]);
+      }
+      for (var moveProgress of p.moves) {
+        const blockMove = moveProgress.move as BlockMove;
+        const turnNormal = axesInfo[face[blockMove.family]].vector;
+        const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - moveProgress.fraction * moveProgress.direction * blockMove.amount * TAU/4);
+        for (var i = 0; i < pieces.length; i++) {
+          const k = Puzzles["333"].moves[blockMove.family][orbit].permutation[i];
+          if (i !== k || Puzzles["333"].moves[blockMove.family][orbit].orientation[i] !== 0) {
+            const j = reid333[orbit].permutation[i];
+            this.pieces[orbit][j].matrix.premultiply(moveMatrix);
+          }
+        }
       }
     }
   }
