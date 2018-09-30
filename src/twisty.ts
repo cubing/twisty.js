@@ -9,8 +9,8 @@ import {Player} from "./widget"
 "use strict";
 
 class TwistyParams {
-   alg?: Sequence;
-   puzzle?: KPuzzleDefinition;
+  alg?: Sequence;
+  puzzle?: KPuzzleDefinition;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
