@@ -36,6 +36,15 @@ const face: {[s: string]: number} = {
   D: 5
 }
 
+const familyToAxis: {[s: string]: number} = {
+  "U": face["U"], "u": face["U"], "y": face["U"],
+  "L": face["L"], "l": face["L"], "M": face["L"],
+  "F": face["F"], "f": face["F"], "S": face["F"], "z": face["F"],
+  "R": face["R"], "r": face["R"], "x": face["R"],
+  "B": face["B"], "b": face["B"],
+  "D": face["D"], "d": face["D"], "E": face["D"]
+}
+
 const cubieDimensions = {
   stickerWidth: 0.85,
   stickerElevation: 0.501,
@@ -188,7 +197,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
       }
       for (var moveProgress of p.moves) {
         const blockMove = moveProgress.move as BlockMove;
-        const turnNormal = axesInfo[face[blockMove.family]].vector;
+        const turnNormal = axesInfo[familyToAxis[blockMove.family]].vector;
         const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - moveProgress.fraction * moveProgress.direction * blockMove.amount * TAU/4);
         for (var i = 0; i < pieces.length; i++) {
           const k = Puzzles["333"].moves[blockMove.family][orbit].permutation[i];
