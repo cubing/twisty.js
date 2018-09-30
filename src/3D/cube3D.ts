@@ -186,6 +186,10 @@ export class Cube3D extends Twisty3D<Puzzle> {
     return stickerMesh;
   }
 
+  private ease(fraction: number) {
+    return smootherStep(fraction)
+  }
+
   protected updateScene(p: Cursor.Position<Puzzle>) {
     const reid333 = <Transformation>p.state;
     for (var orbit in pieceDefs) {
@@ -198,7 +202,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
       for (var moveProgress of p.moves) {
         const blockMove = moveProgress.move as BlockMove;
         const turnNormal = axesInfo[familyToAxis[blockMove.family]].vector;
-        const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - moveProgress.fraction * moveProgress.direction * blockMove.amount * TAU/4);
+        const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - this.ease(moveProgress.fraction) * moveProgress.direction * blockMove.amount * TAU/4);
         for (var i = 0; i < pieces.length; i++) {
           const k = Puzzles["333"].moves[blockMove.family][orbit].permutation[i];
           if (i !== k || Puzzles["333"].moves[blockMove.family][orbit].orientation[i] !== 0) {
