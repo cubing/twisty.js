@@ -72,7 +72,7 @@ export abstract class Twisty3D<P extends Puzzle> {
 
   public draw(p: Cursor.Position<P>): void {
     this.updateScene(p);
-    for (var vantage of this.vantages) {
+    for (const vantage of this.vantages) {
       vantage.renderer.render(this.scene, vantage.camera);
     }
   }

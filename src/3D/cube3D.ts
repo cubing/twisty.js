@@ -199,7 +199,7 @@ export class Cube3D extends Twisty3D<Puzzle> {
         this.pieces[orbit][j].matrix.copy(pieceDefs[orbit][i].matrix);
         this.pieces[orbit][j].matrix.multiply(orientationRotation[orbit][reid333[orbit].orientation[i]]);
       }
-      for (var moveProgress of p.moves) {
+      for (const moveProgress of p.moves) {
         const blockMove = moveProgress.move as BlockMove;
         const turnNormal = axesInfo[familyToAxis[blockMove.family]].vector;
         const moveMatrix = new THREE.Matrix4().makeRotationAxis(turnNormal, - this.ease(moveProgress.fraction) * moveProgress.direction * blockMove.amount * TAU/4);
