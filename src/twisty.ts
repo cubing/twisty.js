@@ -4,13 +4,14 @@ import {KPuzzle, KPuzzleDefinition, Puzzles} from "kpuzzle"
 import {AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle, State, KSolvePuzzle} from "./puzzle"
-import {Player} from "./widget"
+import {Player, VisualizationFormat} from "./widget"
 
 "use strict";
 
 class TwistyParams {
-   alg?: Sequence;
-   puzzle?: KPuzzleDefinition;
+  alg?: Sequence;
+  puzzle?: KPuzzleDefinition;
+  visualization?: VisualizationFormat;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
@@ -26,7 +27,7 @@ export class Twisty {
     // this.timeline = new Timeline(Example.HeadlightSwaps);
     this.anim = new AnimModel(this.cursor);
 
-    this.element.appendChild((new Player(this.anim, this.puzzleDef)).element);
+    this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization)).element);
   }
 }
 
@@ -41,6 +42,16 @@ function paramsFromTwistyElem(elem: Element): TwistyParams {
   var algo = elem.getAttribute("alg");
   if (algo) {
     params.alg = parse(algo); // TODO: parse
+  }
+
+  var visualization = elem.getAttribute("visualization");
+  // TODO: Factor this code out for testing.
+  if (visualization) {
+    if (visualization === "2D" || visualization === "3D") {
+      params.visualization = visualization;
+    } else {
+      console.warn(`Invalid visualization: ${visualization}`)
+    }
   }
 
   return params;

@@ -50,21 +50,21 @@ export class Dispatcher implements CursorObserver, DirectionObserver {
 
   animCursorChanged(cursor: Cursor<Puzzle>) {
     // TODO: guard against nested changes and test.
-    for (var observer of this.cursorObservers) {
+    for (const observer of this.cursorObservers) {
       observer.animCursorChanged(cursor);
     }
   }
 
   animDirectionChanged(direction: Cursor.Direction) {
     // TODO: guard against nested changes and test.
-    for (var observer of this.directionObservers) {
+    for (const observer of this.directionObservers) {
       observer.animDirectionChanged(direction);
     }
   }
 
   animCursorJumped() {
     // TODO: guard against nested changes and test.
-    for (var observer of this.jumpObservers) {
+    for (const observer of this.jumpObservers) {
       observer.animCursorJumped();
     }
   }

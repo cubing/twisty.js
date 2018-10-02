@@ -21,7 +21,7 @@ import {Puzzle, State} from "./puzzle"
 class CountAnimatedMoves extends TraversalUp<number> {
   public traverseSequence(sequence: Sequence): number {
     var total = 0;
-    for (var part of sequence.nestedUnits) {
+    for (const part of sequence.nestedUnits) {
       total += this.traverse(part);
     }
     return total;
@@ -260,7 +260,7 @@ export namespace Cursor {
 
     public traverseSequence(sequence: Sequence):             Duration {
       var total = 0;
-      for (var alg of sequence.nestedUnits) {
+      for (const alg of sequence.nestedUnits) {
         total += this.traverse(alg)
       }
       return total;
