@@ -13,15 +13,7 @@
       var elem = document.querySelector("#custom-example");
       var tw = new twisty.Twisty(elem, {
         puzzle: kpuzzle.Puzzles["pyram"],
-        alg: new alg.Sequence([
-          new alg.BlockMove("R",  1),
-          new alg.BlockMove("U",  1),
-          new alg.BlockMove("R", -1),
-          new alg.BlockMove("U",  1),
-          new alg.BlockMove("R",  1),
-          new alg.BlockMove("U",  1),
-          new alg.BlockMove("R", -1)
-        ])
+        alg: alg.parse("R U R' U R U R' U")
       });
     });
   </script>
