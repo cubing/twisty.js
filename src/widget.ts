@@ -302,11 +302,15 @@ export class Player {
       if (definition.name === "333") {
         this.element.appendChild((new Cube3DView(this.anim, definition)).element);
       } else {
-        console.warn(`3D visualization specified for unsupprted puzzle: ${definition.name}. Falling back to 2D.`);
+        console.warn(`3D visualization specified for unsupported puzzle: ${definition.name}. Falling back to 2D.`);
         this.element.appendChild((new KSolveView(this.anim, definition)).element);
       }
     } else {
-      this.element.appendChild((new KSolveView(this.anim, definition)).element);
+      if (!visualizationFormat && definition.name === "333") {
+        this.element.appendChild((new Cube3DView(this.anim, definition)).element);
+      } else {
+        this.element.appendChild((new KSolveView(this.anim, definition)).element);
+      }
     }
     this.element.appendChild((new Scrubber(this.anim)).element);
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
