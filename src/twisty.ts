@@ -12,6 +12,7 @@ class TwistyParams {
   alg?: Sequence;
   puzzle?: KPuzzleDefinition;
   visualization?: VisualizationFormat;
+  stickerDat?: any;
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
@@ -27,7 +28,7 @@ export class Twisty {
     // this.timeline = new Timeline(Example.HeadlightSwaps);
     this.anim = new AnimModel(this.cursor);
 
-    this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization)).element);
+    this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization, config.stickerDat)).element);
   }
 }
 
