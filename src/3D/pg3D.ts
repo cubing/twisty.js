@@ -111,7 +111,7 @@ export class PG3D extends Twisty3D<Puzzle> {
       for (const moveProgress of p.moves) {
         const blockMove = moveProgress.move as BlockMove;
         var fullMove = stateForBlockMove(this.definition, blockMove) ;
-        var ax = this.axesInfo[blockMove.family] ;
+        var ax = this.axesInfo[blockMove.family.toUpperCase()] ;
         const turnNormal = ax.axis ;
         const angle = - this.ease(moveProgress.fraction) *
                     moveProgress.direction * blockMove.amount * TAU/ax.order ;
