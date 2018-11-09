@@ -7,8 +7,8 @@
   "license": "GPL-3.0-or-later",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "alg": "^0.9.17",
-    "kpuzzle": "^0.9.17",
+    "alg": "^0.9.18",
+    "kpuzzle": "^0.9.18",
     "three": "^0.96.0"
   },
   "externalsForWebpack": [
