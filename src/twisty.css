@@ -127,7 +127,7 @@ twisty player cube3d {
   justify-content: center;
 }
 
-twisty player ksolve-svg-view .svg-wrapper  {
+twisty player ksolve-svg-view .svg-wrapper svg  {
   width: 90%;
   height: 90%;
 }
