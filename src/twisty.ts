@@ -30,7 +30,7 @@ export class Twisty {
     this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization)).element);
   }
 
-  // Plays the full final move.
+  // Plays the full final move if there is one.
   experimentalSetAlg(alg: Sequence) {
     this.anim.skipToStart();
     this.alg = alg;
@@ -40,8 +40,8 @@ export class Twisty {
       // TODO: This is a hack.
       this.cursor.backward(0.01, false); // TODO: Give this API to `Cursor`/`AnimModel`.
       this.cursor.backward(100000, true); // TODO: Give this API to `Cursor`/`AnimModel`.
+      this.anim.stepForward();
     }
-    this.anim.stepForward();
   }
 }
 
