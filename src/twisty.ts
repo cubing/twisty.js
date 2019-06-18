@@ -29,6 +29,7 @@ export class Twisty {
     this.element.appendChild((new Player(this.anim, this.puzzleDef)).element);
   }
 
+  // Plays the full final move.
   experimentalSetAlg(alg: Sequence) {
     this.anim.skipToStart();
     this.alg = alg;
