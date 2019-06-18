@@ -62,9 +62,13 @@ export class Cursor<P extends Puzzle> {
     this.durationFn = new Cursor.AlgDuration(Cursor.DefaultDurationForAmount)
   }
 
+  public experimentalSetMoves(alg: Sequence) {
+    this.setMoves(alg);
+  }
+
   private setMoves(alg: Sequence) {
     var moves = expand(alg);
-    if (moves instanceof Sequence) {
+    if (moves.type == "sequence") {
       this.moves = moves
     } else {
       this.moves = new Sequence([moves]);
@@ -146,8 +150,8 @@ export class Cursor<P extends Puzzle> {
 
     while (this.moveIdx < this.numMoves()) {
       var move = this.moves.nestedUnits[this.moveIdx];
-      if(!(move instanceof BlockMove)) {
-        throw "TODO - only BlockMove supported";
+      if(move.type != "blockMove") {
+        throw "TODO — Only BlockMove supported for cursor.";
       }
       var lengthOfMove = this.durationFn.traverse(move);
       if (remainingOffset < lengthOfMove) {
@@ -156,7 +160,7 @@ export class Cursor<P extends Puzzle> {
       }
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.stateFromMove(move)
+        this.puzzle.stateFromMove(move as BlockMove)
       );
       this.moveIdx += 1;
       this.moveStartTimestamp += lengthOfMove;
@@ -185,13 +189,13 @@ export class Cursor<P extends Puzzle> {
       }
 
       var prevMove = this.moves.nestedUnits[this.moveIdx - 1];
-      if(!(prevMove instanceof BlockMove)) {
+      if(prevMove.type != "blockMove") {
         throw "TODO - only BlockMove supported";
       }
 
       this.state = this.puzzle.combine(
         this.state,
-        this.puzzle.invert(this.puzzle.stateFromMove(prevMove))
+        this.puzzle.invert(this.puzzle.stateFromMove(prevMove as BlockMove))
       );
       var lengthOfMove = this.durationFn.traverse(prevMove);
       this.moveIdx -= 1;

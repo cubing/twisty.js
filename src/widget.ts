@@ -1,9 +1,12 @@
+import * as THREE from 'three'
+
 import {Sequence, BlockMove, algToString} from "alg"
 import {Combine, KPuzzleDefinition, SVG, Transformation, stateForBlockMove} from "kpuzzle"
 
 import {CursorObserver, DirectionObserver, JumpObserver, AnimModel} from "./anim"
 import {Cursor} from "./cursor"
 import {Puzzle} from "./puzzle"
+import {Cube3D} from "./3D/cube3D"
 
 interface Document {
     mozCancelFullScreen: () => void;
@@ -39,6 +42,13 @@ namespace FullscreenAPI {
                          (document as any).webkitExitFullscreen;
     exitFullscreen.call(document);
   }
+}
+
+// TODO: Expose this as a config per instance.
+var showJumpingFlash = true;
+export function experimentalShowJumpingFlash(show: boolean): void {
+  console.log("show jumping flash:", show)
+  showJumpingFlash = show;
 }
 
 export abstract class Button {
@@ -245,18 +255,61 @@ export class KSolveView implements CursorObserver, JumpObserver {
   }
 
   animCursorJumped() {
-    console.log("jumped KSolve");
-    this.element.classList.add("flash");
-    setTimeout(() => this.element.classList.remove("flash"), 0);
+    if (showJumpingFlash) {
+      this.element.classList.add("flash");
+      setTimeout(() => this.element.classList.remove("flash"), 0);
+    }
+  }
+}
+
+export class Cube3DView implements CursorObserver, JumpObserver {
+  public readonly element: HTMLElement;
+  private cube3D: Cube3D;
+  constructor(private anim: AnimModel, private definition: KPuzzleDefinition) {
+    this.element = document.createElement("cube3d-view");
+    this.anim.dispatcher.registerCursorObserver(this);
+    this.anim.dispatcher.registerJumpObserver(this);
+
+    this.cube3D = new Cube3D(definition); // TODO: Dynamic puzzle
+
+    setTimeout(function() {
+      this.cube3D.newVantage(this.element)
+    }.bind(this), 0);
+
+    this.createBackViewForTesting();
+  }
+
+  // TODO: Remove
+  createBackViewForTesting() {
+    const backWrapper = document.createElement("cube3d-back-wrapper");
+    this.element.appendChild(backWrapper);
+    setTimeout(function() {
+      this.cube3D.newVantage(backWrapper, {position: new THREE.Vector3(-1.25, -2.5, -2.5)})
+    }.bind(this), 0);
+  }
+
+  animCursorChanged(cursor: Cursor<Puzzle>) {
+    this.cube3D.draw(cursor.currentPosition());
+  }
+
+  animCursorJumped() {
+    if (showJumpingFlash) {
+      this.element.classList.add("flash");
+      setTimeout(() => this.element.classList.remove("flash"), 0);
+    }
   }
 }
 
 export class Player {
   public element: HTMLElement;
-  constructor(private anim: AnimModel, definition: KPuzzleDefinition) {
+  constructor(private anim: AnimModel, definition: KPuzzleDefinition, params: {experimental3D?: boolean} = {}) {
     this.element = document.createElement("player");
 
-    this.element.appendChild((new KSolveView(this.anim, definition)).element);
+    if (params.experimental3D) {
+      this.element.appendChild((new Cube3DView(this.anim, definition)).element);
+    } else {
+      this.element.appendChild((new KSolveView(this.anim, definition)).element);
+    }
     this.element.appendChild((new Scrubber(this.anim)).element);
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
     this.element.appendChild((new CursorTextMoveView(this.anim)).element);
