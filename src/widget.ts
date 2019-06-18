@@ -44,6 +44,13 @@ namespace FullscreenAPI {
   }
 }
 
+// TODO: Expose this as a config per instance.
+var showJumpingFlash = true;
+export function experimentalShowJumpingFlash(show: boolean): void {
+  console.log("show jumping flash:", show)
+  showJumpingFlash = show;
+}
+
 export abstract class Button {
   public element: HTMLButtonElement;
   constructor(title: string, initialClass: string) {
@@ -249,8 +256,10 @@ export class KSolveView implements CursorObserver, JumpObserver {
 
   animCursorJumped() {
     console.log("jumped KSolve");
-    this.element.classList.add("flash");
-    setTimeout(() => this.element.classList.remove("flash"), 0);
+    if (showJumpingFlash) {
+      this.element.classList.add("flash");
+      setTimeout(() => this.element.classList.remove("flash"), 0);
+    }
   }
 }
 
@@ -286,8 +295,10 @@ export class Cube3DView implements CursorObserver, JumpObserver {
 
   animCursorJumped() {
     console.log("jumped KSolve");
-    this.element.classList.add("flash");
-    setTimeout(() => this.element.classList.remove("flash"), 0);
+    if (showJumpingFlash) {
+      this.element.classList.add("flash");
+      setTimeout(() => this.element.classList.remove("flash"), 0);
+    }
   }
 }
 
