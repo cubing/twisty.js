@@ -62,6 +62,10 @@ export class Cursor<P extends Puzzle> {
     this.durationFn = new Cursor.AlgDuration(Cursor.DefaultDurationForAmount)
   }
 
+  public experimentalSetMoves(alg: Sequence) {
+    this.setMoves(alg);
+  }
+
   private setMoves(alg: Sequence) {
     var moves = expand(alg);
     if (moves.type == "sequence") {
