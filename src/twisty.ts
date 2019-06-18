@@ -20,6 +20,7 @@ export class Twisty {
   private anim: AnimModel;
   private cursor: Cursor<Puzzle>;
   private puzzleDef: KPuzzleDefinition; // TODO: Replace this with a Puzzle instance.
+  private player: Player;
   constructor(public element: Element, config: TwistyParams = {}) {
     this.alg = config.alg || Example.Niklas;
     this.puzzleDef = config.puzzle || Puzzles["333"];
@@ -27,7 +28,8 @@ export class Twisty {
     // this.timeline = new Timeline(Example.HeadlightSwaps);
     this.anim = new AnimModel(this.cursor);
 
-    this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization)).element);
+    this.player = new Player(this.anim, this.puzzleDef, config.visualization);
+    this.element.appendChild((this.player).element);
   }
 
   // Plays the full final move if there is one.
@@ -36,6 +38,7 @@ export class Twisty {
     this.alg = alg;
     this.cursor.experimentalSetMoves(alg);
     this.anim.skipToEnd();
+    this.player.updateFromAnim();
     if (this.anim.cursor.currentTimestamp() > 0) {
       // TODO: This is a hack.
       this.cursor.backward(0.01, false); // TODO: Give this API to `Cursor`/`AnimModel`.

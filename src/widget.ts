@@ -146,11 +146,15 @@ export class Scrubber implements CursorObserver {
     this.element.type = "range";
 
     this.element.addEventListener("input", this.oninput.bind(this));
+    this.updateFromAnim();
+    this.anim.dispatcher.registerCursorObserver(this);
+  }
+
+  updateFromAnim() {
     var bounds = this.anim.getBounds();
     this.element.min = String(bounds[0]);
     this.element.max = String(bounds[1]);
     this.element.value = String(this.anim.cursor.currentTimestamp());
-    this.anim.dispatcher.registerCursorObserver(this);
   }
 
   private updateBackground() {
@@ -304,6 +308,7 @@ export class Cube3DView implements CursorObserver, JumpObserver {
 
 export class Player {
   public element: HTMLElement;
+  private scrubber: Scrubber;
   constructor(private anim: AnimModel, definition: KPuzzleDefinition, visualizationFormat?: VisualizationFormat) {
     this.element = document.createElement("player");
 
@@ -321,8 +326,13 @@ export class Player {
         this.element.appendChild((new KSolveView(this.anim, definition)).element);
       }
     }
-    this.element.appendChild((new Scrubber(this.anim)).element);
+    this.scrubber = new Scrubber(this.anim);
+    this.element.appendChild(this.scrubber.element);
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
     this.element.appendChild((new CursorTextMoveView(this.anim)).element);
+  }
+
+  updateFromAnim(): void {
+    this.scrubber.updateFromAnim()
   }
 }
