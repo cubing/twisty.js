@@ -11,6 +11,9 @@ import {Player} from "./widget"
 class TwistyParams {
    alg?: Sequence;
    puzzle?: KPuzzleDefinition;
+   player?: {
+    experimental3D?: boolean
+   }
 }
 
 // TODO: Turn Twisty into a module and move Twisty.Twisty into Twisty proper.
@@ -26,7 +29,7 @@ export class Twisty {
     // this.timeline = new Timeline(Example.HeadlightSwaps);
     this.anim = new AnimModel(this.cursor);
 
-    this.element.appendChild((new Player(this.anim, this.puzzleDef)).element);
+    this.element.appendChild((new Player(this.anim, this.puzzleDef, config.player)).element);
   }
 
   // Plays the full final move.

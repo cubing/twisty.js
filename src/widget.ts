@@ -302,11 +302,14 @@ export class Cube3DView implements CursorObserver, JumpObserver {
 
 export class Player {
   public element: HTMLElement;
-  constructor(private anim: AnimModel, definition: KPuzzleDefinition) {
+  constructor(private anim: AnimModel, definition: KPuzzleDefinition, params: {experimental3D?: boolean} = {}) {
     this.element = document.createElement("player");
 
-    // this.element.appendChild((new KSolveView(this.anim, definition)).element);
-    this.element.appendChild((new Cube3DView(this.anim, definition)).element);
+    if (params.experimental3D) {
+      this.element.appendChild((new Cube3DView(this.anim, definition)).element);
+    } else {
+      this.element.appendChild((new KSolveView(this.anim, definition)).element);
+    }
     this.element.appendChild((new Scrubber(this.anim)).element);
     this.element.appendChild((new ControlBar(this.anim, this.element)).element);
     this.element.appendChild((new CursorTextMoveView(this.anim)).element);
