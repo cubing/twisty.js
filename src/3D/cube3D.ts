@@ -164,6 +164,9 @@ export class Cube3D extends Twisty3D<Puzzle> {
     cubie.add(this.createCubieFoundation());
     for (var i = 0; i < edge.stickerFaces.length; i++) {
       cubie.add(this.createSticker(axesInfo[cubieStickerOrder[i]], axesInfo[edge.stickerFaces[i]], false));
+      if (cubieConfig.showHintStickers) {
+        cubie.add(this.createSticker(axesInfo[cubieStickerOrder[i]], axesInfo[edge.stickerFaces[i]], true));
+      }
     }
     cubie.matrix.copy(edge.matrix);
     cubie.matrixAutoUpdate = false;

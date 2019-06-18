@@ -83,10 +83,10 @@ describe("Durations", () => {
 //       var actualMove = pos.moves[i].move;
 
 
-//       if (!(expectedMove instanceof Alg.BlockMove)) {
+//       if (expectedMove.type != "blockMove")) {
 //         return false;
 //       }
-//       if (!(actualMove instanceof Alg.BlockMove)) {
+//       if (actualMove.type != "blockMove")) {
 //         return false;
 //       }
 

@@ -7,8 +7,9 @@
   "license": "GPL-3.0-or-later",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "alg": "^0.9.18",
+    "alg": "^0.9.23",
     "kpuzzle": "^0.9.18",
+    "terser-webpack-plugin": "^1.3.0",
     "three": "^0.96.0"
   },
   "externalsForWebpack": [

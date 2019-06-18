@@ -29,6 +29,20 @@ export class Twisty {
 
     this.element.appendChild((new Player(this.anim, this.puzzleDef, config.visualization)).element);
   }
+
+  // Plays the full final move.
+  experimentalSetAlg(alg: Sequence) {
+    this.anim.skipToStart();
+    this.alg = alg;
+    this.cursor.experimentalSetMoves(alg);
+    this.anim.skipToEnd();
+    if (this.anim.cursor.currentTimestamp() > 0) {
+      // TODO: This is a hack.
+      this.cursor.backward(0.01, false); // TODO: Give this API to `Cursor`/`AnimModel`.
+      this.cursor.backward(100000, true); // TODO: Give this API to `Cursor`/`AnimModel`.
+    }
+    this.anim.stepForward();
+  }
 }
 
 function paramsFromTwistyElem(elem: Element): TwistyParams {
