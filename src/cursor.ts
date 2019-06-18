@@ -172,7 +172,7 @@ export class Cursor<P extends Puzzle> {
     }
     return true;
   }
-  backward(duration: Cursor.Duration, stopAtStartOfMove: boolean): /* TODO: Remove this. Represents of move breakpoint was reachec. */ boolean {
+  backward(duration: Cursor.Duration, stopAtStartOfMove: boolean): /* TODO: Remove this. Represents of move breakpoint was reached. */ boolean {
     if (duration < 0) {
       throw "negative";
     }
