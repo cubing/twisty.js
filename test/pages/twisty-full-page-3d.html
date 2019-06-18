@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Full-Page Test | twisty.js</title>
+  <script src="../../node_modules/alg/dist/alg.js"></script>
+  <script src="../../node_modules/kpuzzle/dist/kpuzzle.js"></script>
+  <script src="../../dist/twisty.js"></script>
+
+  <link href="../../src/twisty.css" rel="stylesheet" type="text/css">
+  <link href="twisty-full-page.css" rel="stylesheet" type="text/css">
+  <script>
+    window.addEventListener("load", function() {
+      var elem = document.querySelector("#custom-example");
+      var tw = new twisty.Twisty(elem, {
+        puzzle: kpuzzle.Puzzles["333"],
+        alg: alg.parse("U M' U' R' U' R U M2' U' R' U r"),
+        player: {
+          experimental3D: true
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <twisty id="custom-example" initialization="custom"></twisty>
+</body>
+</html>
