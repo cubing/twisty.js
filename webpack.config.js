@@ -1,6 +1,6 @@
 const path = require("path");
 const webpack = require('webpack');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const WebpackNotifierPlugin = require("webpack-notifier");
 
 const package = require("./package.json");
@@ -46,22 +46,24 @@ module.exports = {
 
 if (PROD) {
   // https://webpack.js.org/concepts/mode/#mode-production
-  module.exports.plugins.push(
-    new UglifyJSPlugin({
-      sourceMap: true,
-      uglifyOptions: {
-        mangle: false
-      }
-    })
-  );
-  module.exports.plugins.push(
-    new webpack.DefinePlugin({"process.env.NODE_ENV": JSON.stringify("production")})
-  );
-  module.exports.plugins.push(
-    new webpack.optimize.ModuleConcatenationPlugin()
-  );
+  module.exports.mode = "production";
+  module.exports.optimization = {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          keep_classnames: true,
+          keep_fnames: true,
+          // We actually only want to keep function arguments (for console
+          // completion), but all the minifiers I've found group this with
+          // mangling internal variable names. :-/
+          // So we take the size hit. Apps will have to minify their final
+          // builds if they want to save more on size.
+          mangle: false
+        },
+      }),
+    ]
+  };
   module.exports.plugins.push(
     new webpack.NoEmitOnErrorsPlugin()
   );
 }
-
