@@ -255,7 +255,6 @@ export class KSolveView implements CursorObserver, JumpObserver {
   }
 
   animCursorJumped() {
-    console.log("jumped KSolveView");
     if (showJumpingFlash) {
       this.element.classList.add("flash");
       setTimeout(() => this.element.classList.remove("flash"), 0);
@@ -294,7 +293,6 @@ export class Cube3DView implements CursorObserver, JumpObserver {
   }
 
   animCursorJumped() {
-    console.log("jumped Cube3DView");
     if (showJumpingFlash) {
       this.element.classList.add("flash");
       setTimeout(() => this.element.classList.remove("flash"), 0);
