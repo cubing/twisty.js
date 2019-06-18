@@ -1,7 +1,7 @@
 {
   "name": "twisty",
   "main": "./dist/twisty.js",
-  "version": "0.9.18",
+  "version": "0.9.23",
   "description": "Twisty puzzle simulation library.",
   "author": "The js.cubing.net team",
   "license": "GPL-3.0-or-later",
